@@ -1,2 +1,2 @@
-# Trading-Bot
-Trading Bot made with Pandas, Numpy and Scikit-learn
+# FinTech Projects
+Repository with the fintech projects finished.
