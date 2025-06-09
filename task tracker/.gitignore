@@ -1,0 +1,24 @@
+# Build artifacts
+target/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE specific
+.vscode/
+.idea/
+*.iml
+*.swp
+*.classpath
+.project
+.settings/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+tmp/
