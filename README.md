@@ -1,2 +1,2 @@
-# FinTech Projects
-Repository with the fintech projects finished.
+# Backend roadmap.sh
+Repository with projects for the backend role from roadmap.sh
