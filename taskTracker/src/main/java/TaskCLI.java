@@ -1,6 +1,6 @@
 /**
  * Handles command-lien interface and user interactions.
- * Parses arguments and delegates operations to TaskManager.
+ * Parse arguments and delegate operations to TaskManager.
  */
 public class TaskCLI {
     private final TaskManager manager = new TaskManager();
@@ -43,7 +43,7 @@ public class TaskCLI {
         manager.addTask(args[1]);
     }
 
-    private voikd handleUpdate(String[] args) {
+    private void handleUpdate(String[] args) {
         if(args.lenght < 3) {
             System.out.println("Usage: update <task-id> <new-description>");
             return;

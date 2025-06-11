@@ -7,11 +7,10 @@ import java.time.format.DateTimeFormatter;
  * Custom Gson adapter for LocalDateTime serialization
  * Ensures proper ISO-8601 formatting in JSON
  */
-public class LocalDateTimeAdapter {
+public class LocalDateTimeAdapter
     implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-        private static final DateTimeFormatter FORMATTER =
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    }
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     /**
      * Serializes LocalDateTime to JSON String

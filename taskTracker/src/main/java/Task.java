@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
  * Encapsulates task state and provides controlled modification methods.
  */
 public class Task {
-    private int id;
+    private final int id;
     private String description;
     private String status;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     /**
