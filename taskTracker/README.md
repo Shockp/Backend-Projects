@@ -25,29 +25,29 @@ A simple command-line task tracker application built in Java that allows you to 
 3. Execute commands using: `mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='[command]'`
 
 ## Commands
-### Basic Command Structure
+#### Basic Command Structure
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='[command] [arguments]'
-### Add New Task
+#### Add New Task
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='add "Buy groceries"'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='add "Write documentation"'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='add "Review code changes"'
-### Delete Task
+#### Delete Task
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='delete 1'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='delete 5'
-### Update Task Description
+#### Update Task Description
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='update 1 "Buy organic groceries"'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='update 2 "Write comprehensive documentation"'
-### Change Task Status
+#### Change Task Status
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='mark-in-progress 1'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='mark-in-progress 2'
 
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='mark-done 1'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='mark-done 3'
-### List Tasks
+#### List Tasks
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='list'
 
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='list todo'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='list in-progress'
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='list done'
-### Get Help
+#### Get Help
 - mvn exec:java -Dexec.mainClass="TaskCLI" -Dexec.args='help'
