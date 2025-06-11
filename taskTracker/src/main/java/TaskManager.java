@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * Manages task lifecycle operations and JSON persistence.
- * Handles all CRUD operations and maintans data integrity.
+ * Handles all CRUD operations and maintains data integrity.
  */
 public class TaskManager {
     private List<Task> tasks = new ArrayList<>();
@@ -18,7 +18,7 @@ public class TaskManager {
     private final Gson gson;
 
     /**
-     * Initializes taskManager with JSON configuration.
+     * Initializes TaskManager with JSON configuration.
      * Automatically loads tasks from JSON file if it exists.
      */
     public TaskManager() {
@@ -30,14 +30,14 @@ public class TaskManager {
     }
 
     /**
-     * Adds new task to the system.
+     * Adds a new task to the system.
      * @param description Task description (minimum 3 characters)
      */
     public void addTask(String description) {
         Task newTask = new Task(nextId++, description);
         tasks.add(newTask);
         saveTasks();
-        System.out.println("Added Task ID %d%n", newTask.getId());
+        System.out.printf("Added Task ID %d%n", newTask.getId());
     }
 
     /**
@@ -50,9 +50,9 @@ public class TaskManager {
                 task -> {
                     task.setDescription(newDescription);
                     saveTasks();
-                    System.out.println("Updated Task ID %d%n", id);
+                    System.out.printf("Updated Task ID %d%n", id);
                 },
-                () -> System.out.println("Task not found with ID %d%n", id)
+                () -> System.out.printf("Task not found with ID %d%n", id)
         );
     }
 
@@ -61,11 +61,11 @@ public class TaskManager {
      * @param id Target task ID.
      */
     public void deleteTask(int id) {
-        if(task.removeIf(task -> task.getId() == id)) {
+        if(tasks.removeIf(task -> task.getId() == id)) {
             saveTasks();
-            System.out.println("Deleted Task ID %d%n", id);
+            System.out.printf("Deleted Task ID %d%n", id);
         } else {
-            System.out.println("Task not found with ID %d%n", id);
+            System.out.printf("Task not found with ID %d%n", id);
         }
     }
 
@@ -89,13 +89,13 @@ public class TaskManager {
      * Displays tasks with optional status filtering
      * @param statusFilter Optional status filter (null for all)
      */
-    public listTasks(String statusFiler) {
+    public void listTasks(String statusFilter) {
         List<Task> filtered = tasks.stream()
                 .filter(t -> statusFilter == null || t.getStatus().equals(statusFilter))
-                .collect(Collectors.toList());
+                .toList();
 
         if(filtered.isEmpty()) {
-            System.out.println("No tasks found%n" + (statusFilter == null ? " with status: " + statusFiler : ""));
+            System.out.println("No tasks found" + (statusFilter != null ? " with status: " + statusFilter : ""));
         } else {
             filtered.forEach(System.out::println);
         }
@@ -108,14 +108,14 @@ public class TaskManager {
                 .findFirst();
     }
 
-    private void UpdateStatus(int id, String status) {
+    private void updateStatus(int id, String status) {
         findTaskById(id).ifPresentOrElse(
                 task -> {
                     task.setStatus(status);
                     saveTasks();
-                    System.out.println("Updated Task ID %d status to %s%n", id, status);
+                    System.out.printf("Updated Task ID %d status to %s%n", id, status);
                 },
-                () -> System.out.println("Task not found with ID %d%n", id)
+                () -> System.out.printf("Task not found with ID %d%n", id)
         );
     }
 
@@ -129,7 +129,7 @@ public class TaskManager {
             List<Task> loaded = gson.fromJson(reader, taskListType);
             if (loaded != null) {
                 tasks = loaded;
-                nexId = tasks.stream()
+                nextId = tasks.stream()
                         .mapToInt(Task::getId)
                         .max()
                         .orElse(0) + 1;
@@ -148,6 +148,6 @@ public class TaskManager {
             gson.toJson(tasks, writer);
         } catch (IOException e) {
             System.err.println("Error saving tasks to JSON file: " + e.getMessage());
-        })
+        }
     }
 }

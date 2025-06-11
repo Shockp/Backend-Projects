@@ -1,5 +1,7 @@
+import java.util.List;
+
 /**
- * Handles command-lien interface and user interactions.
+ * Handles command-line interface and user interactions.
  * Parse arguments and delegate operations to TaskManager.
  */
 public class TaskCLI {
@@ -10,7 +12,7 @@ public class TaskCLI {
     }
 
     /**
-     * Executes appropiate command based on arguments
+     * Executes the appropriate command based on arguments
      * @param args command-line arguments
      */
     public void run(String[] args) {
@@ -27,6 +29,7 @@ public class TaskCLI {
             case "mark-in-progress" -> handleStatusChange(args, "in-progress");
             case "mark-done" -> handleStatusChange(args, "done");
             case "list" -> handleList(args);
+            case "help" -> showHelp();
             default -> {
                 System.out.println("Invalid command: " + command);
                 showHelp();
@@ -37,20 +40,21 @@ public class TaskCLI {
     // Command handlers
     private void handleAdd(String[] args) {
         if(args.length < 2) {
-            System.out.println("Usage: add <task-description>");
+            System.out.println("Usage: add \"task-description\"");
             return;
         }
         manager.addTask(args[1]);
     }
 
     private void handleUpdate(String[] args) {
-        if(args.lenght < 3) {
-            System.out.println("Usage: update <task-id> <new-description>");
+        if(args.length < 3) {
+            System.out.println("Usage: update <task-id> \"new-description\"");
             return;
-        } try {
+        }
+        try {
             int id = Integer.parseInt(args[1]);
             manager.updateTask(id, args[2]);
-        } catch(numberFormatException e) {
+        } catch(NumberFormatException e) {
             System.out.println("Invalid task ID: " + args[1]);
         }
     }
@@ -59,7 +63,8 @@ public class TaskCLI {
         if(args.length < 2) {
             System.out.println("Usage: delete <task-id>");
             return;
-        } try {
+        }
+        try {
             int id = Integer.parseInt(args[1]);
             manager.deleteTask(id);
         } catch(NumberFormatException e) {
@@ -69,7 +74,7 @@ public class TaskCLI {
 
     private void handleStatusChange(String[] args, String status) {
         if (args.length < 2) {
-            System.out.printf("Usage: %s <id>%n", args[0]);
+            System.out.printf("Usage: %s <task-id>%n", args[0]);
             return;
         }
         try {
@@ -79,7 +84,7 @@ public class TaskCLI {
             } else {
                 manager.markDone(id);
             }
-        } catch(numberFormatException e) {
+        } catch(NumberFormatException e) {
             System.out.println("Invalid task ID: " + args[1]);
         }
     }
@@ -97,13 +102,13 @@ public class TaskCLI {
      * Displays available commands and their usage
      */
     private void showHelp() {
-        System.out.println("Task Tracker CLI commands:");
-        System.out.println("add <task-description>: Adds a new task");
-        System.out.println("update <task-id> <new-description>: Updates the description of a task");
-        System.out.println("delete <task-id>: Deletes a task");
-        System.out.println("mark-in-progress <task-id>: Marks a task as in-progress");
-        System.out.println("mark-done <task-id>: Marks a task as done");
-        System.out.println("list [todo|in-progress|done]: Lists tasks based on the given filter (optional)");
-        System.out.println("help: Displays this help message");
+        System.out.println("Task Tracker CLI Commands:");
+        System.out.println("  add \"description\"            Add new task");
+        System.out.println("  update <id> \"description\"    Update task description");
+        System.out.println("  delete <id>                  Remove task");
+        System.out.println("  mark-in-progress <id>        Mark task as in-progress");
+        System.out.println("  mark-done <id>               Mark task as completed");
+        System.out.println("  list [status]                Show tasks (optional filter: todo, in-progress, done)");
+        System.out.println("  help                         Show this help message");
     }
 }

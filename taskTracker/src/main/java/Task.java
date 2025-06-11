@@ -57,7 +57,7 @@ public class Task {
      */
     @Override
     public String toString() {
-        return String.format("Task{id=%d, description='%s', status='%s', createdAt=%s, updatedAd=%s}",
+        return String.format("Task{id=%d, description='%s', status='%s', createdAt=%s, updatedAt=%s}",
                                 id, description, status, createdAt, updatedAt);
     }
 }
