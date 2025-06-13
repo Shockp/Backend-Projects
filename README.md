@@ -8,7 +8,7 @@ The projects are designed to help developers like myself build practical skills 
 - 4 Advanced Projects (Projects 19-22): Challenging experienced developers with sophisticated system design.
 
 ## Projects
-#### 1. Task Tracker CLI
+#### 1. Task Tracker
 Project Link: https://roadmap.sh/projects/task-tracker
 
 Implementing a command-line interface application for managing tasks and to-do lists.
@@ -17,7 +17,7 @@ Implementing a command-line interface application for managing tasks and to-do l
 - Basic data structures
 - CRUD operations
 
-#### 2. Github User Activity CLI
+#### 2. Github User Activity
 Project Link: https://roadmap.sh/projects/github-user-activity
 
 Developing a CLI tool that fetches and displays GitHub user activity using the GitHub API.
