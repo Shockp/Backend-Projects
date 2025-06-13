@@ -5,16 +5,15 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.afb.shockp</groupId>
-    <artifactId>task-tracker</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <parent>
+        <groupId>com.afb.shockp</groupId>
+        <artifactId>parent-project</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>task-tracker</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
