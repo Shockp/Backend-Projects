@@ -12,10 +12,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>expenses-tracker</artifactId>
+    <artifactId>expense-tracker</artifactId>
     <packaging>jar</packaging>
 
-    <name>Expenses Tracker CLI</name>
+    <name>Expense Tracker CLI</name>
     <description>CLI tool to manage your finances</description>
 
     <dependencies>

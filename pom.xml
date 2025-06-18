@@ -21,7 +21,7 @@
     <modules>
         <module>task-tracker</module>
         <module>github-user-activity</module>
-        <module>expenses-tracker</module>
+        <module>expense-tracker</module>
     </modules>
 
 </project>
