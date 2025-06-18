@@ -12,8 +12,11 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>task-tracker</artifactId>
+    <artifactId>expenses-tracker</artifactId>
     <packaging>jar</packaging>
+
+    <name>Expenses Tracker CLI</name>
+    <description>CLI tool to manage your finances</description>
 
     <dependencies>
         <dependency>
@@ -22,4 +25,5 @@
             <version>2.13.1</version>
         </dependency>
     </dependencies>
+
 </project>

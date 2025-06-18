@@ -5,12 +5,12 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.afb.shockp</groupId>
+    <groupId>com.shockp.backendprojects</groupId>
     <artifactId>parent-project</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>Backend-Roadmap.sh-Projects</name>
+    <name>Backend-Projects</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -21,6 +21,7 @@
     <modules>
         <module>task-tracker</module>
         <module>github-user-activity</module>
+        <module>expenses-tracker</module>
     </modules>
 
 </project>
