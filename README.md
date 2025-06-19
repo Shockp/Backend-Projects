@@ -26,5 +26,5 @@ Developing a CLI tool that fetches and displays GitHub user activity using the G
 - Error handling and validation
 - Command-line inteface design
 
-#### 3. Expense Tracker (Working in Progress)
+#### 3. Expense Tracker (Working in Progress) | https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker
 Project Link: https://roadmap.sh/projects/expense-tracker
