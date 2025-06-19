@@ -10,6 +10,7 @@ The projects are designed to help developers like myself build practical skills 
 ## Projects
 #### 1. Task Tracker
 Project Link: https://roadmap.sh/projects/task-tracker
+Personal Project Link: https://github.com/Shockp/Backend-Projects/tree/main/task-tracker
 
 Implementing a command-line interface application for managing tasks and to-do lists.
 - File I/O operations
@@ -19,6 +20,7 @@ Implementing a command-line interface application for managing tasks and to-do l
 
 #### 2. Github User Activity
 Project Link: https://roadmap.sh/projects/github-user-activity
+Personal Project Link: https://github.com/Shockp/Backend-Projects/tree/main/github-user-activity
 
 Developing a CLI tool that fetches and displays GitHub user activity using the GitHub API.
 - API integration and HTTP requests
@@ -26,5 +28,6 @@ Developing a CLI tool that fetches and displays GitHub user activity using the G
 - Error handling and validation
 - Command-line inteface design
 
-#### 3. Expense Tracker (Working in Progress) | https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker
+#### 3. Expense Tracker (Working in Progress)
 Project Link: https://roadmap.sh/projects/expense-tracker
+Personal Project Link: https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker
