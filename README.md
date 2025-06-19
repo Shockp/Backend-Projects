@@ -12,7 +12,7 @@ The projects are designed to help developers like myself build practical skills 
 - Project Link: https://roadmap.sh/projects/task-tracker
 - Personal Project Link: https://github.com/Shockp/Backend-Projects/tree/main/task-tracker
 
-Implementing a command-line interface application for managing tasks and to-do lists.
+###### Implementing a command-line interface application for managing tasks and to-do lists.
 - File I/O operations
 - Command-line argument parsing
 - Basic data structures
