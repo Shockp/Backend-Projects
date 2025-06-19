@@ -25,3 +25,6 @@ Developing a CLI tool that fetches and displays GitHub user activity using the G
 - JSON data parsing
 - Error handling and validation
 - Command-line inteface design
+
+#### 3. Expense Tracker (Working in Progress)
+Project Link: https://roadmap.sh/projects/expense-tracker
