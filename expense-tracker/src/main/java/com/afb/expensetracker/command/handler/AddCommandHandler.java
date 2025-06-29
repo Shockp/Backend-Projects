@@ -46,6 +46,7 @@ public class AddCommandHandler implements CommandHandler {
     @Override
     public void populateCommand(ParsedCommand parsedCommand, CommandLine cmd)
         throws ValidationException {
+
         parsedCommand.setArgument("description",
                 descriptionValidator.validate(cmd.getOptionValue("description")));
         parsedCommand.setArgument("amount",

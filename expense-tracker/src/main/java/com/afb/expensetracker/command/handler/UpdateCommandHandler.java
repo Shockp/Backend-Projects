@@ -53,6 +53,7 @@ public class UpdateCommandHandler implements CommandHandler {
     @Override
     public void populateCommand(ParsedCommand parsedCommand, CommandLine cmd)
         throws ValidationException {
+
         parsedCommand.setArgument("id",
                 idValidator.validate(cmd.getOptionValue("id")));
 
