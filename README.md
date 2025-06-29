@@ -37,4 +37,14 @@ A CLI tool that fetches and displays GitHub user activity using the GitHub API.
 ### 3. Expense Tracker *(Work in Progress)*
 [🔗 Project Page](https://roadmap.sh/projects/expense-tracker) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker)
 
+A modular Java CLI application for managing personal finances with JSON persistence.
+
+- Full CRUD operations for expenses (add, update, delete, list)
+- Summary reports (total and month-specific with category breakdown)
+- Filter expenses by category and month
+- Monthly budget management with overspend warnings
+- Export expense data to CSV files
+- Gson-based JSON storage and retrieval
+- Layered architecture with command pattern and comprehensive input validation
+
 ---
