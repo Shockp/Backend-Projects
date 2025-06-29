@@ -14,7 +14,7 @@ import org.apache.commons.cli.CommandLine;
  */
 public class DeleteCommandHandler implements CommandHandler {
     /** Validator for ID arguments. */
-    public final IdValidator idValidator = new IdValidator();
+    private final IdValidator idValidator = new IdValidator();
 
     @Override
     public void validateArguments(CommandLine cmd) throws ValidationException {
