@@ -22,7 +22,7 @@ A command-line interface application for managing tasks and to-do lists.
 
 ---
 
-### 2. GitHub User Activity
+### 2. GitHub User Activity Tracker
 [🔗 Project Page](https://roadmap.sh/projects/github-user-activity) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/github-user-activity)
 
 A CLI tool that fetches and displays GitHub user activity using the GitHub API.
