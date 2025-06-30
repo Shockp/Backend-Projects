@@ -34,7 +34,7 @@ A CLI tool that fetches and displays GitHub user activity using the GitHub API.
 
 ---
 
-### 3. Expense Tracker *(Work in Progress)*
+### 3. Expense Tracker
 [🔗 Project Page](https://roadmap.sh/projects/expense-tracker) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker)
 
 A modular Java CLI application for managing personal finances with JSON persistence.
@@ -48,3 +48,5 @@ A modular Java CLI application for managing personal finances with JSON persiste
 - Layered architecture with command pattern and comprehensive input validation
 
 ---
+
+### 4. Number Guessing Game *(Work in Progress)*
