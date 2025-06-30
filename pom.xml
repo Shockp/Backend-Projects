@@ -22,6 +22,7 @@
         <module>task-tracker</module>
         <module>github-user-activity</module>
         <module>expense-tracker</module>
+        <module>number-guessing-game</module>
     </modules>
 
 </project>
