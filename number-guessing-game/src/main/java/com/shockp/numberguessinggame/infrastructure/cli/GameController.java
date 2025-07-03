@@ -1,4 +1,4 @@
 package com.shockp.numberguessinggame.infrastructure.cli;
 
-public class GameRepository {
+public class GameController {
 }
