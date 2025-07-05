@@ -1,8 +1,7 @@
 package com.shockp.numberguessinggame.domain.model;
 
 import com.shockp.numberguessinggame.domain.model.difficulty.GameDifficulty;
-
-import java.util.Random;
+import com.shockp.numberguessinggame.domain.service.NumberGeneratorService;
 
 /**
  * Represents a number guessing game instance.
@@ -59,22 +58,8 @@ public class Game {
         this.difficulty = difficulty;
         this.player = player;
         this.state = GameState.NOT_STARTED;
-        this.targetNumber = generateRandomNumber();
+        this.targetNumber = new NumberGeneratorService().generateNumber();
         this.currentAttempts = 0;
-    }
-
-    /**
-     * Generates a random number between 1 and 100 for the player to guess.
-     * <p>
-     * This method uses Java's Random class to generate a uniformly distributed
-     * random integer in the specified range.
-     * </p>
-     *
-     * @return a random number between 1 and 100 (inclusive)
-     */
-    private int generateRandomNumber() {
-        Random random = new Random();
-        return random.nextInt(100) + 1;
     }
 
     /**
