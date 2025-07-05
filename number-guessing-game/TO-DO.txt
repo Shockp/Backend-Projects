@@ -1,0 +1,122 @@
+NUMBER GUESSING GAME - TO-DO LIST
+================================
+
+✅ COMPLETED CLASSES
+===================
+Domain Model Layer:
+- Game.java (216 lines) - ✅ FULLY IMPLEMENTED
+- Player.java (54 lines) - ✅ FULLY IMPLEMENTED 
+- GameState.java (53 lines) - ✅ FULLY IMPLEMENTED
+- GameDifficulty.java (163 lines) - ✅ FULLY IMPLEMENTED
+- DifficultyStrategy.java (23 lines) - ✅ FULLY IMPLEMENTED
+- DifficultyEasy.java (43 lines) - ✅ FULLY IMPLEMENTED
+- DifficultyMedium.java (44 lines) - ✅ FULLY IMPLEMENTED
+- DifficultyHard.java (45 lines) - ✅ FULLY IMPLEMENTED
+
+❌ TO-DO LIST (Empty Classes)
+============================
+
+PRIORITY 1: DOMAIN SERVICES
+---------------------------
+1. GameService.java - Core game business logic
+   - Validate guesses
+   - Check win/lose conditions
+   - Manage game state transitions
+   - Track attempts and provide hints
+
+2. NumberGeneratorService.java - Random number generation
+   - Generate numbers based on difficulty strategy
+   - Ensure numbers are within difficulty range
+
+PRIORITY 2: APPLICATION LAYER
+-----------------------------
+3. GameRepository.java - Data persistence interface
+   - Define methods for saving/loading games
+   - Should be an interface, not a class
+   - Methods: save(Game game), load(String gameId), delete(String gameId)
+
+4. UserInterface.java - UI interface
+   - Define methods for user interaction
+   - Should be an interface, not a class
+   - Methods: displayMessage(String message), getUserInput(), displayMenu()
+
+5. StartGameUseCase.java - Application logic for starting games
+   - Initialize new game with selected difficulty
+   - Set up player and game state
+   - Return game instance
+
+6. MakeGuessUseCase.java - Application logic for processing guesses
+   - Validate input
+   - Process guess and return result
+   - Update game state
+   - Return feedback message
+
+7. EndGameUseCase.java - Application logic for ending games
+   - Handle win/lose scenarios
+   - Save game statistics
+   - Clean up resources
+   - Return final game result
+
+PRIORITY 3: INFRASTRUCTURE LAYER
+--------------------------------
+8. InMemoryGameRepository.java - Repository implementation
+   - Implement GameRepository interface
+   - Store games in memory (Map<String, Game>)
+   - Handle game persistence
+   - Methods: save, load, delete, getAllGames
+
+9. ConsoleView.java - CLI user interface
+   - Implement UserInterface interface
+   - Handle console input/output
+   - Display game messages and prompts
+   - Methods: displayMessage, getUserInput, displayMenu, clearScreen
+
+10. GameController.java - Application controller
+    - Orchestrate use cases
+    - Handle user input routing
+    - Manage game flow
+    - Main game loop logic
+
+11. GameFactory.java - Factory for creating game instances
+    - Create Game objects with proper configuration
+    - Set up difficulty strategies
+    - Methods: createGame(GameDifficulty difficulty, Player player)
+
+PRIORITY 4: MAIN APPLICATION
+----------------------------
+12. Main.java - Application entry point
+    - Initialize dependencies
+    - Start the game loop
+    - Handle application lifecycle
+    - Dependency injection setup
+
+RECOMMENDED IMPLEMENTATION ORDER
+===============================
+1. Fix GameRepository.java and UserInterface.java to be interfaces
+2. Implement GameService.java and NumberGeneratorService.java
+3. Implement use cases (StartGameUseCase.java, MakeGuessUseCase.java, EndGameUseCase.java)
+4. Implement infrastructure classes (InMemoryGameRepository.java, ConsoleView.java)
+5. Implement GameController.java and GameFactory.java
+6. Create Main.java to tie everything together
+
+IMPLEMENTATION NOTES
+===================
+- Follow hexagonal architecture principles
+- Use dependency injection where appropriate
+- Implement proper error handling
+- Add comprehensive JavaDoc comments
+- Consider adding unit tests for each class
+- Ensure proper separation of concerns between layers
+
+TESTING STRATEGY
+================
+- Unit tests for domain services
+- Integration tests for use cases
+- Mock tests for infrastructure components
+- End-to-end tests for complete game flow
+
+DEPENDENCIES
+============
+- Java 23 (as specified in pom.xml)
+- JUnit 5 for testing (already in pom.xml)
+- No external dependencies required for core functionality 
