@@ -5,30 +5,44 @@ NUMBER GUESSING GAME - TO-DO LIST
 ===================
 Domain Model Layer:
 - Game.java (201 lines) - ✅ FULLY IMPLEMENTED
+  Methods: startGame(), makeGuess(int guess), getDifficulty(), getPlayer(), getState(), 
+           getTargetNumber(), getCurrentAttempts(), getRemainingAttempts(), isGameOver()
+
 - Player.java (54 lines) - ✅ FULLY IMPLEMENTED 
+  Methods: getName(), getScore(), incrementScore()
+
 - GameState.java (53 lines) - ✅ FULLY IMPLEMENTED
+  Enum values: NOT_STARTED, IN_PROGRESS, WON, LOST
+
 - GameDifficulty.java (163 lines) - ✅ FULLY IMPLEMENTED
+  Methods: easy(), medium(), hard(), getMaxAttempts(), getDifficultyName(), 
+           setStrategy(DifficultyStrategy), getStrategy(), equals(), hashCode(), toString()
+
 - DifficultyStrategy.java (23 lines) - ✅ FULLY IMPLEMENTED
+  Methods: getMaxAttempts(), getDifficultyName()
+
 - DifficultyEasy.java (43 lines) - ✅ FULLY IMPLEMENTED
+  Methods: getMaxAttempts() [returns 10], getDifficultyName() [returns "Easy"]
+
 - DifficultyMedium.java (44 lines) - ✅ FULLY IMPLEMENTED
+  Methods: getMaxAttempts() [returns 5], getDifficultyName() [returns "Medium"]
+
 - DifficultyHard.java (45 lines) - ✅ FULLY IMPLEMENTED
+  Methods: getMaxAttempts() [returns 3], getDifficultyName() [returns "Hard"]
 
 Domain Services Layer:
 - GameService.java (73 lines) - ✅ FULLY IMPLEMENTED
+  Methods: createGame(GameDifficulty difficulty, Player player), processGuess(Game game, int guess)
+
 - NumberGeneratorService.java (15 lines) - ✅ FULLY IMPLEMENTED
+  Methods: generateNumber() [returns 1-100]
 
 Application Layer (Ports):
 - GameRepository.java (39 lines) - ✅ FULLY IMPLEMENTED
-  - Repository interface for game persistence operations
-  - Methods: save(Game game), load(String gameId), delete(String gameId)
-  - Comprehensive JavaDoc documentation
-  - Follows hexagonal architecture principles
+  Methods: save(Game game), load(String gameId), delete(String gameId)
 
 - UserInterface.java (67 lines) - ✅ FULLY IMPLEMENTED
-  - Port interface for user interaction operations
-  - Methods: displayMessage(String message), getUserInput(), displayMenu()
-  - Comprehensive JavaDoc documentation
-  - Follows dependency inversion principle
+  Methods: displayMessage(String message), getUserInput(), displayMenu()
 
 ❌ TO-DO LIST (Empty Classes)
 ============================
@@ -36,62 +50,191 @@ Application Layer (Ports):
 PRIORITY 1: APPLICATION LAYER (Use Cases)
 -----------------------------------------
 1. StartGameUseCase.java - Application logic for starting games
-   - Initialize new game with selected difficulty
-   - Set up player and game state
-   - Return game instance
-   - Coordinate with GameService and GameRepository
+   Constructor: StartGameUseCase(GameService gameService, GameRepository gameRepository, UserInterface userInterface)
+   Methods:
+   - execute(String playerName, GameDifficulty difficulty): Game
+     * Validate player name and difficulty
+     * Create player instance
+     * Create game using GameService
+     * Save game to repository
+     * Display welcome message
+     * Return created game instance
+   - selectDifficulty(): GameDifficulty
+     * Display difficulty options
+     * Get user selection
+     * Return selected difficulty
+   - getPlayerName(): String
+     * Prompt for player name
+     * Validate input
+     * Return player name
 
 2. MakeGuessUseCase.java - Application logic for processing guesses
-   - Validate input
-   - Process guess and return result
-   - Update game state
-   - Return feedback message
-   - Coordinate with GameService
+   Constructor: MakeGuessUseCase(GameService gameService, UserInterface userInterface)
+   Methods:
+   - execute(Game game, int guess): String
+     * Validate game state
+     * Process guess using GameService
+     * Return feedback message
+   - getValidGuess(Game game): int
+     * Prompt for guess
+     * Validate input (1-100)
+     * Return valid guess
+   - validateGuess(int guess): boolean
+     * Check if guess is between 1-100
+     * Return validation result
 
 3. EndGameUseCase.java - Application logic for ending games
-   - Handle win/lose scenarios
-   - Save game statistics
-   - Clean up resources
-   - Return final game result
-   - Coordinate with GameRepository
+   Constructor: EndGameUseCase(GameRepository gameRepository, UserInterface userInterface)
+   Methods:
+   - execute(Game game): GameResult
+     * Check game state (WON/LOST)
+     * Save final game state
+     * Display final result
+     * Return GameResult object
+   - saveGameStatistics(Game game): void
+     * Save game to repository
+     * Update player statistics
+   - displayFinalResult(Game game): void
+     * Show win/lose message
+     * Display attempts used
+     * Show target number
+   - askToPlayAgain(): boolean
+     * Prompt user for another game
+     * Return user choice
 
 PRIORITY 2: INFRASTRUCTURE LAYER
 --------------------------------
 4. InMemoryGameRepository.java - Repository implementation
-   - Implement GameRepository interface
-   - Store games in memory (Map<String, Game>)
-   - Handle game persistence
-   - Methods: save, load, delete, getAllGames
-   - Add proper error handling and validation
+   Fields: Map<String, Game> games, AtomicLong gameIdCounter
+   Constructor: InMemoryGameRepository()
+   Methods:
+   - save(Game game): void
+     * Generate unique game ID if not exists
+     * Store game in memory map
+     * Handle null game validation
+   - load(String gameId): Game
+     * Retrieve game from memory map
+     * Return null if not found
+     * Validate gameId parameter
+   - delete(String gameId): void
+     * Remove game from memory map
+     * Validate gameId parameter
+   - getAllGames(): List<Game>
+     * Return all stored games
+   - generateGameId(): String
+     * Generate unique game identifier
+   - clearAllGames(): void
+     * Remove all games (for testing)
 
 5. ConsoleView.java - CLI user interface
-   - Implement UserInterface interface
-   - Handle console input/output
-   - Display game messages and prompts
-   - Methods: displayMessage, getUserInput, displayMenu, clearScreen
-   - Add input validation and error handling
+   Fields: Scanner scanner, PrintStream output
+   Constructor: ConsoleView(), ConsoleView(InputStream input, PrintStream output)
+   Methods:
+   - displayMessage(String message): void
+     * Print message to console
+     * Handle null message validation
+   - getUserInput(): String
+     * Read line from console
+     * Return trimmed input
+   - displayMenu(): void
+     * Show numbered menu options
+     * Display game title and options
+   - clearScreen(): void
+     * Clear console screen (platform-specific)
+   - displayGameState(Game game): void
+     * Show current game status
+     * Display attempts and difficulty
+   - displayError(String error): void
+     * Show error message in red (if supported)
+   - displaySuccess(String message): void
+     * Show success message in green (if supported)
 
 6. GameController.java - Application controller
-   - Orchestrate use cases
-   - Handle user input routing
-   - Manage game flow
-   - Main game loop logic
-   - Coordinate between UI and use cases
+   Fields: StartGameUseCase startGameUseCase, MakeGuessUseCase makeGuessUseCase, 
+           EndGameUseCase endGameUseCase, UserInterface userInterface
+   Constructor: GameController(StartGameUseCase startGameUseCase, MakeGuessUseCase makeGuessUseCase, 
+                              EndGameUseCase endGameUseCase, UserInterface userInterface)
+   Methods:
+   - startGame(): void
+     * Main game loop entry point
+     * Initialize game flow
+   - runGameLoop(): void
+     * Main game loop logic
+     * Handle game state transitions
+   - processUserInput(String input): void
+     * Parse user commands
+     * Route to appropriate use case
+   - handleGameState(Game game): void
+     * Process current game state
+     * Manage game flow
+   - displayWelcome(): void
+     * Show game welcome message
+   - displayGoodbye(): void
+     * Show exit message
 
 7. GameFactory.java - Factory for creating game instances
-   - Create Game objects with proper configuration
-   - Set up difficulty strategies
-   - Methods: createGame(GameDifficulty difficulty, Player player)
-   - Follow factory pattern best practices
+   Constructor: GameFactory()
+   Methods:
+   - createGame(GameDifficulty difficulty, Player player): Game
+     * Create new Game instance
+     * Validate parameters
+     * Return configured game
+   - createPlayer(String name): Player
+     * Create new Player instance
+     * Validate player name
+     * Return player object
+   - createDifficulty(String difficultyName): GameDifficulty
+     * Create difficulty based on name
+     * Support "easy", "medium", "hard"
+     * Return appropriate difficulty
+   - createGameWithDefaults(): Game
+     * Create game with default settings
+     * Use medium difficulty and default player
 
 PRIORITY 3: MAIN APPLICATION
 ----------------------------
 8. Main.java - Application entry point
-    - Initialize dependencies
-    - Start the game loop
-    - Handle application lifecycle
-    - Dependency injection setup
-    - Configure and wire all components
+   Methods:
+   - main(String[] args): void
+     * Application entry point
+     * Initialize all dependencies
+     * Start game controller
+   - initializeDependencies(): GameController
+     * Create all service instances
+     * Wire dependencies together
+     * Return configured controller
+   - setupGameServices(): GameService
+     * Create domain services
+     * Configure services
+   - setupRepositories(): GameRepository
+     * Create repository instances
+     * Configure persistence
+   - setupUserInterface(): UserInterface
+     * Create UI implementation
+     * Configure input/output
+
+ADDITIONAL CLASSES TO CONSIDER
+==============================
+9. GameResult.java - Result object for game outcomes
+   Fields: boolean won, int attempts, int maxAttempts, String playerName, GameDifficulty difficulty
+   Constructor: GameResult(boolean won, int attempts, int maxAttempts, String playerName, GameDifficulty difficulty)
+   Methods:
+   - isWon(): boolean
+   - getAttempts(): int
+   - getMaxAttempts(): int
+   - getPlayerName(): String
+   - getDifficulty(): GameDifficulty
+   - toString(): String
+
+10. GameException.java - Custom exception for game errors
+    Constructor: GameException(String message), GameException(String message, Throwable cause)
+    Methods: Inherited from Exception
+
+11. InputValidator.java - Utility for input validation
+    Methods:
+    - validateNumericInput(String input, int min, int max): boolean
+    - validatePlayerName(String name): boolean
+    - validateDifficultyChoice(String choice): boolean
 
 RECOMMENDED IMPLEMENTATION ORDER
 ===============================
@@ -100,16 +243,19 @@ RECOMMENDED IMPLEMENTATION ORDER
 3. Implement infrastructure classes (InMemoryGameRepository.java, ConsoleView.java)
 4. Implement GameController.java and GameFactory.java
 5. Create Main.java to tie everything together
+6. Add additional utility classes (GameResult.java, GameException.java, InputValidator.java)
 
 IMPLEMENTATION NOTES
 ===================
 - Follow hexagonal architecture principles
 - Use dependency injection where appropriate
-- Implement proper error handling
+- Implement proper error handling with custom exceptions
 - Add comprehensive JavaDoc comments
 - Consider adding unit tests for each class
 - Ensure proper separation of concerns between layers
 - Use SOLID principles in all implementations
+- Implement proper input validation and error recovery
+- Add logging for debugging and monitoring
 
 TESTING STRATEGY
 ================
@@ -118,6 +264,8 @@ TESTING STRATEGY
 - Mock tests for infrastructure components
 - End-to-end tests for complete game flow
 - Test all port implementations
+- Test error scenarios and edge cases
+- Test input validation thoroughly
 
 DEPENDENCIES
 ============
@@ -133,6 +281,7 @@ PROJECT STATUS
 - Application Layer (Use Cases): ❌ 0% Complete (3/3 classes to implement)
 - Infrastructure Layer: ❌ 0% Complete (4/4 classes to implement)
 - Main Application: ❌ 0% Complete (1/1 class to implement)
+- Additional Classes: ❌ 0% Complete (3/3 classes to consider)
 
 OVERALL PROGRESS: 58% Complete (12/20 classes implemented)
 
@@ -141,4 +290,7 @@ RECENT UPDATES
 - ✅ GameRepository.java: Fixed import path, added comprehensive documentation
 - ✅ UserInterface.java: Added comprehensive JavaDoc documentation
 - ✅ Both interfaces now follow hexagonal architecture principles
-- ✅ Updated progress from 47% to 58% 
+- ✅ Updated progress from 47% to 58%
+- ✅ Added detailed method specifications for all remaining classes
+- ✅ Included constructor parameters and field definitions
+- ✅ Added additional utility classes for better architecture 
