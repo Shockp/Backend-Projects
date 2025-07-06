@@ -9,9 +9,9 @@ classDiagram
         -GameState state
         -int targetNumber
         -int currentAttempts
-        +Game(GameDifficulty, Player)
+        +Game(GameDifficulty, Player, int targetNumber)
         +startGame() void
-        +makeGuess(int guess) String
+        +recordGuess(int guess) GuessResult
         +getDifficulty() GameDifficulty
         +getPlayer() Player
         +getState() GameState
@@ -19,6 +19,8 @@ classDiagram
         +getCurrentAttempts() int
         +getRemainingAttempts() int
         +isGameOver() boolean
+        +incrementPlayerScore() void
+        +enum GuessResult
     }
 
     class Player {
@@ -82,8 +84,14 @@ classDiagram
 
     %% Domain Services Layer
     class GameService {
+        -NumberGeneratorService numberGeneratorService
+        +GameService(NumberGeneratorService)
         +createGame(GameDifficulty, Player) Game
         +processGuess(Game, int) String
+        +canAcceptGuess(Game) boolean
+        +isValidGuess(int) boolean
+        +getGameStatus(Game) String
+        -generateFeedback(Game, GuessResult, int) String
     }
 
     class NumberGeneratorService {
@@ -226,18 +234,23 @@ classDiagram
     Game --> GameDifficulty : has
     Game --> Player : has
     Game --> GameState : has
-    Game --> NumberGeneratorService : uses
+    Game --> GuessResult : returns
 
     GameDifficulty --> DifficultyStrategy : uses
     DifficultyEasy ..|> DifficultyStrategy : implements
     DifficultyMedium ..|> DifficultyStrategy : implements
     DifficultyHard ..|> DifficultyStrategy : implements
 
+    GameService --> NumberGeneratorService : uses
+    GameService --> Game : manages
+    GameService --> Player : manages
+
     StartGameUseCase --> GameService : uses
     StartGameUseCase --> GameRepository : uses
     StartGameUseCase --> UserInterface : uses
     StartGameUseCase --> Game : creates
     StartGameUseCase --> GameDifficulty : uses
+    StartGameUseCase --> Player : creates
 
     MakeGuessUseCase --> GameService : uses
     MakeGuessUseCase --> UserInterface : uses
@@ -279,22 +292,22 @@ classDiagram
 ## Architecture Layers
 
 ### Domain Layer (Core Business Logic)
-- **Game**: Main game entity with business rules
+- **Game**: Pure domain entity with state management and GuessResult enum
 - **Player**: Player entity with score management
 - **GameState**: Enumeration of game states
-- **GameDifficulty**: Strategy pattern for difficulty levels
+- **GameDifficulty**: Strategy pattern wrapper for difficulty levels
 - **DifficultyStrategy**: Interface for difficulty implementations
 
 ### Domain Services Layer
-- **GameService**: High-level game operations
-- **NumberGeneratorService**: Random number generation
+- **GameService**: Rich domain service with comprehensive business logic and dependency injection
+- **NumberGeneratorService**: Random number generation service
 
 ### Application Layer
 - **Ports**: Interfaces for external dependencies
   - **GameRepository**: Data persistence contract
   - **UserInterface**: User interaction contract
 - **Use Cases**: Application business logic
-  - **StartGameUseCase**: Game initialization logic
+  - **StartGameUseCase**: Enhanced game initialization logic with comprehensive documentation
   - **MakeGuessUseCase**: Guess processing logic
   - **EndGameUseCase**: Game completion logic
 
@@ -319,4 +332,24 @@ classDiagram
 3. **Factory Pattern**: Object creation in GameFactory
 4. **Dependency Injection**: Constructor-based dependency management
 5. **Repository Pattern**: Data access abstraction
-6. **Use Case Pattern**: Application business logic organization 
+6. **Use Case Pattern**: Application business logic organization
+7. **Anemic Domain Model**: Game entity focuses on data, GameService handles business logic
+
+## Key Architectural Improvements
+
+### **Refactored Game Class**
+- **Pure Domain Entity**: Removed business logic and dependencies
+- **GuessResult Enum**: Clean state management for guess outcomes
+- **Immutability**: Clear documentation of immutable vs mutable fields
+- **Thread Safety**: Explicit documentation of concurrency considerations
+
+### **Enhanced GameService**
+- **Rich Domain Service**: All business logic centralized
+- **Dependency Injection**: Proper constructor-based DI
+- **Comprehensive Validation**: Centralized input and state validation
+- **Feedback Generation**: Encapsulated message formatting logic
+
+### **Improved StartGameUseCase**
+- **Enhanced Documentation**: Comprehensive JavaDoc with workflow descriptions
+- **Better Error Handling**: Detailed validation and exception handling
+- **Professional Standards**: Author tags and version information 

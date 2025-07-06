@@ -21,11 +21,12 @@ graph TB
         end
 
         subgraph "Domain Layer"
-            GameService[GameService<br/>Business Logic]
-            Game[Game<br/>Core Entity]
+            GameService[GameService<br/>Rich Domain Service]
+            Game[Game<br/>Pure Domain Entity]
             Player[Player<br/>Entity]
             GameDifficulty[GameDifficulty<br/>Strategy Wrapper]
             DifficultyStrategy[DifficultyStrategy<br/>Interface]
+            NumberGeneratorService[NumberGeneratorService<br/>Utility Service]
         end
 
         subgraph "Infrastructure Layer"
@@ -62,6 +63,7 @@ graph TB
 
     %% Domain layer internal
     GameService --> Game
+    GameService --> NumberGeneratorService
     Game --> Player
     Game --> GameDifficulty
     GameDifficulty --> DifficultyStrategy
@@ -84,7 +86,7 @@ graph TB
     class User external
     class ConsoleView presentation
     class GameController,StartGameUseCase,MakeGuessUseCase,EndGameUseCase application
-    class GameService,Game,Player,GameDifficulty,DifficultyStrategy domain
+    class GameService,Game,Player,GameDifficulty,DifficultyStrategy,NumberGeneratorService domain
     class InMemoryGameRepository,GameFactory infrastructure
     class Main main
 ```
@@ -106,11 +108,12 @@ graph LR
     end
 
     subgraph "Domain Components"
-        GameService[GameService]
+        GameService[GameService<br/>Rich Domain Service]
         NumberGeneratorService[NumberGeneratorService]
-        Game[Game]
-        Player[Player]
-        GameDifficulty[GameDifficulty]
+        Game[Game<br/>Pure Domain Entity]
+        Player[Player<br/>Entity]
+        GameDifficulty[GameDifficulty<br/>Strategy Wrapper]
+        GuessResult[GuessResult<br/>Enum]
     end
 
     subgraph "Infrastructure Components"
@@ -148,8 +151,10 @@ graph LR
     %% Domain Layer Dependencies
     GameService --> Game
     GameService --> NumberGeneratorService
+    GameService --> Player
     Game --> Player
     Game --> GameDifficulty
+    Game --> GuessResult
 
     %% Infrastructure Layer Dependencies
     InMemoryGameRepository --> Game
@@ -172,7 +177,7 @@ graph LR
 
     class ConsoleView,InputValidator ui
     class GameController,StartGameUseCase,MakeGuessUseCase,EndGameUseCase app
-    class GameService,NumberGeneratorService,Game,Player,GameDifficulty domain
+    class GameService,NumberGeneratorService,Game,Player,GameDifficulty,GuessResult domain
     class InMemoryGameRepository,GameFactory infra
     class GameResult,GameException util
 ```
@@ -199,10 +204,11 @@ graph TB
         end
 
         subgraph "Domain Core"
-            Game[Game<br/>Entity]
+            Game[Game<br/>Pure Domain Entity]
             Player[Player<br/>Entity]
-            GameService[GameService<br/>Domain Service]
+            GameService[GameService<br/>Rich Domain Service]
             GameDifficulty[GameDifficulty<br/>Value Object]
+            GuessResult[GuessResult<br/>Enum]
         end
     end
 
@@ -238,6 +244,7 @@ graph TB
     GameService --> Game
     Game --> Player
     Game --> GameDifficulty
+    Game --> GuessResult
 
     %% Styling
     classDef external fill:#ffebee
@@ -249,7 +256,7 @@ graph TB
     class User,FileSystem,Database external
     class GameRepositoryPort,UserInterfacePort port
     class UseCases,GameController application
-    class Game,Player,GameService,GameDifficulty domain
+    class Game,Player,GameService,GameDifficulty,GuessResult domain
     class ConsoleViewAdapter,InMemoryRepositoryAdapter,FileRepositoryAdapter,DatabaseRepositoryAdapter adapter
 ```
 
@@ -261,16 +268,17 @@ graph TB
 
 ### **Application Layer**
 - **GameController**: Orchestrates the overall game flow and coordinates use cases
-- **StartGameUseCase**: Manages game initialization and setup
+- **StartGameUseCase**: Enhanced game initialization with comprehensive documentation
 - **MakeGuessUseCase**: Handles guess processing and validation
 - **EndGameUseCase**: Manages game completion and statistics
 
 ### **Domain Layer**
-- **GameService**: Provides high-level game operations and business logic
+- **GameService**: Rich domain service with comprehensive business logic and dependency injection
 - **NumberGeneratorService**: Generates random numbers for the game
-- **Game**: Core game entity with business rules and state management
+- **Game**: Pure domain entity with state management and GuessResult enum
 - **Player**: Player entity with score and name management
-- **GameDifficulty**: Strategy pattern implementation for difficulty levels
+- **GameDifficulty**: Strategy pattern wrapper for difficulty levels
+- **GuessResult**: Enum for clean state management of guess outcomes
 
 ### **Infrastructure Layer**
 - **InMemoryGameRepository**: In-memory implementation of data persistence
@@ -306,4 +314,26 @@ graph TB
 - Adapters implement only what they need
 - No unnecessary dependencies
 
-This component diagram shows how the number guessing game follows clean architecture principles with clear separation of concerns and dependency management. 
+### **6. Anemic Domain Model**
+- **Game Entity**: Now a pure domain entity focused on state management
+- **GameService**: Rich domain service handling all business logic
+- **Clear Separation**: Business logic separated from data
+
+## Architectural Improvements
+
+### **Enhanced Separation of Concerns**
+- **Game Entity**: Now a pure domain entity focused on state management
+- **GameService**: Rich domain service handling all business logic
+- **GuessResult Enum**: Clean state management for guess outcomes
+
+### **Improved Dependency Management**
+- **Constructor Injection**: GameService properly injects NumberGeneratorService
+- **No Direct Dependencies**: Game entity no longer creates dependencies
+- **Better Testability**: Clear separation enables easier unit testing
+
+### **Enhanced Documentation**
+- **Comprehensive JavaDoc**: All components have detailed documentation
+- **Thread Safety Notes**: Explicit documentation of concurrency considerations
+- **Professional Standards**: Author tags and version information
+
+This component diagram shows how the number guessing game follows clean architecture principles with clear separation of concerns, dependency management, and the refactored domain model approach. 

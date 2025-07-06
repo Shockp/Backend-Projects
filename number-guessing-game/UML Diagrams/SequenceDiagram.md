@@ -16,20 +16,22 @@ sequenceDiagram
     participant InMemoryGameRepository
     participant Player
     participant GameDifficulty
+    participant NumberGeneratorService
 
-    Note over User, GameDifficulty: Game Initialization
+    Note over User, NumberGeneratorService: Game Initialization
     User->>Main: Start Application
     Main->>Main: initializeDependencies()
+    Main->>NumberGeneratorService: Create NumberGeneratorService
+    Main->>GameService: Create GameService(NumberGeneratorService)
     Main->>GameController: Create GameController
     Main->>ConsoleView: Create ConsoleView
     Main->>InMemoryGameRepository: Create Repository
-    Main->>GameService: Create GameService
     Main->>StartGameUseCase: Create StartGameUseCase
     Main->>MakeGuessUseCase: Create MakeGuessUseCase
     Main->>EndGameUseCase: Create EndGameUseCase
     Main->>GameController: startGame()
     
-    Note over User, GameDifficulty: Game Setup
+    Note over User, NumberGeneratorService: Game Setup
     GameController->>ConsoleView: displayWelcome()
     ConsoleView-->>User: Show welcome message
     GameController->>StartGameUseCase: execute()
@@ -45,14 +47,15 @@ sequenceDiagram
     StartGameUseCase->>GameDifficulty: Create difficulty
     StartGameUseCase->>Player: Create player
     StartGameUseCase->>GameService: createGame(difficulty, player)
-    GameService->>Game: Create Game(difficulty, player)
-    Game->>Game: Generate target number
+    GameService->>NumberGeneratorService: generateNumber()
+    NumberGeneratorService-->>GameService: Return random number
+    GameService->>Game: Create Game(difficulty, player, targetNumber)
     GameService-->>StartGameUseCase: Return game instance
     StartGameUseCase->>InMemoryGameRepository: save(game)
     StartGameUseCase->>ConsoleView: displayMessage("Game started!")
     StartGameUseCase-->>GameController: Return game instance
     
-    Note over User, GameDifficulty: Game Loop
+    Note over User, NumberGeneratorService: Game Loop
     loop Until game ends
         GameController->>MakeGuessUseCase: execute(game)
         MakeGuessUseCase->>ConsoleView: getValidGuess(game)
@@ -62,21 +65,26 @@ sequenceDiagram
         MakeGuessUseCase->>MakeGuessUseCase: validateGuess(guess)
         alt Valid guess
             MakeGuessUseCase->>GameService: processGuess(game, guess)
-            GameService->>Game: makeGuess(guess)
+            GameService->>GameService: validateInput(game, guess)
+            alt Game not started
+                GameService->>Game: startGame()
+            end
+            GameService->>Game: recordGuess(guess)
             Game->>Game: Check guess vs target
             alt Correct guess
                 Game->>Game: Set state to WON
                 Game->>Player: incrementScore()
-                Game-->>GameService: Return win message
+                Game-->>GameService: Return CORRECT
             else Wrong guess
                 Game->>Game: Increment attempts
                 alt Max attempts reached
                     Game->>Game: Set state to LOST
-                    Game-->>GameService: Return lose message
+                    Game-->>GameService: Return GAME_OVER
                 else Attempts remaining
-                    Game-->>GameService: Return hint message
+                    Game-->>GameService: Return TOO_HIGH/TOO_LOW
                 end
             end
+            GameService->>GameService: generateFeedback(game, result, guess)
             GameService-->>MakeGuessUseCase: Return feedback
             MakeGuessUseCase->>ConsoleView: displayMessage(feedback)
             MakeGuessUseCase-->>GameController: Return feedback
@@ -121,6 +129,7 @@ sequenceDiagram
     participant StartGameUseCase
     participant ConsoleView
     participant GameService
+    participant NumberGeneratorService
     participant Game
     participant Player
     participant GameDifficulty
@@ -137,7 +146,9 @@ sequenceDiagram
     StartGameUseCase->>Player: new Player("Player Name")
     Player-->>StartGameUseCase: Player instance
     StartGameUseCase->>GameService: createGame(difficulty, player)
-    GameService->>Game: new Game(difficulty, player)
+    GameService->>NumberGeneratorService: generateNumber()
+    NumberGeneratorService-->>GameService: 42
+    GameService->>Game: new Game(difficulty, player, 42)
     Game-->>GameService: Game instance
     GameService-->>StartGameUseCase: Game instance
     StartGameUseCase->>InMemoryGameRepository: save(game)
@@ -160,22 +171,27 @@ sequenceDiagram
     MakeGuessUseCase->>MakeGuessUseCase: validateGuess(guess)
     alt Valid guess
         MakeGuessUseCase->>GameService: processGuess(game, guess)
-        GameService->>Game: makeGuess(guess)
+        GameService->>GameService: validateInput(game, guess)
+        alt Game not started
+            GameService->>Game: startGame()
+        end
+        GameService->>Game: recordGuess(guess)
         Game->>Game: Check guess vs target
         alt Correct guess
             Game->>Game: Set state to WON
             Game->>Player: incrementScore()
-            Game-->>GameService: "Congratulations! You've guessed the number in X attempts."
+            Game-->>GameService: CORRECT
         else Wrong guess
             Game->>Game: Increment attempts
             alt Max attempts reached
                 Game->>Game: Set state to LOST
-                Game-->>GameService: "Sorry, you've run out of attempts. The number was X."
+                Game-->>GameService: GAME_OVER
             else Attempts remaining
-                Game-->>GameService: "Too high/low! Try again. You have X attempts left."
+                Game-->>GameService: TOO_HIGH/TOO_LOW
             end
         end
-        GameService-->>MakeGuessUseCase: Feedback message
+        GameService->>GameService: generateFeedback(game, result, guess)
+        GameService-->>MakeGuessUseCase: "Congratulations! You've guessed the number in X attempts."
         MakeGuessUseCase->>ConsoleView: displayMessage(feedback)
         MakeGuessUseCase-->>GameController: Feedback message
     else Invalid guess
@@ -243,21 +259,21 @@ sequenceDiagram
 ## Key Interactions Explained
 
 ### 1. **Application Initialization**
-- Main class creates all dependencies
-- Dependency injection setup
+- Main class creates all dependencies with proper dependency injection
+- GameService is created with NumberGeneratorService dependency
 - GameController starts the main game loop
 
 ### 2. **Game Setup Flow**
 - Player name input and validation
 - Difficulty selection from menu
-- Game creation with domain services
+- Game creation through GameService with dependency injection
 - Game persistence in repository
 
-### 3. **Game Loop**
+### 3. **Game Loop with Enhanced Architecture**
 - Continuous guess processing until game ends
-- Input validation and error handling
-- Game state management
-- User feedback and hints
+- Input validation through GameService
+- Game state management with GuessResult enum
+- User feedback and hints through rich domain service
 
 ### 4. **Game Completion**
 - Final result display
@@ -266,8 +282,14 @@ sequenceDiagram
 - Clean exit handling
 
 ### 5. **Error Handling**
-- Invalid input validation
+- Invalid input validation through GameService
 - Game state validation
 - Exception handling throughout the flow
 
-This sequence diagram shows the complete flow of the number guessing game, demonstrating how all components interact following the hexagonal architecture principles. 
+### 6. **Architectural Improvements**
+- **Dependency Injection**: GameService properly injects NumberGeneratorService
+- **Separation of Concerns**: Game entity is pure, GameService handles business logic
+- **Clean State Management**: GuessResult enum for clear state transitions
+- **Rich Domain Service**: Centralized business logic and validation
+
+This sequence diagram shows the complete flow of the number guessing game, demonstrating how all components interact following the refactored hexagonal architecture principles with enhanced separation of concerns and dependency injection. 

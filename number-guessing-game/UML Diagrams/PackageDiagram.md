@@ -5,61 +5,61 @@ graph TB
     subgraph "Number Guessing Game"
         subgraph "Domain Layer"
             subgraph "com.shockp.numberguessinggame.domain.model"
-                Game[Game.java]
-                Player[Player.java]
-                GameState[GameState.java]
+                Game[Game.java<br/>Pure Domain Entity]
+                Player[Player.java<br/>Entity]
+                GameState[GameState.java<br/>Enum]
             end
             
             subgraph "com.shockp.numberguessinggame.domain.model.difficulty"
-                GameDifficulty[GameDifficulty.java]
-                DifficultyStrategy[DifficultyStrategy.java]
-                DifficultyEasy[DifficultyEasy.java]
-                DifficultyMedium[DifficultyMedium.java]
-                DifficultyHard[DifficultyHard.java]
+                GameDifficulty[GameDifficulty.java<br/>Strategy Wrapper]
+                DifficultyStrategy[DifficultyStrategy.java<br/>Interface]
+                DifficultyEasy[DifficultyEasy.java<br/>Easy Implementation]
+                DifficultyMedium[DifficultyMedium.java<br/>Medium Implementation]
+                DifficultyHard[DifficultyHard.java<br/>Hard Implementation]
             end
             
             subgraph "com.shockp.numberguessinggame.domain.service"
-                GameService[GameService.java]
-                NumberGeneratorService[NumberGeneratorService.java]
+                GameService[GameService.java<br/>Rich Domain Service]
+                NumberGeneratorService[NumberGeneratorService.java<br/>Utility Service]
             end
         end
         
         subgraph "Application Layer"
             subgraph "com.shockp.numberguessinggame.application.port"
-                GameRepository[GameRepository.java]
-                UserInterface[UserInterface.java]
+                GameRepository[GameRepository.java<br/>Persistence Port]
+                UserInterface[UserInterface.java<br/>UI Port]
             end
             
             subgraph "com.shockp.numberguessinggame.application.usecase"
-                StartGameUseCase[StartGameUseCase.java]
-                MakeGuessUseCase[MakeGuessUseCase.java]
-                EndGameUseCase[EndGameUseCase.java]
+                StartGameUseCase[StartGameUseCase.java<br/>Enhanced Initialization]
+                MakeGuessUseCase[MakeGuessUseCase.java<br/>Guess Processing]
+                EndGameUseCase[EndGameUseCase.java<br/>Game Completion]
             end
         end
         
         subgraph "Infrastructure Layer"
             subgraph "com.shockp.numberguessinggame.infrastructure.persistence"
-                InMemoryGameRepository[InMemoryGameRepository.java]
+                InMemoryGameRepository[InMemoryGameRepository.java<br/>Memory Storage]
             end
             
             subgraph "com.shockp.numberguessinggame.infrastructure.cli"
-                ConsoleView[ConsoleView.java]
-                GameController[GameController.java]
+                ConsoleView[ConsoleView.java<br/>CLI Implementation]
+                GameController[GameController.java<br/>Application Orchestrator]
             end
             
             subgraph "com.shockp.numberguessinggame.infrastructure.factory"
-                GameFactory[GameFactory.java]
+                GameFactory[GameFactory.java<br/>Object Factory]
             end
         end
         
         subgraph "Main Application"
-            Main[Main.java]
+            Main[Main.java<br/>Entry Point]
         end
         
         subgraph "Utility Classes"
-            GameResult[GameResult.java]
-            GameException[GameException.java]
-            InputValidator[InputValidator.java]
+            GameResult[GameResult.java<br/>DTO]
+            GameException[GameException.java<br/>Custom Exception]
+            InputValidator[InputValidator.java<br/>Validation Utility]
         end
     end
     
@@ -69,6 +69,7 @@ graph TB
     StartGameUseCase --> UserInterface
     StartGameUseCase --> Game
     StartGameUseCase --> GameDifficulty
+    StartGameUseCase --> Player
     
     MakeGuessUseCase --> GameService
     MakeGuessUseCase --> UserInterface
@@ -103,7 +104,11 @@ graph TB
     Game --> GameDifficulty
     Game --> Player
     Game --> GameState
-    Game --> NumberGeneratorService
+    Game --> GuessResult
+    
+    GameService --> Game
+    GameService --> NumberGeneratorService
+    GameService --> Player
     
     GameDifficulty --> DifficultyStrategy
     DifficultyEasy --> DifficultyStrategy
@@ -136,7 +141,7 @@ graph TB
 **Purpose**: Contains the core business logic and domain entities
 
 #### `com.shockp.numberguessinggame.domain.model`
-- **Game.java**: Main game entity with business rules
+- **Game.java**: Pure domain entity with state management and GuessResult enum
 - **Player.java**: Player entity with score management
 - **GameState.java**: Enumeration of game states
 
@@ -148,7 +153,7 @@ graph TB
 - **DifficultyHard.java**: Hard difficulty implementation (3 attempts)
 
 #### `com.shockp.numberguessinggame.domain.service`
-- **GameService.java**: High-level game operations
+- **GameService.java**: Rich domain service with comprehensive business logic and dependency injection
 - **NumberGeneratorService.java**: Random number generation service
 
 ### Application Layer
@@ -159,7 +164,7 @@ graph TB
 - **UserInterface.java**: User interaction contract (port)
 
 #### `com.shockp.numberguessinggame.application.usecase`
-- **StartGameUseCase.java**: Game initialization logic
+- **StartGameUseCase.java**: Enhanced game initialization with comprehensive documentation
 - **MakeGuessUseCase.java**: Guess processing logic
 - **EndGameUseCase.java**: Game completion logic
 
@@ -201,4 +206,30 @@ graph TB
 - **Domain → No dependencies**: Pure business logic
 - **Application → Domain**: Uses domain services and entities
 - **Infrastructure → Application**: Implements application ports
-- **Main → All layers**: Coordinates and wires dependencies 
+- **Main → All layers**: Coordinates and wires dependencies
+
+## Key Architectural Improvements
+
+### **Enhanced Domain Layer**
+- **Game Entity**: Now a pure domain entity focused on state management
+- **GameService**: Rich domain service with comprehensive business logic
+- **Dependency Injection**: GameService properly injects NumberGeneratorService
+- **GuessResult Enum**: Clean state management for guess outcomes
+
+### **Improved Separation of Concerns**
+- **Business Logic**: Centralized in GameService
+- **Data Management**: Handled by Game entity
+- **State Management**: Clean enum-based approach
+- **Validation**: Centralized in domain services
+
+### **Better Package Organization**
+- **Clear Boundaries**: Each package has a specific responsibility
+- **Minimal Dependencies**: Packages depend only on what they need
+- **Testability**: Clear separation enables easier unit testing
+- **Maintainability**: Well-organized code structure
+
+### **Professional Standards**
+- **Comprehensive Documentation**: All classes have detailed JavaDoc
+- **Thread Safety Notes**: Explicit documentation of concurrency considerations
+- **Author Tags**: Professional documentation standards
+- **Version Information**: Clear version tracking 

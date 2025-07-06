@@ -1,23 +1,35 @@
 package com.shockp.numberguessinggame.domain.model;
 
 import com.shockp.numberguessinggame.domain.model.difficulty.GameDifficulty;
-import com.shockp.numberguessinggame.domain.service.NumberGeneratorService;
 
 /**
  * Represents a number guessing game instance.
  * <p>
- * This class manages the core game logic including:
+ * This class is a pure domain entity that encapsulates game state and data.
+ * It follows the principle of anemic domain model where business logic is
+ * handled by domain services, not the entity itself.
+ * </p>
+ * <p>
+ * The game contains:
  * </p>
  * <ul>
- *   <li>Game state management (not started, in progress, won, lost)</li>
- *   <li>Player guess processing and feedback</li>
- *   <li>Attempt tracking and validation</li>
- *   <li>Score management</li>
- *   <li>Game completion detection</li>
+ *   <li>Game state (not started, in progress, won, lost)</li>
+ *   <li>Game data (target number, attempts, difficulty, player)</li>
+ *   <li>Basic state transitions</li>
  * </ul>
  * <p>
- * The game generates a random target number between 1 and 100 that the player
- * must guess within the allowed number of attempts defined by the game difficulty.
+ * Business logic such as guess processing, validation, and feedback generation
+ * is handled by the GameService class.
+ * </p>
+ * 
+ * <p>
+ * Thread Safety: This class is not thread-safe. External synchronization
+ * should be used if multiple threads access the same game instance.
+ * </p>
+ * 
+ * <p>
+ * Immutability: The difficulty, player, and target number are immutable.
+ * The state and current attempts can be modified through public methods.
  * </p>
  */
 public class Game {
@@ -37,28 +49,36 @@ public class Game {
     private int currentAttempts;
 
     /**
-     * Constructs a new Game with the specified difficulty and player.
+     * Constructs a new Game with the specified difficulty, player, and target number.
      * <p>
-     * The game is initialized in the NOT_STARTED state with a randomly
-     * generated target number between 1 and 100.
+     * The game is initialized in the NOT_STARTED state. The target number
+     * should be provided by the service layer, not generated within the entity.
+     * </p>
+     * <p>
+     * The constructor performs validation on all parameters to ensure
+     * the game is created in a valid state.
      * </p>
      *
      * @param difficulty the difficulty level of the game, cannot be null
      * @param player the player participating in the game, cannot be null
-     * @throws IllegalArgumentException if difficulty or player is null
+     * @param targetNumber the target number to guess (1-100 inclusive)
+     * @throws IllegalArgumentException if difficulty or player is null, or targetNumber is invalid
      */
-    public Game(GameDifficulty difficulty, Player player) {
+    public Game(GameDifficulty difficulty, Player player, int targetNumber) {
         if (difficulty == null) {
             throw new IllegalArgumentException("Game difficulty cannot be null");
         }
         if (player == null) {
             throw new IllegalArgumentException("Player cannot be null");
         }
+        if (targetNumber < 1 || targetNumber > 100) {
+            throw new IllegalArgumentException("Target number must be between 1 and 100");
+        }
         
         this.difficulty = difficulty;
         this.player = player;
+        this.targetNumber = targetNumber;
         this.state = GameState.NOT_STARTED;
-        this.targetNumber = new NumberGeneratorService().generateNumber();
         this.currentAttempts = 0;
     }
 
@@ -68,6 +88,10 @@ public class Game {
      * This method can only be called when the game is in the NOT_STARTED state.
      * If the game is already in progress or has ended, this method has no effect.
      * </p>
+     * <p>
+     * This method is idempotent - calling it multiple times when the game
+     * is already started will not change the state.
+     * </p>
      */
     public void startGame() {
         if (state == GameState.NOT_STARTED) {
@@ -76,61 +100,47 @@ public class Game {
     }
 
     /**
-     * Processes a player's guess and returns appropriate feedback.
+     * Records a guess attempt and updates the game state accordingly.
      * <p>
-     * This method:
+     * This method only updates the internal state. Business logic for
+     * determining win/loss conditions and generating feedback messages
+     * should be handled by the GameService.
      * </p>
-     * <ul>
-     *   <li>Validates that the game is in progress</li>
-     *   <li>Increments the attempt counter</li>
-     *   <li>Compares the guess with the target number</li>
-     *   <li>Updates the game state if the game ends (win or loss)</li>
-     *   <li>Increments the player's score if they win</li>
-     *   <li>Returns appropriate feedback message</li>
-     * </ul>
+     * <p>
+     * The method increments the attempt counter and checks if the guess
+     * is correct or if the maximum attempts have been reached.
+     * </p>
      *
-     * @param guess the player's guess (must be between 1 and 100)
-     * @return a feedback message describing the result of the guess
+     * @param guess the player's guess (should be between 1-100)
+     * @return the result of the guess (correct, too high, too low, or game over)
      * @throws IllegalStateException if the game is not in progress
-     * @throws IllegalArgumentException if guess is outside valid range (1-100)
      */
-    public String makeGuess(int guess) {
+    public GuessResult recordGuess(int guess) {
         if (state != GameState.IN_PROGRESS) {
             throw new IllegalStateException("Game is not in progress");
-        }
-        
-        if (guess < 1 || guess > 100) {
-            throw new IllegalArgumentException("Guess must be between 1 and 100");
         }
 
         currentAttempts++;
 
         if (guess == targetNumber) {
             state = GameState.WON;
-            player.incrementScore();
-            return "Congratulations! You've guessed the number in " + 
-                   currentAttempts + " attempts.";
+            return GuessResult.CORRECT;
         } else if (currentAttempts >= difficulty.getMaxAttempts()) {
             state = GameState.LOST;
-            return "Sorry, you've run out of attempts. The number was " + 
-                   targetNumber + ".";
+            return GuessResult.GAME_OVER;
         } else {
-            int remainingAttempts = difficulty.getMaxAttempts() - currentAttempts;
-
-            if (guess < targetNumber) {
-                return "Too low! Try again. You have " + remainingAttempts +
-                       " attempts left.";
-            } else {
-                return "Too high! Try again. You have " + remainingAttempts +
-                       " attempts left.";
-            }
+            return guess < targetNumber ? GuessResult.TOO_LOW : GuessResult.TOO_HIGH;
         }
     }
 
     /**
      * Gets the difficulty level of this game.
+     * <p>
+     * The difficulty determines the maximum number of attempts allowed
+     * and other game parameters.
+     * </p>
      *
-     * @return the game difficulty
+     * @return the game difficulty, never null
      */
     public GameDifficulty getDifficulty() {
         return difficulty;
@@ -138,8 +148,12 @@ public class Game {
 
     /**
      * Gets the player participating in this game.
+     * <p>
+     * The player object contains information about the participant
+     * including their name and score.
+     * </p>
      *
-     * @return the game player
+     * @return the game player, never null
      */
     public Player getPlayer() {
         return player;
@@ -147,8 +161,12 @@ public class Game {
 
     /**
      * Gets the current state of the game.
+     * <p>
+     * The game can be in one of four states: NOT_STARTED, IN_PROGRESS,
+     * WON, or LOST.
+     * </p>
      *
-     * @return the current game state
+     * @return the current game state, never null
      */
     public GameState getState() {
         return state;
@@ -160,8 +178,11 @@ public class Game {
      * Note: This method is typically used for testing or debugging purposes.
      * In a production game, the target number should remain hidden from the player.
      * </p>
+     * <p>
+     * The target number is set during construction and cannot be changed.
+     * </p>
      *
-     * @return the target number (1-100)
+     * @return the target number (1-100 inclusive)
      */
     public int getTargetNumber() {
         return targetNumber;
@@ -169,8 +190,11 @@ public class Game {
 
     /**
      * Gets the number of attempts the player has made so far.
+     * <p>
+     * This counter starts at 0 and is incremented with each guess.
+     * </p>
      *
-     * @return the current number of attempts
+     * @return the current number of attempts (0 or greater)
      */
     public int getCurrentAttempts() {
         return currentAttempts;
@@ -182,8 +206,12 @@ public class Game {
      * This is calculated as the difference between the maximum allowed
      * attempts (based on difficulty) and the current number of attempts.
      * </p>
+     * <p>
+     * The result can be negative if the player has exceeded the maximum
+     * attempts, though this should not occur in normal gameplay.
+     * </p>
      *
-     * @return the number of remaining attempts
+     * @return the number of remaining attempts (can be negative)
      */
     public int getRemainingAttempts() {
         return difficulty.getMaxAttempts() - currentAttempts;
@@ -191,10 +219,55 @@ public class Game {
 
     /**
      * Checks if the game has ended (either won or lost).
+     * <p>
+     * A game is considered over when the player has either correctly
+     * guessed the number or exhausted all available attempts.
+     * </p>
      *
-     * @return true if the game is over, false otherwise
+     * @return true if the game is over (WON or LOST), false otherwise
      */
     public boolean isGameOver() {
         return state == GameState.WON || state == GameState.LOST;
+    }
+
+    /**
+     * Increments the player's score.
+     * <p>
+     * This method should be called when the player wins the game.
+     * It delegates the score increment to the player object.
+     * </p>
+     * <p>
+     * The score increment is typically handled by the GameService
+     * after processing a winning guess.
+     * </p>
+     */
+    public void incrementPlayerScore() {
+        player.incrementScore();
+    }
+
+    /**
+     * Enum representing the result of a guess.
+     * <p>
+     * This enum provides the possible outcomes when a player makes a guess:
+     * </p>
+     * <ul>
+     *   <li>CORRECT - The player guessed the number correctly</li>
+     *   <li>TOO_HIGH - The guess is higher than the target number</li>
+     *   <li>TOO_LOW - The guess is lower than the target number</li>
+     *   <li>GAME_OVER - The player has exhausted all attempts</li>
+     * </ul>
+     */
+    public enum GuessResult {
+        /** Player guessed the number correctly */
+        CORRECT,
+        
+        /** Guess is higher than the target number */
+        TOO_HIGH,
+        
+        /** Guess is lower than the target number */
+        TOO_LOW,
+        
+        /** Game is over (max attempts reached) */
+        GAME_OVER
     }
 }
