@@ -49,4 +49,20 @@ A modular Java CLI application for managing personal finances with JSON persiste
 
 ---
 
-### 4. Number Guessing Game (CLI) *(Work in Progress)*
+### 4. Number Guessing Game (CLI)
+[🔗 Project Page](https://roadmap.sh/projects/number-guessing-game) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/number-guessing-game)
+
+A comprehensive Java CLI application implementing a number guessing game following hexagonal architecture principles.
+
+- Hexagonal architecture with ports and adapters pattern for clean separation of concerns
+- Domain-driven design with rich domain services and anemic domain entities
+- Dependency injection for loose coupling and enhanced testability
+- SOLID principles implementation throughout the codebase
+- Design patterns including Strategy, Factory, and Repository patterns
+- Clean architecture with clear separation between domain, application, and infrastructure layers
+- Comprehensive error handling and input validation
+- Modern Java features with extensive JavaDoc documentation
+- Professional command-line interface with user-friendly interactions
+- Game state management with proper lifecycle transitions
+- Unit testing readiness with dependency injection and clear interfaces
+- Maven build system with plugins for compilation, execution, and packaging
