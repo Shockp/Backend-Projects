@@ -116,12 +116,7 @@ Infrastructure Layer:
   + generateGameId(): String
   + clearAllGames(): void
 
-❌ TO-DO LIST (Empty/Planned Classes)
-============================
-
-PRIORITY 1: INFRASTRUCTURE LAYER
---------------------------------
-+ com.shockp.numberguessinggame.infrastructure.cli.ConsoleView
+- com.shockp.numberguessinggame.infrastructure.cli.ConsoleView
   + ConsoleView()
   + ConsoleView(InputStream input, PrintStream output)
   + displayMessage(String message): void
@@ -132,21 +127,38 @@ PRIORITY 1: INFRASTRUCTURE LAYER
   + displayError(String error): void
   + displaySuccess(String message): void
 
-+ com.shockp.numberguessinggame.infrastructure.cli.GameController
-  + GameController(StartGameUseCase, MakeGuessUseCase, EndGameUseCase, UserInterface)
-  + startGame(): void
-  + runGameLoop(): void
-  + processUserInput(String input): void
-  + handleGameState(Game game): void
-  + displayWelcome(): void
-  + displayGoodbye(): void
+❌ TO-DO LIST (Empty/Planned Classes)
+============================
 
-+ com.shockp.numberguessinggame.infrastructure.factory.GameFactory
+PRIORITY 1: INFRASTRUCTURE LAYER
+--------------------------------
++ com.shockp.numberguessinggame.infrastructure.cli.GameController (class and method stubs exist, logic not implemented)
+  + GameController(StartGameUseCase startGameUseCase, MakeGuessUseCase makeGuessUseCase, EndGameUseCase endGameUseCase, UserInterface userInterface)
+    - Store all dependencies as fields. Validate that none are null. This enables orchestration of the game flow.
+  + void startGame()
+    - Entry point for the CLI game. Should call displayWelcomeMessage(), then runGameLoop(), then displayGoodbyeMessage().
+  + void runGameLoop()
+    - Main game loop. Use StartGameUseCase to create a new game (prompt for player name and difficulty). While the game is not over, prompt for guesses using MakeGuessUseCase, process guesses, and display feedback. After the game ends, call EndGameUseCase. Ask if the user wants to play again; if yes, repeat, else exit.
+  + void processUserInput(String input)
+    - Parse and handle user input (e.g., menu selection, commands). Route to the appropriate method or action. For simple CLI, may be used for menu navigation.
+  + void handleGameState(Game game)
+    - Display the current game state (attempts, remaining attempts, status) using the UserInterface. Optionally, provide hints or additional info.
+  + void displayWelcomeMessage()
+    - Print a stylized welcome message/banner using UserInterface.displayMessage().
+  + void displayGoodbyeMessage()
+    - Print a stylized goodbye/exit message using UserInterface.displayMessage().
+
++ com.shockp.numberguessinggame.infrastructure.factory.GameFactory (class stub only)
   + GameFactory()
-  + createGame(GameDifficulty, Player): Game
-  + createPlayer(String name): Player
-  + createDifficulty(String difficultyName): GameDifficulty
-  + createGameWithDefaults(): Game
+    - Default constructor. No special logic unless you want to inject dependencies for advanced factories.
+  + Game createGame(GameDifficulty difficulty, Player player)
+    - Use a NumberGeneratorService to generate a random number (1-100). Return new Game(difficulty, player, targetNumber).
+  + Player createPlayer(String name)
+    - Return new Player(name).
+  + GameDifficulty createDifficulty(String difficultyName)
+    - Return GameDifficulty.easy(), .medium(), or .hard() based on the string (case-insensitive). Throw IllegalArgumentException for invalid input.
+  + Game createGameWithDefaults()
+    - Use default player name and difficulty, call createGame(). Useful for demo or test setups.
 
 PRIORITY 2: MAIN APPLICATION
 ----------------------------
