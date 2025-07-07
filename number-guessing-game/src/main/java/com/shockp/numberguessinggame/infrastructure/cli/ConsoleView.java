@@ -38,31 +38,38 @@ public class ConsoleView implements UserInterface {
 
     /**
      * Displays a message to the user.
-     * @param message the message to display (must not be null or empty)
-     * @throws IllegalArgumentException if the message is null or empty
+     * @param message the message to display (null or empty messages are handled gracefully)
      */
     @Override
     public void displayMessage(String message) {
-        if (message == null || message.trim().isEmpty()) {
-            throw new IllegalArgumentException("Message cannot be null or empty");
+        if (message == null) {
+            output.println();
+            return;
         }
-        output.println(message);
+        
+        String trimmedMessage = message.trim();
+        if (trimmedMessage.isEmpty()) {
+            output.println();
+        } else {
+            output.println(trimmedMessage);
+        }
     }
 
     /**
      * Prompts the user for input and returns the trimmed input string.
-     * @return the user's input (never null or empty)
-     * @throws RuntimeException if the input is null or empty
+     * @return the user's input (never null, may be empty)
      */
     @Override
     public String getUserInput() {
-        output.print("> ");
-        output.flush();
-        String input = scanner.nextLine();
-        if (input == null || input.trim().isEmpty()) {
-            throw new RuntimeException("Invalid input");
+        while (true) {
+            output.print("> ");
+            output.flush();
+            String input = scanner.nextLine();
+            if (input == null) {
+                input = "";
+            }
+            return input.trim();
         }
-        return input.trim();
     }
 
     /**
