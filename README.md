@@ -66,3 +66,7 @@ A comprehensive Java CLI application implementing a number guessing game followi
 - Game state management with proper lifecycle transitions
 - Unit testing readiness with dependency injection and clear interfaces
 - Maven build system with plugins for compilation, execution, and packaging
+
+---
+
+### 5. Weather Wrapper Service (API) *(Work in progress)*
