@@ -321,26 +321,6 @@ mvn jacoco:report
 - Mock external dependencies
 - Test edge cases and error scenarios
 
-## Future Enhancements
-- **Persistent Storage**: Database or file-based repository
-- **High Score System**: Track and display player achievements
-- **Statistics Tracking**: Detailed game analytics
-- **GUI Interface**: Graphical user interface option
-- **Multiplayer Support**: Network-based multiplayer games
-- **Custom Difficulty**: User-defined difficulty settings
-- **Sound Effects**: Audio feedback for game events
-- **Themes**: Customizable visual themes
-
-## Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Follow the existing code style and architecture
-4. Add comprehensive tests
-5. Submit a pull request
-
-## License
-This project is open source and available under the MIT License.
-
 ---
 
 **Enjoy playing the Number Guessing Game!** 🎮🎯
