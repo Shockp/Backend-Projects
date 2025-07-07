@@ -10,7 +10,7 @@ The projects are designed to help developers like myself build practical skills 
 
 ## Projects
 
-### 1. Task Tracker
+### 1. Task Tracker (CLI)
 [🔗 Project Page](https://roadmap.sh/projects/task-tracker) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/task-tracker)
 
 A command-line interface application for managing tasks and to-do lists.
@@ -22,7 +22,7 @@ A command-line interface application for managing tasks and to-do lists.
 
 ---
 
-### 2. GitHub User Activity Tracker
+### 2. GitHub User Activity Tracker (CLI)
 [🔗 Project Page](https://roadmap.sh/projects/github-user-activity) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/github-user-activity)
 
 A CLI tool that fetches and displays GitHub user activity using the GitHub API.
@@ -34,7 +34,7 @@ A CLI tool that fetches and displays GitHub user activity using the GitHub API.
 
 ---
 
-### 3. Expense Tracker
+### 3. Expense Tracker (CLI)
 [🔗 Project Page](https://roadmap.sh/projects/expense-tracker) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/expense-tracker)
 
 A modular Java CLI application for managing personal finances with JSON persistence.
@@ -49,4 +49,4 @@ A modular Java CLI application for managing personal finances with JSON persiste
 
 ---
 
-### 4. Number Guessing Game *(Work in Progress)*
+### 4. Number Guessing Game (CLI) *(Work in Progress)*
