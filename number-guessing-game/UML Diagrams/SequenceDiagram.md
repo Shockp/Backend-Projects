@@ -5,7 +5,7 @@
 ```mermaid
 sequenceDiagram
     participant User
-    participant Main
+    participant NumberGuessingCLI
     participant GameController
     participant StartGameUseCase
     participant MakeGuessUseCase
@@ -18,21 +18,21 @@ sequenceDiagram
     participant GameDifficulty
     participant NumberGeneratorService
 
-    Note over User, NumberGeneratorService: Game Initialization
-    User->>Main: Start Application
-    Main->>Main: initializeDependencies()
-    Main->>NumberGeneratorService: Create NumberGeneratorService
-    Main->>GameService: Create GameService(NumberGeneratorService)
-    Main->>GameController: Create GameController
-    Main->>ConsoleView: Create ConsoleView
-    Main->>InMemoryGameRepository: Create Repository
-    Main->>StartGameUseCase: Create StartGameUseCase
-    Main->>MakeGuessUseCase: Create MakeGuessUseCase
-    Main->>EndGameUseCase: Create EndGameUseCase
-    Main->>GameController: startGame()
+    Note over User, NumberGeneratorService: Application Initialization
+    User->>NumberGuessingCLI: Start Application
+    NumberGuessingCLI->>NumberGuessingCLI: initializeDependencies()
+    NumberGuessingCLI->>NumberGeneratorService: Create NumberGeneratorService
+    NumberGuessingCLI->>GameService: Create GameService(NumberGeneratorService)
+    NumberGuessingCLI->>ConsoleView: Create ConsoleView
+    NumberGuessingCLI->>InMemoryGameRepository: Create Repository
+    NumberGuessingCLI->>StartGameUseCase: Create StartGameUseCase
+    NumberGuessingCLI->>MakeGuessUseCase: Create MakeGuessUseCase
+    NumberGuessingCLI->>EndGameUseCase: Create EndGameUseCase
+    NumberGuessingCLI->>GameController: Create GameController
+    NumberGuessingCLI->>GameController: startGame()
     
     Note over User, NumberGeneratorService: Game Setup
-    GameController->>ConsoleView: displayWelcome()
+    GameController->>ConsoleView: displayWelcomeMessage()
     ConsoleView-->>User: Show welcome message
     GameController->>StartGameUseCase: execute()
     StartGameUseCase->>ConsoleView: getPlayerName()
@@ -89,6 +89,9 @@ sequenceDiagram
             MakeGuessUseCase->>ConsoleView: displayMessage(feedback)
             MakeGuessUseCase-->>GameController: Return feedback
             ConsoleView-->>User: Show feedback
+            GameController->>GameController: handleGameState(game)
+            GameController->>ConsoleView: displayGameState(game)
+            ConsoleView-->>User: Show game status
         else Invalid guess
             MakeGuessUseCase->>ConsoleView: displayError("Invalid input")
             MakeGuessUseCase-->>GameController: Return error
@@ -104,19 +107,19 @@ sequenceDiagram
             ConsoleView-->>User: Ask to play again
             User-->>ConsoleView: Yes/No response
             ConsoleView-->>EndGameUseCase: Return choice
-            EndGameUseCase-->>GameController: Return GameResult
+            EndGameUseCase-->>GameController: Return boolean
             alt User wants to play again
                 GameController->>StartGameUseCase: execute()
                 Note over StartGameUseCase: Repeat game setup
             else User wants to exit
-                GameController->>ConsoleView: displayGoodbye()
+                GameController->>ConsoleView: displayGoodbyeMessage()
                 ConsoleView-->>User: Show goodbye message
-                GameController-->>Main: Exit game loop
+                GameController-->>NumberGuessingCLI: Exit game loop
             end
         end
     end
     
-    Main-->>User: Application ends
+    NumberGuessingCLI-->>User: Application ends
 ```
 
 ## Use Case Sequence Diagrams
@@ -209,19 +212,16 @@ sequenceDiagram
     participant ConsoleView
     participant InMemoryGameRepository
     participant Game
-    participant GameResult
 
     GameController->>EndGameUseCase: execute(game)
     EndGameUseCase->>InMemoryGameRepository: saveGameStatistics(game)
     EndGameUseCase->>ConsoleView: displayFinalResult(game)
     ConsoleView-->>User: Show final result
-    EndGameUseCase->>GameResult: new GameResult(won, attempts, maxAttempts, playerName, difficulty)
-    GameResult-->>EndGameUseCase: GameResult instance
     EndGameUseCase->>ConsoleView: askToPlayAgain()
     ConsoleView-->>User: "Do you want to play again? (y/n)"
     User-->>ConsoleView: "y" or "n"
     ConsoleView-->>EndGameUseCase: Boolean choice
-    EndGameUseCase-->>GameController: GameResult
+    EndGameUseCase-->>GameController: Boolean
 ```
 
 ## Repository Operations Sequence Diagram
@@ -259,7 +259,7 @@ sequenceDiagram
 ## Key Interactions Explained
 
 ### 1. **Application Initialization**
-- Main class creates all dependencies with proper dependency injection
+- NumberGuessingCLI creates all dependencies with proper dependency injection
 - GameService is created with NumberGeneratorService dependency
 - GameController starts the main game loop
 
@@ -269,11 +269,12 @@ sequenceDiagram
 - Game creation through GameService with dependency injection
 - Game persistence in repository
 
-### 3. **Game Loop with Enhanced Architecture**
+### 3. **Game Loop with Complete Architecture**
 - Continuous guess processing until game ends
 - Input validation through GameService
 - Game state management with GuessResult enum
 - User feedback and hints through rich domain service
+- Real-time game status display
 
 ### 4. **Game Completion**
 - Final result display
@@ -285,11 +286,14 @@ sequenceDiagram
 - Invalid input validation through GameService
 - Game state validation
 - Exception handling throughout the flow
+- Graceful error recovery
 
-### 6. **Architectural Improvements**
+### 6. **Complete Implementation Features**
 - **Dependency Injection**: GameService properly injects NumberGeneratorService
 - **Separation of Concerns**: Game entity is pure, GameService handles business logic
 - **Clean State Management**: GuessResult enum for clear state transitions
 - **Rich Domain Service**: Centralized business logic and validation
+- **Professional UI**: Comprehensive user feedback and status updates
+- **Error Recovery**: Graceful handling of edge cases and invalid input
 
-This sequence diagram shows the complete flow of the number guessing game, demonstrating how all components interact following the refactored hexagonal architecture principles with enhanced separation of concerns and dependency injection. 
+This sequence diagram shows the complete flow of the number guessing game, demonstrating how all components interact following the hexagonal architecture principles with complete implementation and enhanced user experience. 
