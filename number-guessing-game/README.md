@@ -77,6 +77,7 @@ java -jar target/number-guessing-game-1.0.0.jar
 # Method 4: Direct compilation without Maven (Advanced)
 javac -d target/classes -cp "src/main/java" src/main/java/com/shockp/numberguessinggame/*.java src/main/java/com/shockp/numberguessinggame/*/*.java src/main/java/com/shockp/numberguessinggame/*/*/*.java
 java -cp "target/classes" com.shockp.numberguessinggame.NumberGuessingCLI
+```
 
 ### Game Flow
 1. **Welcome Screen**: Displays game introduction and instructions
