@@ -23,6 +23,7 @@
         <module>github-user-activity</module>
         <module>expense-tracker</module>
         <module>number-guessing-game</module>
+        <module>weather-api-wrapper-service</module>
     </modules>
 
 </project>
