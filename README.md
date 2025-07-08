@@ -15,6 +15,16 @@ The projects are designed to help developers like myself build practical skills 
 
 A command-line interface application for managing tasks and to-do lists.
 
+**Tech Stack:**
+- Java 8+
+- Gson (JSON serialization)
+- Maven
+
+**Architecture:**
+- Layered Architecture (CLI, Service, Persistence)
+- Simple OOP with separation of concerns
+
+**Features:**
 - File I/O operations
 - Command-line argument parsing
 - Basic data structures
@@ -27,6 +37,18 @@ A command-line interface application for managing tasks and to-do lists.
 
 A CLI tool that fetches and displays GitHub user activity using the GitHub API.
 
+**Tech Stack:**
+- Java 11+
+- Java HttpClient (HTTP requests)
+- Gson (JSON parsing)
+- Maven
+
+**Architecture:**
+- Layered Architecture (CLI, Service, Client, Model, Util)
+- Command Pattern for extensibility
+- Clean separation of concerns
+
+**Features:**
 - API integration and HTTP requests
 - JSON data parsing
 - Error handling and validation
@@ -39,6 +61,21 @@ A CLI tool that fetches and displays GitHub user activity using the GitHub API.
 
 A modular Java CLI application for managing personal finances with JSON persistence.
 
+**Tech Stack:**
+- Java 17+
+- Gson (JSON serialization)
+- Apache Commons CLI (argument parsing)
+- OpenCSV (CSV export)
+- Maven
+
+**Architecture:**
+- Layered Architecture (CLI, Command, Service, Persistence, Model)
+- Command Pattern for CLI extensibility
+- Factory Pattern for command handlers
+- Validation Framework for input
+- Clean separation of concerns
+
+**Features:**
 - Full CRUD operations for expenses (add, update, delete, list)
 - Summary reports (total and month-specific with category breakdown)
 - Filter expenses by category and month
@@ -54,18 +91,25 @@ A modular Java CLI application for managing personal finances with JSON persiste
 
 A comprehensive Java CLI application implementing a number guessing game following hexagonal architecture principles.
 
-- Hexagonal architecture with ports and adapters pattern for clean separation of concerns
-- Domain-driven design with rich domain services and anemic domain entities
-- Dependency injection for loose coupling and enhanced testability
-- SOLID principles implementation throughout the codebase
-- Design patterns including Strategy, Factory, and Repository patterns
-- Clean architecture with clear separation between domain, application, and infrastructure layers
-- Comprehensive error handling and input validation
-- Modern Java features with extensive JavaDoc documentation
-- Professional command-line interface with user-friendly interactions
-- Game state management with proper lifecycle transitions
-- Unit testing readiness with dependency injection and clear interfaces
-- Maven build system with plugins for compilation, execution, and packaging
+**Tech Stack:**
+- Java 17+ (or higher)
+- Maven
+
+**Architecture:**
+- Hexagonal Architecture (Ports & Adapters)
+- Layered (Domain, Application, Infrastructure, Main)
+- Dependency Injection throughout
+- SOLID principles and design patterns (Strategy, Factory, Repository)
+
+**Features:**
+- Multiple difficulty levels (Easy, Medium, Hard)
+- Player management and score tracking
+- Real-time feedback and game state display
+- Input validation and error handling
+- Play again functionality
+- Professional CLI interface
+- Comprehensive JavaDoc documentation
+- Fully testable and extensible structure
 
 ---
 
