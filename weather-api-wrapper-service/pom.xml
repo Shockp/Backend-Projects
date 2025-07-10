@@ -15,8 +15,9 @@
     <description>Spring Boot service for wrapping Visual Crossing Weather API with Redis caching and rate limiting.</description>
     <properties>
         <java.version>21</java.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
+        <spring-boot.version>3.5.3</spring-boot.version>
     </properties>
+    
     <dependencies>
         <!-- Spring Boot Starter Web -->
         <dependency>
@@ -38,9 +39,9 @@
         </dependency>
         <!-- Bucket4j for rate limiting -->
         <dependency>
-            <groupId>com.github.vladimir-bukhtoyarov</groupId>
+            <groupId>com.bucket4j</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>8.6.0</version>
+            <version>8.7.0</version>
         </dependency>
         <!-- Spring Boot Starter Cache -->
         <dependency>
