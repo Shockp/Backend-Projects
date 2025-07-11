@@ -62,10 +62,15 @@ public class RateLimiterService {
      * @param clientId the unique client identifier, must not be {@code null} or empty
      * @return {@code true} if the client has available tokens, {@code false} otherwise
      * @throws IllegalArgumentException if {@code clientId} is {@code null} or empty
+     * @throws WeatherServiceException if rate limit checking fails
      */
     public boolean checkRateLimit(String clientId) {
         validateClientId(clientId);
-        return rateLimiterPort.getAvailableTokens(clientId.trim()) > 0;
+        try {
+            return rateLimiterPort.getAvailableTokens(clientId.trim()) > 0;
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to check rate limit for client: " + clientId, e);
+        }
     }
 
     /**
@@ -74,10 +79,15 @@ public class RateLimiterService {
      * @param clientId the unique client identifier, must not be {@code null} or empty
      * @return {@code true} if a token was successfully consumed, {@code false} if the limit is exceeded
      * @throws IllegalArgumentException if {@code clientId} is {@code null} or empty
+     * @throws WeatherServiceException if token consumption fails
      */
     public boolean consumeToken(String clientId) {
         validateClientId(clientId);
-        return rateLimiterPort.tryConsume(clientId.trim());
+        try {
+            return rateLimiterPort.tryConsume(clientId.trim());
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to consume rate limit token for client: " + clientId, e);
+        }
     }
 
     /**
@@ -86,10 +96,15 @@ public class RateLimiterService {
      * @param clientId the unique client identifier, must not be {@code null} or empty
      * @return the number of remaining tokens
      * @throws IllegalArgumentException if {@code clientId} is {@code null} or empty
+     * @throws WeatherServiceException if token retrieval fails
      */
     public int getRemainingTokens(String clientId) {
         validateClientId(clientId);
-        return rateLimiterPort.getAvailableTokens(clientId.trim());
+        try {
+            return rateLimiterPort.getAvailableTokens(clientId.trim());
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to get remaining tokens for client: " + clientId, e);
+        }
     }
 
     /**
@@ -101,10 +116,15 @@ public class RateLimiterService {
      *
      * @param clientId the unique client identifier, must not be {@code null} or empty
      * @throws IllegalArgumentException if {@code clientId} is {@code null} or empty
+     * @throws WeatherServiceException if rate limit reset fails
      */
     public void reset(String clientId) {
         validateClientId(clientId);
-        rateLimiterPort.reset(clientId.trim());
+        try {
+            rateLimiterPort.reset(clientId.trim());
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to reset rate limit for client: " + clientId, e);
+        }
     }
 
     /**

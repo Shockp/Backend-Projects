@@ -47,10 +47,15 @@ public class CacheService {
      * @param key the cache key, must not be {@code null}
      * @return an {@link Optional} containing the {@link WeatherData} if present, or empty if not found
      * @throws NullPointerException if {@code key} is {@code null}
+     * @throws WeatherServiceException if cache retrieval fails
      */
     public Optional<WeatherData> get(String key) {
         Objects.requireNonNull(key, "Cache key cannot be null");
-        return cachePort.get(key);
+        try {
+            return cachePort.get(key);
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to retrieve weather data from cache for key: " + key, e);
+        }
     }
 
     /**
@@ -59,6 +64,7 @@ public class CacheService {
      * @param key the cache key, must not be {@code null}
      * @param data the {@link WeatherData} to cache, must not be {@code null}
      * @throws NullPointerException if either parameter is {@code null}
+     * @throws WeatherServiceException if cache storage fails
      */
     public void put(String key, WeatherData data) {
         put(key, data, cacheTimeout);
@@ -71,12 +77,17 @@ public class CacheService {
      * @param data the {@link WeatherData} to cache, must not be {@code null}
      * @param ttl the time-to-live duration, must not be {@code null}
      * @throws NullPointerException if any parameter is {@code null}
+     * @throws WeatherServiceException if cache storage fails
      */
     public void put(String key, WeatherData data, Duration ttl) {
         Objects.requireNonNull(key, "Cache key cannot be null");
         Objects.requireNonNull(data, "Weather data cannot be null");
         Objects.requireNonNull(ttl, "TTL cannot be null");
-        cachePort.put(key, data, ttl);
+        try {
+            cachePort.put(key, data, ttl);
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to store weather data in cache for key: " + key, e);
+        }
     }
 
     /**
@@ -84,10 +95,15 @@ public class CacheService {
      *
      * @param key the cache key to evict, must not be {@code null}
      * @throws NullPointerException if {@code key} is {@code null}
+     * @throws WeatherServiceException if cache eviction fails
      */
     public void evict(String key) {
         Objects.requireNonNull(key, "Cache key cannot be null");
-        cachePort.delete(key);
+        try {
+            cachePort.delete(key);
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to evict weather data from cache for key: " + key, e);
+        }
     }
 
     /**
@@ -96,9 +112,15 @@ public class CacheService {
      * This operation removes all cached weather data. Use with caution as it may
      * be expensive depending on the cache implementation and the number of entries.
      * </p>
+     *
+     * @throws WeatherServiceException if cache clearing fails
      */
     public void clear() {
-        cachePort.clear();
+        try {
+            cachePort.clear();
+        } catch (Exception e) {
+            throw new WeatherServiceException("Failed to clear cache", e);
+        }
     }
 
     /**
