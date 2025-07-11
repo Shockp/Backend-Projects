@@ -1,5 +1,7 @@
 package com.shockp.weather.domain.service;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when weather service operations fail.
  * <p>
@@ -13,6 +15,7 @@ package com.shockp.weather.domain.service;
 public class WeatherServiceException extends RuntimeException {
 
     /** Serial version UID for serialization compatibility. */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
