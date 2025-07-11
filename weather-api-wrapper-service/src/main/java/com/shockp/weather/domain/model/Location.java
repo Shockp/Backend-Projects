@@ -41,20 +41,23 @@ public final class Location {
     private final String country;
 
     /**
-     * Constructs a new Location with the specified coordinates and place information.
-     * 
+     * Constructs a new {@link Location} instance with the specified coordinates and place information.
+     *
      * <p>Validates that:
      * <ul>
-     *   <li>Latitude is between -90.0 and 90.0 degrees</li>
-     *   <li>Longitude is between -180.0 and 180.0 degrees</li>
-     *   <li>City is not null or empty</li>
-     *   <li>Country is not null or empty</li>
-     * </ul></p>
-     * 
-     * @param latitude the latitude coordinate in decimal degrees
-     * @param longitude the longitude coordinate in decimal degrees
-     * @param city the city name, must not be null or empty
-     * @param country the country name, must not be null or empty
+     *   <li>{@code latitude} is between {@code #MIN_LATITUDE} and {@code #MAX_LATITUDE} degrees</li>
+     *   <li>{@code longitude} is between {@code #MIN_LONGITUDE} and {@code #MAX_LONGITUDE} degrees</li>
+     *   <li>{@code city} is not {@code null} or empty</li>
+     *   <li>{@code country} is not {@code null} or empty</li>
+     * </ul>
+     * Validation is performed by {@link #validateCoordinates(double, double)} and
+     * {@link #validatePlaceNames(String, String)}.
+     * </p>
+     *
+     * @param latitude the latitude coordinate in decimal degrees; must be between {@code -90.0} and {@code 90.0}
+     * @param longitude the longitude coordinate in decimal degrees; must be between {@code -180.0} and {@code 180.0}
+     * @param city the city name; must not be {@code null} or empty
+     * @param country the country name; must not be {@code null} or empty
      * @throws IllegalArgumentException if any parameter is invalid
      */
     public Location(double latitude, double longitude, String city, String country) {
@@ -70,7 +73,7 @@ public final class Location {
     /**
      * Returns the latitude coordinate in decimal degrees.
      * 
-     * @return the latitude value between -90.0 and 90.0
+     * @return the latitude value between {@code #MIN_LATITUDE} and {@code #MAX_LATITUDE}
      */
     public double getLatitude() {
         return latitude;
@@ -79,7 +82,7 @@ public final class Location {
     /**
      * Returns the longitude coordinate in decimal degrees.
      * 
-     * @return the longitude value between -180.0 and 180.0
+     * @return the longitude value between {@code #MIN_LONGITUDE} and {@code #MAX_LONGITUDE}
      */
     public double getLongitude() {
         return longitude;
@@ -88,7 +91,7 @@ public final class Location {
     /**
      * Returns the city name.
      * 
-     * @return the city name, never null or empty
+     * @return the city name, never {@code null} or empty
      */
     public String getCity() {
         return city;
@@ -97,7 +100,7 @@ public final class Location {
     /**
      * Returns the country name.
      * 
-     * @return the country name, never null or empty
+     * @return the country name, never {@code null} or empty
      */
     public String getCountry() {
         return country;
@@ -125,11 +128,11 @@ public final class Location {
     }
 
     /**
-     * Validates that place names are not null or empty.
+     * Validates that place names are not {@code null} or empty.
      * 
      * @param city the city name to validate
      * @param country the country name to validate
-     * @throws IllegalArgumentException if any name is null or empty
+     * @throws IllegalArgumentException if any name is {@code null} or empty
      */
     private static void validatePlaceNames(String city, String country) {
         if (city == null || city.trim().isEmpty()) {

@@ -10,7 +10,7 @@ import java.util.Objects;
  * description, timestamp, and location. It provides validation for data integrity
  * and ensures proper weather data representation.</p>
  * 
- * <p>Instances of this class are mutable and not thread-safe.</p>
+ * <p>Instances of this class are immutable and thread-safe.</p>
  * 
  * @author Weather API Wrapper Service
  * @version 1.0
@@ -40,19 +40,24 @@ public final class WeatherData {
     private final Location location;
 
     /**
-     * Constructs a new WeatherData with the specified weather information.
-     * 
+     * Constructs a new {@link WeatherData} instance with the specified weather information.
+     *
      * <p>Validates that:
      * <ul>
-     *   <li>Humidity is between 0 and 100 percent</li>
-     *   <li>Description is not null or empty</li>
-     * </ul></p>
-     * 
+     *   <li>Humidity is between {@link #MIN_HUMIDITY} and {@link #MAX_HUMIDITY} percent</li>
+     *   <li>Description is not {@code null} or empty</li>
+     *   <li>Location is not {@code null}</li>
+     * </ul>
+     * </p>
+     *
+     * <p>The {@link #timestamp} is set to the current time using {@link LocalDateTime#now()} when the object is created.</p>
+     *
      * @param temperature the temperature in Celsius
-     * @param humidity the humidity percentage (0-100)
-     * @param description the weather description, must not be null or empty
-     * @param location the location, must not be null
-     * @throws IllegalArgumentException if any parameter is invalid
+     * @param humidity the humidity percentage (from {@link #MIN_HUMIDITY} to {@link #MAX_HUMIDITY})
+     * @param description the weather description, must not be {@code null} or empty
+     * @param location the {@link Location} for this weather data, must not be {@code null}
+     * @throws IllegalArgumentException if {@code humidity} or {@code description} is invalid
+     * @throws NullPointerException if {@code location} is {@code null}
      */
     public WeatherData(double temperature, int humidity, String description, Location location) {
         validateHumidity(humidity);
@@ -61,7 +66,7 @@ public final class WeatherData {
         this.temperature = temperature;
         this.humidity = humidity;
         this.description = description.trim();
-        this.location = location;
+        this.location = Objects.requireNonNull(location, "Location cannot be null");
         this.timestamp = LocalDateTime.now();
     }
 
@@ -77,7 +82,7 @@ public final class WeatherData {
     /**
      * Returns the humidity percentage.
      * 
-     * @return the humidity value between 0 and 100
+     * @return the humidity value between {@code #MIN_HUMIDITY} and {@code #MAX_HUMIDITY}
      */
     public int getHumidity() {
         return humidity;
@@ -86,7 +91,7 @@ public final class WeatherData {
     /**
      * Returns the weather description.
      * 
-     * @return the weather description, never null or empty
+     * @return the weather description, never {@code null} or empty
      */
     public String getDescription() {
         return description;
@@ -95,7 +100,7 @@ public final class WeatherData {
     /**
      * Returns the timestamp when this weather data was recorded.
      * 
-     * @return the timestamp, never null
+     * @return the timestamp, never {@code null}
      */
     public LocalDateTime getTimestamp() {
         return timestamp;
@@ -104,7 +109,7 @@ public final class WeatherData {
     /**
      * Returns the location for this weather data.
      * 
-     * @return the location, never null
+     * @return the location, never {@code null}
      */
     public Location getLocation() {
         return location;
@@ -126,10 +131,10 @@ public final class WeatherData {
     }
 
     /**
-     * Validates that description is not null or empty.
+     * Validates that description is not {@code null} or empty.
      * 
      * @param description the description to validate
-     * @throws IllegalArgumentException if description is null or empty
+     * @throws IllegalArgumentException if description is {@code null} or empty
      */
     private static void validateDescription(String description) {
         if (description == null || description.trim().isEmpty()) {
