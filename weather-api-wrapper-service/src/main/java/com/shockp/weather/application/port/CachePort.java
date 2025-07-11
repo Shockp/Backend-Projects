@@ -48,4 +48,13 @@ public interface CachePort {
      * @return {@code true} if the cache entry exists, {@code false} otherwise
      */
     boolean exists(String key);
+
+    /**
+     * Clears all entries from the cache.
+     * <p>
+     * This operation removes all cached weather data. Use with caution as it may
+     * be expensive depending on the cache implementation and the number of entries.
+     * </p>
+     */
+    void clear();
 } 
