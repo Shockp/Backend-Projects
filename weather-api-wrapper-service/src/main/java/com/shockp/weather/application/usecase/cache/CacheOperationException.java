@@ -1,4 +1,4 @@
-package com.shockp.weather.application.usecase;
+package com.shockp.weather.application.usecase.cache;
 
 import java.io.Serial;
 
@@ -20,7 +20,7 @@ import java.io.Serial;
  * @author Weather API Wrapper Service
  * @version 1.0
  * @since 1.0
- * @see com.shockp.weather.application.usecase.CacheWeatherUseCase
+ * @see com.shockp.weather.application.usecase.cache.CacheWeatherUseCase
  */
 public final class CacheOperationException extends RuntimeException {
 

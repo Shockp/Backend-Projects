@@ -1,4 +1,4 @@
-package com.shockp.weather.application.usecase;
+package com.shockp.weather.application.usecase.cache;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -27,7 +27,7 @@ import com.shockp.weather.domain.service.WeatherServiceException;
  * @since 1.0
  * @see com.shockp.weather.domain.service.CacheService
  * @see com.shockp.weather.domain.model.WeatherData
- * @see com.shockp.weather.application.usecase.CacheOperationException
+ * @see com.shockp.weather.application.usecase.cache.CacheOperationException
  */
 public final class CacheWeatherUseCase {
 
