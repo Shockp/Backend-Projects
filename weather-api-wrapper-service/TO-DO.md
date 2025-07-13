@@ -72,7 +72,7 @@ Domain Services Layer:
 + +validateRequest(request: WeatherRequest): void
 + +isAvailable(): boolean
 + +getProviderName(): String
-+ -retrieveFromProvider(request: WeatherRequest): WeatherData
+- -retrieveFromProvider(request: WeatherRequest): WeatherData
 
 ✅ CacheService: COMPLETED
 - -cachePort: CachePort
@@ -128,26 +128,60 @@ Application Layer (Ports):
 Application Layer (Use Cases):
 ============================
 
-⏳ GetWeatherUseCase: TODO
+✅ GetWeatherUseCase: COMPLETED
 - -weatherService: WeatherService
 + +GetWeatherUseCase(weatherService: WeatherService)
++ +execute(city: String, country: String, date: LocalDate, includeHourly: boolean): WeatherResponse
++ +execute(latitude: double, longitude: double, city: String, country: String, date: LocalDate, includeHourly: boolean): WeatherResponse
 + +execute(request: WeatherRequest): WeatherResponse
-+ +validateInput(request: WeatherRequest): void
-+ +handleError(exception: Exception): WeatherResponse
++ +isServiceAvailable(): boolean
++ +getProviderName(): String
+- -validateAndSanitizeCity(city: String): void
+- -validateAndSanitizeCountry(country: String): void
+- -validateCoordinates(latitude: double, longitude: double): void
+- -validateDate(date: LocalDate): void
+- -validateWeatherRequest(request: WeatherRequest): void
 
-⏳ CacheWeatherUseCase: TODO
+✅ CacheWeatherUseCase: COMPLETED
 - -cacheService: CacheService
 + +CacheWeatherUseCase(cacheService: CacheService)
 + +execute(key: String, data: WeatherData): void
++ +execute(key: String, data: WeatherData, ttl: Duration): void
 + +retrieve(key: String): Optional<WeatherData>
 + +invalidate(key: String): void
++ +exists(key: String): boolean
++ +clearAll(): void
+- -validateAndSanitizeKey(key: String): void
+- -validateTtl(ttl: Duration): void
 
-⏳ RateLimitUseCase: TODO
+✅ RateLimitUseCase: COMPLETED
 - -rateLimiterService: RateLimiterService
 + +RateLimitUseCase(rateLimiterService: RateLimiterService)
 + +execute(clientId: String): boolean
-+ +getRemainingRequests(clientId: String): int
++ +checkRateLimit(clientId: String): boolean
++ +getRemainingTokens(clientId: String): int
 + +resetLimit(clientId: String): void
++ +getMaxRequests(): int
++ +getTimeWindow(): Duration
+- -validateAndSanitizeClientId(clientId: String): void
+
+Application Layer (Custom Exceptions):
+====================================
+
+✅ WeatherOperationException: COMPLETED
++ +WeatherOperationException(message: String)
++ +WeatherOperationException(message: String, cause: Throwable)
++ +WeatherOperationException(cause: Throwable)
+
+✅ CacheOperationException: COMPLETED
++ +CacheOperationException(message: String)
++ +CacheOperationException(message: String, cause: Throwable)
++ +CacheOperationException(cause: Throwable)
+
+✅ RateLimitOperationException: COMPLETED
++ +RateLimitOperationException(message: String)
++ +RateLimitOperationException(message: String, cause: Throwable)
++ +RateLimitOperationException(cause: Throwable)
 
 Infrastructure Layer:
 ===================
@@ -207,7 +241,7 @@ Infrastructure Layer:
 - -extractClientId(request: HttpServletRequest): String
 - -validateLocation(location: String): Location
 - -validateDate(date: String): LocalDate
-- +handleValidationException(exception: ValidationException): ResponseEntity<ErrorResponse>
++ +handleValidationException(exception: ValidationException): ResponseEntity<ErrorResponse>
 + +handleRateLimitException(exception: RateLimitException): ResponseEntity<ErrorResponse>
 + +handleWeatherServiceException(exception: WeatherServiceException): ResponseEntity<ErrorResponse>
 
@@ -242,10 +276,15 @@ Main Application:
 - ✅ CachePort.java - Interface for cache operations with TTL support
 - ✅ RateLimiterPort.java - Interface for rate limiting operations
 
-🔄 Application Layer (Use Cases): 0% Complete (0/3 classes)
-- ⏳ GetWeatherUseCase.java - TODO: Implement use case
-- ⏳ CacheWeatherUseCase.java - TODO: Implement use case
-- ⏳ RateLimitUseCase.java - TODO: Implement use case
+✅ Application Layer (Use Cases): 100% Complete (3/3 classes)
+- ✅ GetWeatherUseCase.java - Fully implemented with security validation and multiple execution methods
+- ✅ CacheWeatherUseCase.java - Fully implemented with comprehensive cache operations
+- ✅ RateLimitUseCase.java - Fully implemented with rate limiting operations
+
+✅ Application Layer (Custom Exceptions): 100% Complete (3/3 classes)
+- ✅ WeatherOperationException.java - Custom exception for weather operations
+- ✅ CacheOperationException.java - Custom exception for cache operations
+- ✅ RateLimitOperationException.java - Custom exception for rate limiting operations
 
 🔄 Infrastructure Layer: 0% Complete (0/5 classes)
 - ⏳ VisualCrossingWeatherProvider.java - TODO: Implement provider adapter
@@ -257,7 +296,7 @@ Main Application:
 🔄 Main Application: 0% Complete (0/1 classes)
 - ⏳ WeatherApiWrapperApplication.java - TODO: Implement main application
 
-📊 OVERALL PROGRESS: 68.75% Complete (11/16 classes implemented)
+📊 OVERALL PROGRESS: 81.25% Complete (13/16 classes implemented)
 
 🛠️ KEY FEATURES TO IMPLEMENT
 ============================
@@ -325,6 +364,8 @@ IMPLEMENTATION NOTES
 - Domain model classes with full validation and documentation ✅
 - Domain services with comprehensive business logic ✅
 - Application layer ports with clear contracts ✅
+- Application layer use cases with security validation and error handling ✅
+- Custom exceptions for all operations ✅
 - Proper use of @link and @code tags in JavaDoc ✅
 - Immutable objects with thread safety ✅
 - Comprehensive error handling and validation ✅
@@ -338,7 +379,7 @@ IMPLEMENTATION NOTES
 =============
 1. ✅ ~~Implement Application Layer (Ports)~~ - COMPLETED
 2. ✅ ~~Implement Domain Services Layer~~ - COMPLETED
-3. 🔄 Implement Application Layer (Use Cases) - IN PROGRESS
+3. ✅ ~~Implement Application Layer (Use Cases)~~ - COMPLETED
 4. 🔄 Implement Infrastructure Layer - NEXT
 5. 🔄 Add Spring Boot configuration
 6. 🔄 Implement REST controller
@@ -348,17 +389,17 @@ IMPLEMENTATION NOTES
 
 🎯 IMMEDIATE PRIORITIES
 =======================
-1. **Implement Use Cases** - Complete the application layer business logic
-2. **Implement Infrastructure Adapters** - Connect to external systems
-3. **Add Spring Boot Configuration** - Wire everything together
-4. **Implement REST Controller** - Expose API endpoints
-5. **Add Main Application Class** - Bootstrap the application
+1. **Implement Infrastructure Adapters** - Connect to external systems
+2. **Add Spring Boot Configuration** - Wire everything together
+3. **Implement REST Controller** - Expose API endpoints
+4. **Add Main Application Class** - Bootstrap the application
 
 📈 PROGRESS METRICS
 ===================
 - **Domain Layer**: 100% Complete ✅
 - **Application Layer (Ports)**: 100% Complete ✅
-- **Application Layer (Use Cases)**: 0% Complete ⏳
+- **Application Layer (Use Cases)**: 100% Complete ✅
+- **Application Layer (Exceptions)**: 100% Complete ✅
 - **Infrastructure Layer**: 0% Complete ⏳
 - **Testing**: 100% Complete ✅
 - **Documentation**: 90% Complete ✅
@@ -368,6 +409,8 @@ IMPLEMENTATION NOTES
 - ✅ Complete domain model with validation
 - ✅ Full domain services implementation
 - ✅ Comprehensive port interfaces
+- ✅ Complete use case implementation with security
+- ✅ Custom exceptions for all operations
 - ✅ Extensive unit test coverage
 - ✅ Clean architecture principles
 - ✅ Professional code quality
