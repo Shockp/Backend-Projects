@@ -113,7 +113,7 @@ A comprehensive Java CLI application implementing a number guessing game followi
 
 ---
 
-### 5. Weather API Wrapper Service (Spring Boot)
+### 5. Weather API Wrapper Service (API)
 [🔗 Project Page](https://roadmap.sh/projects/weather-api-wrapper-service) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/weather-api-wrapper-service)
 
 A production-ready Spring Boot microservice that wraps the Visual Crossing Weather API, providing secure RESTful endpoints for weather data with comprehensive caching, rate limiting, and monitoring capabilities.
