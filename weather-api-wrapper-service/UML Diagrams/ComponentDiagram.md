@@ -38,27 +38,37 @@ graph TB
     subgraph "Main Application"
         APP[WeatherApiWrapperApplication]
         CONFIG[AppConfig]
+        SECURITY[Security Configuration]
+        MONITORING[Application Monitoring]
     end
 
     %% Component Details
     subgraph "Web Layer Components"
         CONTROLLER[WeatherController]
-        ERROR_HANDLER[Error Handler]
+        ERROR_HANDLER[Global Error Handler]
+        REQUEST_VALIDATION[Request Validation]
+        RESPONSE_FORMATTING[Response Formatting]
     end
 
     subgraph "Cache Layer Components"
         REDIS_ADAPTER[RedisCacheAdapter]
         CACHE_SERVICE[CacheService]
+        CACHE_CONFIG[Cache Configuration]
+        CACHE_MONITORING[Cache Monitoring]
     end
 
     subgraph "Rate Limiting Components"
         BUCKET4J_ADAPTER[Bucket4jRateLimiterAdapter]
         RATE_LIMITER_SERVICE[RateLimiterService]
+        CLIENT_IDENTIFICATION[Client ID Management]
+        BUCKET_MANAGEMENT[Bucket Management]
     end
 
     subgraph "Weather Provider Components"
         VC_PROVIDER[VisualCrossingWeatherProvider]
         WEATHER_SERVICE[WeatherService]
+        API_CLIENT[WebClient Configuration]
+        RESPONSE_PARSER[Response Parser]
     end
 
     subgraph "Use Case Components"
@@ -120,8 +130,12 @@ graph TB
     CONFIG --> GET_WEATHER_UC
     CONFIG --> CACHE_WEATHER_UC
     CONFIG --> RATE_LIMIT_UC
+    CONFIG --> SECURITY
+    CONFIG --> MONITORING
 
     APP --> CONFIG
+    APP --> SECURITY
+    APP --> MONITORING
 
     %% Styling
     classDef external fill:#ff9999,stroke:#333,stroke-width:2px
@@ -159,14 +173,18 @@ graph TB
 - **Domain Models**: Core business entities
 
 ### Main Application
-- **WeatherApiWrapperApplication**: Spring Boot main class
-- **AppConfig**: Configuration and dependency injection
+- **WeatherApiWrapperApplication**: Spring Boot main class with comprehensive startup/shutdown management
+- **AppConfig**: Configuration and dependency injection with security measures
+- **Security Configuration**: Security properties and configurations
+- **Application Monitoring**: Startup/shutdown monitoring and performance tracking
 
 ## Component Responsibilities
 
 ### Web Layer
-- **WeatherController**: Handles HTTP requests and responses
-- **Error Handler**: Manages exception handling and error responses
+- **WeatherController**: Handles HTTP requests and responses with comprehensive validation
+- **Global Error Handler**: Centralized exception handling and error responses
+- **Request Validation**: Input validation and sanitization
+- **Response Formatting**: Consistent response formatting and status codes
 
 ### Cache Layer
 - **RedisCacheAdapter**: Redis-specific cache implementation

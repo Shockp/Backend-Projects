@@ -19,6 +19,7 @@ graph TB
             
             subgraph "service"
                 WEATHER_SERVICE[WeatherService.java]
+                WEATHER_SERVICE_EX[WeatherServiceException.java]
                 CACHE_SERVICE[CacheService.java]
                 RATE_LIMITER_SERVICE[RateLimiterService.java]
             end
@@ -32,9 +33,18 @@ graph TB
             end
             
             subgraph "usecase"
-                GET_WEATHER_UC[GetWeatherUseCase.java]
-                CACHE_WEATHER_UC[CacheWeatherUseCase.java]
-                RATE_LIMIT_UC[RateLimitUseCase.java]
+                subgraph "weather"
+                    GET_WEATHER_UC[GetWeatherUseCase.java]
+                    WEATHER_OPERATION_EX[WeatherOperationException.java]
+                end
+                subgraph "cache"
+                    CACHE_WEATHER_UC[CacheWeatherUseCase.java]
+                    CACHE_OPERATION_EX[CacheOperationException.java]
+                end
+                subgraph "ratelimit"
+                    RATE_LIMIT_UC[RateLimitUseCase.java]
+                    RATE_LIMIT_OPERATION_EX[RateLimitOperationException.java]
+                end
             end
         end
         
@@ -61,6 +71,7 @@ graph TB
         end
         
         MAIN_APP[WeatherApiWrapperApplication.java]
+        ERROR_EXCEPTIONS[Custom Exception Classes]
     end
     
     %% External Dependencies
@@ -130,6 +141,7 @@ The core business logic layer containing domain models and services.
 
 #### Service Package (`com.shockp.weather.domain.service`)
 - **WeatherService.java**: Core weather business logic
+- **WeatherServiceException.java**: Weather service specific exceptions
 - **CacheService.java**: Cache business logic
 - **RateLimiterService.java**: Rate limiting business logic
 
@@ -142,9 +154,17 @@ The application layer containing ports and use cases.
 - **RateLimiterPort.java**: Contract for rate limiting operations
 
 #### Use Case Package (`com.shockp.weather.application.usecase`)
+##### Weather Use Cases (`com.shockp.weather.application.usecase.weather`)
 - **GetWeatherUseCase.java**: Weather data retrieval use case
+- **WeatherOperationException.java**: Weather operation specific exceptions
+
+##### Cache Use Cases (`com.shockp.weather.application.usecase.cache`)
 - **CacheWeatherUseCase.java**: Weather data caching use case
+- **CacheOperationException.java**: Cache operation specific exceptions
+
+##### Rate Limit Use Cases (`com.shockp.weather.application.usecase.ratelimit`)
 - **RateLimitUseCase.java**: Rate limiting use case
+- **RateLimitOperationException.java**: Rate limit operation specific exceptions
 
 ### Infrastructure Layer (`com.shockp.weather.infrastructure`)
 The infrastructure layer containing adapters and external integrations.
@@ -165,7 +185,8 @@ The infrastructure layer containing adapters and external integrations.
 - **WeatherController.java**: REST API controller
 
 ### Main Application
-- **WeatherApiWrapperApplication.java**: Spring Boot main class
+- **WeatherApiWrapperApplication.java**: Spring Boot main class with security and monitoring
+- **Custom Exception Classes**: Application-specific exception types
 
 ## Package Dependencies
 

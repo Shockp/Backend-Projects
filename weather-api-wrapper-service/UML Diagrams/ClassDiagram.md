@@ -166,36 +166,45 @@ classDiagram
     }
 
     class RedisCacheAdapter {
-        -RedisTemplate~String, WeatherData~ redisTemplate
+        -RedisTemplate~String, String~ redisTemplate
+        -ObjectMapper objectMapper
         -Duration defaultTtl
-        +RedisCacheAdapter(redisTemplate, defaultTtl)
-        +get(key) Optional~WeatherData~
+        +RedisCacheAdapter(redisTemplate, objectMapper, defaultTtl)
+        +get(key) Optional~String~
         +put(key, data, ttl) void
         +delete(key) void
         +exists(key) boolean
         -serialize(data) String
-        -deserialize(json) WeatherData
+        -deserialize(json) String
+        -generateKey(prefix, identifier) String
+        -isValidKey(key) boolean
     }
 
     class Bucket4jRateLimiterAdapter {
-        -Bucket bucket
-        -BucketConfiguration bucketConfiguration
-        +Bucket4jRateLimiterAdapter(capacity, refillTokens, refillDuration)
+        -Map~String, Bucket~ buckets
+        -long capacity
+        -long refillTokens
+        -Duration refillPeriod
+        +Bucket4jRateLimiterAdapter(capacity, refillTokens, refillPeriod)
         +tryConsume(clientId) boolean
-        +getAvailableTokens(clientId) int
+        +getAvailableTokens(clientId) long
         +reset(clientId) void
         -getBucketForClient(clientId) Bucket
         -createBucketConfiguration() BucketConfiguration
+        -cleanupExpiredBuckets() void
+        -isValidClientId(clientId) boolean
     }
 
     class AppConfig {
-        +webClient() WebClient
-        +redisTemplate() RedisTemplate~String, WeatherData~
-        +bucket4jRateLimiter() Bucket4jRateLimiterAdapter
-        +weatherService() WeatherService
-        +getWeatherUseCase() GetWeatherUseCase
-        +cacheWeatherUseCase() CacheWeatherUseCase
-        +rateLimitUseCase() RateLimitUseCase
+        +webClient(builder, baseUrl) WebClient
+        +redisConnectionFactory(host, port, dbIndex, password) RedisConnectionFactory
+        +redisTemplate(factory) RedisTemplate~String, String~
+        +cacheService(cachePort, cacheTimeout) CacheService
+        +rateLimiterService(rateLimiterPort, maxRequests, timeWindow) RateLimiterService
+        +weatherService(provider, cacheService) WeatherService
+        +getWeatherUseCase(weatherService) GetWeatherUseCase
+        +cacheWeatherUseCase(cacheService) CacheWeatherUseCase
+        +rateLimitUseCase(rateLimiterService) RateLimitUseCase
     }
 
     class WeatherController {
@@ -218,9 +227,20 @@ classDiagram
 
     %% Main Application
     class WeatherApiWrapperApplication {
+        -Logger logger$
+        -DateTimeFormatter TIMESTAMP_FORMATTER$
+        -AtomicBoolean isShuttingDown$
+        -ConfigurableApplicationContext applicationContext$
         +main(args) void
-        -configureRedis() void
-        -configureRateLimiting() void
+        -configureSpringApplication(app) void
+        -configureSecurityProperties() void
+        -registerShutdownHook() void
+        -performGracefulShutdown() void
+        -performEmergencyShutdown() void
+        -logApplicationStartup(args) void
+        -logStartupSuccess() void
+        -logStartupFailure(exception) void
+        +onDestroy() void
     }
 
     %% Relationships

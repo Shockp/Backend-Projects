@@ -42,6 +42,8 @@ graph TB
         MANAGE_RATE_LIMITS[Manage Rate Limits]
         MONITOR_PERFORMANCE[Monitor Performance]
         HANDLE_EXCEPTIONS[Handle Exceptions]
+        CONFIGURE_SECURITY[Configure Security]
+        MANAGE_LIFECYCLE[Manage Application Lifecycle]
     end
 
     %% Actor Relationships
@@ -55,6 +57,8 @@ graph TB
     ADMIN --> MANAGE_CACHE
     ADMIN --> MANAGE_RATE_LIMITS
     ADMIN --> MONITOR_PERFORMANCE
+    ADMIN --> CONFIGURE_SECURITY
+    ADMIN --> MANAGE_LIFECYCLE
 
     WEATHER_PROVIDER --> FETCH_FROM_PROVIDER
     CACHE_SYSTEM --> STORE_IN_CACHE
@@ -243,6 +247,16 @@ graph TB
 - **Description**: System-wide exception handling
 - **Includes**: Error logging, recovery, user notification
 
+#### 5. Configure Security
+- **Actor**: System Administrator
+- **Description**: Configure and manage security settings
+- **Includes**: Security headers, cookie settings, access controls
+
+#### 6. Manage Application Lifecycle
+- **Actor**: System Administrator
+- **Description**: Manage application startup and shutdown
+- **Includes**: Graceful shutdown, resource cleanup, health monitoring
+
 ## Actor Descriptions
 
 ### 1. API Client
@@ -274,6 +288,9 @@ graph TB
 - Input validation
 - Error handling
 - Logging and monitoring
+- Security configuration and management
+- Application lifecycle management
+- Performance monitoring
 
 ### Excluded from System
 - External weather provider implementation
@@ -330,4 +347,18 @@ graph TB
 1. Client sends invalid request
 2. System validation fails
 3. System returns 400 error
-4. Client receives error response 
+4. Client receives error response
+
+### 4. Security Violation
+1. Client sends request with invalid security parameters
+2. System security validation fails
+3. System logs security event
+4. System returns 403 error
+5. Client receives error response
+
+### 5. Application Startup Failure
+1. System administrator starts application
+2. Configuration validation fails
+3. System logs startup failure
+4. System performs emergency shutdown
+5. Administrator receives failure notification 

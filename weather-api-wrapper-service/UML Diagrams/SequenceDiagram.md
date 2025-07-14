@@ -27,6 +27,8 @@ sequenceDiagram
     Controller->>Controller: validateLocation(location)
     Controller->>Controller: validateDate(date)
     
+    Note over Controller: Security validation and input sanitization
+    
     %% Rate Limiting Check
     Controller->>RateLimitUC: execute(clientId)
     RateLimitUC->>RateLimiterService: checkRateLimit(clientId)
@@ -59,10 +61,17 @@ sequenceDiagram
             Controller->>GetWeatherUC: execute(weatherRequest)
             GetWeatherUC->>WeatherService: getWeather(request)
             WeatherService->>WeatherService: validateRequest(request)
+            
+            Note over WeatherService: Business logic validation
+            
             WeatherService->>WeatherProviderPort: getWeatherData(request)
             WeatherProviderPort->>VC_API: GET /timeline/{location}/{date}
+            
+            Note over VC_API: External API call with security headers
+            
             VC_API-->>WeatherProviderPort: JSON Response
             WeatherProviderPort->>WeatherProviderPort: parseResponse(response)
+            WeatherProviderPort->>WeatherProviderPort: validateResponseData(data)
             WeatherProviderPort-->>WeatherService: WeatherData
             WeatherService-->>GetWeatherUC: WeatherResponse
             GetWeatherUC-->>Controller: WeatherResponse
@@ -188,6 +197,46 @@ sequenceDiagram
     Controller-->>Client: 429 Too Many Requests + ErrorResponse
 ```
 
+## Application Startup/Shutdown Sequence
+
+```mermaid
+sequenceDiagram
+    participant User as System User
+    participant App as WeatherApiWrapperApplication
+    participant Config as AppConfig
+    participant Security as Security Configuration
+    participant Monitoring as Application Monitoring
+    participant Spring as Spring Context
+
+    %% Application Startup
+    User->>App: java -jar weather-api-wrapper.jar
+    App->>App: logApplicationStartup(args)
+    App->>App: configureSpringApplication(app)
+    App->>App: configureSecurityProperties()
+    App->>Security: Set security headers and properties
+    Security-->>App: Security configured
+    App->>App: registerShutdownHook()
+    App->>Spring: run(args)
+    Spring->>Config: Initialize all beans
+    Config->>Config: Configure all services and adapters
+    Config-->>Spring: All beans configured
+    Spring->>Monitoring: ApplicationReadyEvent
+    Monitoring->>App: Application ready notification
+    App->>App: logStartupSuccess()
+    App-->>User: Application started successfully
+
+    %% Application Shutdown
+    User->>App: SIGTERM/SIGINT
+    App->>App: Shutdown hook triggered
+    App->>App: performGracefulShutdown()
+    App->>Spring: close()
+    Spring->>Config: Destroy all beans
+    Config-->>Spring: Beans destroyed
+    Spring->>Monitoring: ContextClosedEvent
+    Monitoring->>App: Shutdown complete notification
+    App-->>User: Application shutdown completed
+```
+
 ## Key Interaction Patterns
 
 ### 1. **Request Flow**
@@ -216,6 +265,18 @@ sequenceDiagram
 - **External API Errors**: Graceful handling of third-party service failures
 - **Rate Limit Errors**: Clear indication when limits are exceeded
 - **System Errors**: Proper error responses with appropriate HTTP status codes
+
+### 5. **Security Measures**
+- **Input Validation**: Comprehensive validation at all entry points
+- **Security Headers**: Automatic security header configuration
+- **Rate Limiting**: Protection against API abuse
+- **Error Handling**: No sensitive information disclosure in error responses
+
+### 6. **Application Lifecycle**
+- **Startup Monitoring**: Comprehensive startup logging and validation
+- **Graceful Shutdown**: Proper resource cleanup on application termination
+- **Health Monitoring**: Application readiness and health checks
+- **Performance Tracking**: System resource and performance monitoring
 
 ## Performance Considerations
 
