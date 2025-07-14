@@ -113,4 +113,38 @@ A comprehensive Java CLI application implementing a number guessing game followi
 
 ---
 
-### 5. Weather Wrapper Service (API) *(Work in progress)*
+### 5. Weather API Wrapper Service (Spring Boot)
+[🔗 Project Page](https://roadmap.sh/projects/weather-api-wrapper-service) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/weather-api-wrapper-service)
+
+A production-ready Spring Boot microservice that wraps the Visual Crossing Weather API, providing secure RESTful endpoints for weather data with comprehensive caching, rate limiting, and monitoring capabilities.
+
+**Tech Stack:**
+- Java 21
+- Spring Boot 3.5.3
+- Spring WebFlux (reactive web client)
+- Redis (caching)
+- Bucket4j (rate limiting)
+- Jackson (JSON processing)
+- Maven
+
+**Architecture:**
+- Hexagonal Architecture (Ports & Adapters)
+- Clean Architecture with layered separation
+- Domain-driven design principles
+- Dependency inversion and injection
+- SOLID principles throughout
+
+**Features:**
+- RESTful API endpoints for weather data retrieval
+- Visual Crossing Weather API integration with error handling
+- Redis-based caching for improved performance and cost reduction
+- Bucket4j rate limiting with per-client token buckets
+- Comprehensive input validation and sanitization
+- Security hardening with OWASP compliance
+- Graceful shutdown and application lifecycle management
+- Structured logging and performance monitoring
+- Health checks and observability features
+- Cache and rate limit management endpoints
+- Production-ready configuration and deployment support
+
+---
