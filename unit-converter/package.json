@@ -2,10 +2,10 @@
   "name": "unit-converter",
   "version": "1.0.0",
   "description": "A unit converter web application",
-  "main": "src/app.js",
+  "main": "src/main/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node src/main/app.js",
+    "dev": "nodemon src/main/app.js",
     "test": "jest"
   },
   "dependencies": {
@@ -17,5 +17,8 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "jest": {
+    "testMatch": ["**/src/test/**/*.test.js"]
   }
 }
