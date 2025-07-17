@@ -72,6 +72,11 @@ local.properties
 # IDE - Cursor
 .cursor/
 
+# Claude
+.claude/
+.claude
+*/.claude/
+
 # Operating System Files
 # macOS
 .DS_Store
@@ -125,6 +130,3 @@ application-local.properties
 *~
 .#*
 \#*#
-
-# Claude Code
-.claude/
