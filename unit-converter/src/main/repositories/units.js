@@ -37,6 +37,38 @@ class Units {
             'c', 'f', 'k'
         ]
     });
+
+    /**
+     * Gets the list of length units.
+     * @returns {string[]} Array of length unit abbreviations
+     */
+    static getLengthUnits() {
+        return this.LISTS[Units.CATEGORIES.LENGTH];
+    }
+
+    /**
+     * Gets the list of weight units.
+     * @returns {string[]} Array of weight unit abbreviations
+     */
+    static getWeightUnits() {
+        return this.LISTS[Units.CATEGORIES.WEIGHT];
+    }
+
+    /**
+     * Gets the list of temperature units.
+     * @returns {string[]} Array of temperature unit abbreviations
+     */
+    static getTemperatureUnits() {
+        return this.LISTS[Units.CATEGORIES.TEMPERATURE];
+    }
+
+    /**
+     * Gets all units grouped by category.
+     * @returns {string[][]} Array containing arrays of unit abbreviations grouped by category
+     */
+    static getAllUnits() {
+        return Object.values(this.LISTS);
+    }
 }
 
 module.exports = Units;
