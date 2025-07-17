@@ -31,6 +31,7 @@
         <module>expense-tracker</module>
         <module>number-guessing-game</module>
         <module>weather-api-wrapper-service</module>
+        <module>unit-converter</module>
     </modules>
 
 </project>
