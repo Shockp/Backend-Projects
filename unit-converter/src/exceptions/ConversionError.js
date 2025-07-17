@@ -1,7 +1,21 @@
 const BaseError = require('./BaseError');
 
+/**
+ * Exception thrown when unit conversion operations fail.
+ * 
+ * @class ConversionError
+ * @extends {BaseError}
+ */
 class ConversionError extends BaseError {
-    // TODO: Implement ConversionError class
+    /**
+     * Creates an instance of ConversionError.
+     * 
+     * @param {string} message - Error message
+     * @param {string} [code='CONVERSION_ERROR'] - Error code
+     */
+    constructor(message, code = 'CONVERSION_ERROR') {
+        super(message, code);
+    }
 }
 
 module.exports = ConversionError;
