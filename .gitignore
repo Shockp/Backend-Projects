@@ -125,3 +125,6 @@ application-local.properties
 *~
 .#*
 \#*#
+
+# Claude Code
+.claude
