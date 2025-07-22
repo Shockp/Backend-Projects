@@ -28,7 +28,11 @@ class LengthValidator {
      */
     static validateUnit(unit) {
         unit = InputValidator
-            .validateStringInput(unit, { required: true })
+            .validateStringInput(unit, {
+                required: true,
+                minLength: 1, maxLength: 3,
+                pattern: /^[a-zA-Z]{1,3}$/
+            })
             .toLowerCase();
 
         const supported = Units.getLengthUnits();
