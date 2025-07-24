@@ -47,74 +47,36 @@ class LengthValidator {
     }
 
     /**
-     * Validates a numeric value with optional range constraints.
-     * Supports individual min or max constraints, or both together.
+     * Validates a numeric value for length measurements
      * @static
      * @param {number|string} value - The numeric value to validate
-     * @param {Object} [options={}] - Validation options
-     * @param {number} [options.min] - Minimum allowed value (optional)
-     * @param {number} [options.max] - Maximum allowed value (optional)
      * @returns {number} The validated numeric value
-     * @throws {@link ValidationError} When value is invalid or outside specified constraints
+     * @throws {@link ValidationError} When value is invalid or not a finite number
      * @example
      * // Basic numeric validation
      * const result = LengthValidator.validateNumericValue("123.45");
      * console.log(result); // 123.45
      * 
      * @example
-     * // Validation with both min and max constraints
-     * const result = LengthValidator.validateNumericValue(50, { min: 0, max: 100 });
-     * console.log(result); // 50
+     * // Positive values are valid
+     * const result = LengthValidator.validateNumericValue(100);
+     * console.log(result); // 100
      * 
      * @example
-     * // Validation with single constraint
-     * const result1 = LengthValidator.validateNumericValue(25, { min: 0 });
-     * console.log(result1); // 25
-     * const result2 = LengthValidator.validateNumericValue(75, { max: 100 });
-     * console.log(result2); // 75
+     * // Decimal values are valid
+     * const result = LengthValidator.validateNumericValue(15.75);
+     * console.log(result); // 15.75
      * 
      * @example
-     * // Value outside range throws error
+     * // Invalid value throws error
      * try {
-     *   LengthValidator.validateNumericValue(150, { min: 0, max: 100 });
+     *   LengthValidator.validateNumericValue("abc");
      * } catch (error) {
-     *   console.log(error.message); // "Value 150 is out of range (0 to 100)"
-     * }
-     * 
-     * @example
-     * // Value below minimum throws error
-     * try {
-     *   LengthValidator.validateNumericValue(-5, { min: 0 });
-     * } catch (error) {
-     *   console.log(error.message); // "Value -5 is below minimum 0"
-     * }
-     * 
-     * @example
-     * // Value above maximum throws error
-     * try {
-     *   LengthValidator.validateNumericValue(150, { max: 100 });
-     * } catch (error) {
-     *   console.log(error.message); // "Value 150 is above maximum 100"
+     *   console.log(error.message); // "Value must be a finite number"
      * }
      */
-    static validateNumericValue(value, { min, max } = {}) {
+    static validateNumericValue(value) {
         value = InputValidator.validateNumericInput(value);
-
-        if (min !== undefined) {
-            min = InputValidator.validateNumericInput(min);
-        }
-
-        if (max !== undefined) {
-            max = InputValidator.validateNumericInput(max);
-        }
-
-        if (min !== undefined && max !== undefined) {
-            value = InputValidator.validateRange(value, min, max);
-        } else if (min !== undefined && value < min) {
-            throw new ValidationError(`Value ${value} is below minimum ${min}`);
-        } else if (max !== undefined && value > max) {
-            throw new ValidationError(`Value ${value} is above maximum ${max}`);
-        }
 
         return value;
     }
@@ -124,9 +86,6 @@ class LengthValidator {
      * @static
      * @param {number|string} value - The numeric value to validate
      * @param {string} unit - The unit to validate
-     * @param {Object} [options={}] - Validation options passed to {@code validateNumericValue}
-     * @param {number} [options.min] - Minimum allowed value
-     * @param {number} [options.max] - Maximum allowed value
      * @returns {{value: number, unit: string}} Object containing validated value and unit
      * @returns {number} returns.value - The validated numeric value
      * @returns {string} returns.unit - The validated and normalized unit
@@ -137,16 +96,16 @@ class LengthValidator {
      * console.log(result); // { value: 100, unit: "cm" }
      * 
      * @example
-     * // Validation with both constraints
-     * const result = LengthValidator.validate(50, "m", { min: 0, max: 100 });
-     * console.log(result); // { value: 50, unit: "m" }
+     * // Various length units
+     * const mm = LengthValidator.validate(1000, "MM");
+     * console.log(mm); // { value: 1000, unit: "mm" }
+     * const ft = LengthValidator.validate(5.5, "FT");
+     * console.log(ft); // { value: 5.5, unit: "ft" }
      * 
      * @example
-     * // Validation with single constraints
-     * const result1 = LengthValidator.validate(25, "cm", { min: 0 });
-     * console.log(result1); // { value: 25, unit: "cm" }
-     * const result2 = LengthValidator.validate(75, "in", { max: 100 });
-     * console.log(result2); // { value: 75, unit: "in" }
+     * // Decimal values with units
+     * const result = LengthValidator.validate(2.54, "in");
+     * console.log(result); // { value: 2.54, unit: "in" }
      * 
      * @example
      * // Invalid input throws error
@@ -156,8 +115,8 @@ class LengthValidator {
      *   console.log(error.message); // Error from either value or unit validation
      * }
      */
-    static validate(value, unit, options = {}) {
-        value = this.validateNumericValue(value, options);
+    static validate(value, unit) {
+        value = this.validateNumericValue(value);
         unit = this.validateUnit(unit);
 
         return { value, unit };

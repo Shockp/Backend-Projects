@@ -58,74 +58,41 @@ class WeightValidator {
     }
 
     /**
-     * Validates a numeric value with optional range constraints.
-     * Supports individual min or max constraints, or both together.
+     * Validates a numeric value for weight measurements
      * @static
      * @param {number|string} value - The numeric value to validate
-     * @param {Object} [options={}] - Validation options
-     * @param {number} [options.min] - Minimum allowed value (optional)
-     * @param {number} [options.max] - Maximum allowed value (optional)
      * @returns {number} The validated numeric value
-     * @throws {@link ValidationError} When value is invalid or outside specified constraints
+     * @throws {@link ValidationError} When value is invalid or not a finite number
      * @example
      * // Basic numeric validation
      * const result = WeightValidator.validateValue("50.5");
      * console.log(result); // 50.5
      * 
      * @example
-     * // Validation with both min and max constraints
-     * const result = WeightValidator.validateValue(75, { min: 0, max: 100 });
+     * // Positive values are valid
+     * const result = WeightValidator.validateValue(75);
      * console.log(result); // 75
      * 
      * @example
-     * // Validation with single constraint
-     * const result1 = WeightValidator.validateValue(25, { min: 0 });
-     * console.log(result1); // 25
-     * const result2 = WeightValidator.validateValue(75, { max: 100 });
-     * console.log(result2); // 75
+     * // Decimal values are valid
+     * const result = WeightValidator.validateValue(2.5);
+     * console.log(result); // 2.5
      * 
      * @example
-     * // Value outside range throws error
-     * try {
-     *   WeightValidator.validateValue(150, { min: 0, max: 100 });
-     * } catch (error) {
-     *   console.log(error.message); // "Value 150 is out of range (0 to 100)"
-     * }
+     * // Large values are valid
+     * const result = WeightValidator.validateValue(1000);
+     * console.log(result); // 1000
      * 
      * @example
-     * // Value below minimum throws error
+     * // Invalid value throws error
      * try {
-     *   WeightValidator.validateValue(-5, { min: 0 });
+     *   WeightValidator.validateValue("abc");
      * } catch (error) {
-     *   console.log(error.message); // "Value -5 is below minimum 0"
-     * }
-     * 
-     * @example
-     * // Value above maximum throws error
-     * try {
-     *   WeightValidator.validateValue(150, { max: 100 });
-     * } catch (error) {
-     *   console.log(error.message); // "Value 150 is above maximum 100"
+     *   console.log(error.message); // "Value must be a finite number"
      * }
      */
-    static validateValue(value, { min, max } = {}) {
+    static validateValue(value) {
         value = InputValidator.validateNumericInput(value);
-
-        if (min !== undefined) {
-            min = InputValidator.validateNumericInput(min);
-        }
-
-        if (max !== undefined) {
-            max = InputValidator.validateNumericInput(max);
-        }
-
-        if (min !== undefined && max !== undefined) {
-            value = InputValidator.validateRange(value, min, max);
-        } else if (min !== undefined && value < min) {
-            throw new ValidationError(`Value ${value} is below minimum ${min}`);
-        } else if (max !== undefined && value > max) {
-            throw new ValidationError(`Value ${value} is above maximum ${max}`);
-        }
 
         return value;
     }
@@ -135,9 +102,6 @@ class WeightValidator {
      * @static
      * @param {number|string} value - The numeric value to validate
      * @param {string} unit - The weight unit to validate
-     * @param {Object} [options={}] - Validation options passed to {@code validateValue}
-     * @param {number} [options.min] - Minimum allowed value (optional)
-     * @param {number} [options.max] - Maximum allowed value (optional)
      * @returns {{value: number, unit: string}} Object containing validated value and unit
      * @returns {number} returns.value - The validated numeric value
      * @returns {string} returns.unit - The validated and normalized unit
@@ -148,21 +112,21 @@ class WeightValidator {
      * console.log(result); // { value: 100, unit: "g" }
      * 
      * @example
-     * // Validation with both constraints
-     * const result = WeightValidator.validate(50, "kg", { min: 0, max: 100 });
-     * console.log(result); // { value: 50, unit: "kg" }
-     * 
-     * @example
-     * // Validation with single constraints
-     * const result1 = WeightValidator.validate(25, "lb", { min: 0 });
-     * console.log(result1); // { value: 25, unit: "lb" }
-     * const result2 = WeightValidator.validate(75, "oz", { max: 100 });
-     * console.log(result2); // { value: 75, unit: "oz" }
-     * 
-     * @example
-     * // Various weight units
+     * // Metric units
+     * const kg = WeightValidator.validate(50, "KG");
+     * console.log(kg); // { value: 50, unit: "kg" }
      * const mg = WeightValidator.validate(500, "MG");
      * console.log(mg); // { value: 500, unit: "mg" }
+     * 
+     * @example
+     * // Imperial units
+     * const lb = WeightValidator.validate(25, "LB");
+     * console.log(lb); // { value: 25, unit: "lb" }
+     * const oz = WeightValidator.validate(16, "OZ");
+     * console.log(oz); // { value: 16, unit: "oz" }
+     * 
+     * @example
+     * // Large weight units
      * const ton = WeightValidator.validate(2.5, "TON");
      * console.log(ton); // { value: 2.5, unit: "ton" }
      * 
@@ -174,8 +138,8 @@ class WeightValidator {
      *   console.log(error.message); // Error from either value or unit validation
      * }
      */
-    static validate(value, unit, options = {}) {
-        value = this.validateValue(value, options);
+    static validate(value, unit) {
+        value = this.validateValue(value);
         unit = this.validateUnit(unit);
 
         return { value, unit };
