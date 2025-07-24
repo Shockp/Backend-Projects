@@ -1,5 +1,7 @@
 # Use Case Diagram - Unit Converter System
 
+**Implementation Status**: Core logic use cases (✅ **fully implemented**), Web interface use cases (❌ **pending implementation**)
+
 ```mermaid
 graph TB
     %% Actors
@@ -8,25 +10,29 @@ graph TB
     
     %% System Boundary
     subgraph "Unit Converter System"
-        %% Primary Use Cases
-        UC1[📏 Convert Length Units]
-        UC2[🌡️ Convert Temperature Units]
-        UC3[⚖️ Convert Weight Units]
-        UC4[📋 View Supported Units]
-        UC5[🔍 Validate Input Values]
-        UC6[📊 Get Conversion History]
+        %% Primary Use Cases (✅ Core Logic Implemented)
+        UC1[📏 Convert Length Units<br/>✅ Core Logic]
+        UC2[🌡️ Convert Temperature Units<br/>✅ Core Logic]
+        UC3[⚖️ Convert Weight Units<br/>✅ Core Logic]
+        UC4[📋 View Supported Units<br/>✅ Repository]
+        UC5[🔍 Validate Input Values<br/>✅ Implemented]
+        UC6[📊 Get Conversion History<br/>❌ Web Interface]
         
         %% Secondary Use Cases
-        UC7[⚠️ Handle Conversion Errors]
-        UC8[🔧 Configure Unit Preferences]
-        UC9[📱 Access Mobile Interface]
-        UC10[💾 Save Conversion Results]
+        UC7[⚠️ Handle Conversion Errors<br/>✅ Exception System]
+        UC8[🔧 Configure Unit Preferences<br/>❌ Pending]
+        UC9[📱 Access Mobile Interface<br/>❌ Pending]
+        UC10[💾 Save Conversion Results<br/>❌ Pending]
         
         %% Administrative Use Cases
-        UC11[📈 Monitor System Usage]
-        UC12[⚙️ Manage Configuration]
-        UC13[🔄 Update Conversion Factors]
-        UC14[📝 View System Logs]
+        UC11[📈 Monitor System Usage<br/>❌ Pending]
+        UC12[⚙️ Manage Configuration<br/>❌ Pending]
+        UC13[🔄 Update Conversion Factors<br/>✅ Repository]
+        UC14[📝 View System Logs<br/>❌ Pending]
+        
+        %% Testing Use Cases (✅ Implemented)
+        UC15[🧪 Automated Testing<br/>✅ 251 Test Cases]
+        UC16[🔍 Direct Module Usage<br/>✅ Working Now]
     end
     
     %% External Systems
@@ -50,6 +56,10 @@ graph TB
     ADMIN --> UC13
     ADMIN --> UC14
     
+    %% Developer Relationships
+    DEV[👨‍💻 Developer] --> UC15
+    DEV --> UC16
+    
     %% System Relationships
     UC1 ..> UC5 : includes
     UC2 ..> UC5 : includes
@@ -68,14 +78,17 @@ graph TB
     
     %% Styling
     classDef actor fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef usecase fill:#f1f8e9,stroke:#388e3c,stroke-width:2px
+    classDef implemented fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef pending fill:#ffebee,stroke:#d32f2f,stroke-width:2px
     classDef admin fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     classDef external fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef test fill:#e1f5fe,stroke:#0277bd,stroke-width:3px
     
-    class USER actor
+    class USER,DEV actor
     class ADMIN admin
-    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10 usecase
-    class UC11,UC12,UC13,UC14 admin
+    class UC1,UC2,UC3,UC4,UC5,UC7,UC13 implemented
+    class UC6,UC8,UC9,UC10,UC11,UC12,UC14 pending
+    class UC15,UC16 test
     class BROWSER,DEPLOY external
 ```
 

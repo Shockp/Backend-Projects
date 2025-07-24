@@ -8,10 +8,11 @@ classDiagram
     }
     
     class BaseError {
-        +message: String
-        +statusCode: Number
+        +name: String
+        +code: String  
         +timestamp: Date
-        +BaseError(message: String, statusCode: Number)
+        +stack: String
+        +BaseError(message: String, code: String)
         +toJSON(): Object
     }
     
@@ -31,27 +32,31 @@ classDiagram
         +ValidationError(message: String)
     }
 
-    %% Controllers
+    %% Controllers (Pending Implementation)
     class LengthController {
+        <<pending>>
         -conversionService: ConversionService
         +convert(req: Request, res: Response): Promise~Response~
         +getSupportedUnits(req: Request, res: Response): Promise~Response~
     }
     
     class TemperatureController {
+        <<pending>>
         -conversionService: ConversionService
         +convert(req: Request, res: Response): Promise~Response~
         +getSupportedUnits(req: Request, res: Response): Promise~Response~
     }
     
     class WeightController {
+        <<pending>>
         -conversionService: ConversionService
         +convert(req: Request, res: Response): Promise~Response~
         +getSupportedUnits(req: Request, res: Response): Promise~Response~
     }
 
-    %% Services
+    %% Services (Pending Implementation)
     class ConversionService {
+        <<pending>>
         -validationService: ValidationService
         -lengthConverter: LengthConverter
         -temperatureConverter: TemperatureConverter
@@ -63,6 +68,7 @@ classDiagram
     }
     
     class ValidationService {
+        <<pending>>
         -inputValidator: InputValidator
         -lengthValidator: LengthValidator
         -temperatureValidator: TemperatureValidator
@@ -71,81 +77,138 @@ classDiagram
         +validateUnitType(unitType: String): Boolean
     }
 
-    %% Converter Modules
+    %% Converter Modules (✅ IMPLEMENTED & TESTED)
     class LengthConverter {
-        -conversionFactors: ConversionFactors
-        -units: Units
-        +convert(value: Number, fromUnit: String, toUnit: String): Number
-        +getSupportedUnits(): Array~String~
-        -getConversionFactor(fromUnit: String, toUnit: String): Number
+        <<implemented>>
+        +convert(value: Number, fromUnit: String, toUnit: String)$ Number
+        -convertToMeters(value: Number, fromUnit: String)$ Number
+        -convertFromMeters(meters: Number, toUnit: String)$ Number
     }
     
     class TemperatureConverter {
-        -units: Units
-        +convert(value: Number, fromUnit: String, toUnit: String): Number
-        +getSupportedUnits(): Array~String~
-        -celsiusToFahrenheit(celsius: Number): Number
-        -fahrenheitToCelsius(fahrenheit: Number): Number
-        -celsiusToKelvin(celsius: Number): Number
-        -kelvinToCelsius(kelvin: Number): Number
+        <<implemented>>
+        +convert(value: Number, fromUnit: String, toUnit: String)$ Number
+        -convertToKelvin(value: Number, fromUnit: String)$ Number
+        -convertFromKelvin(kelvin: Number, toUnit: String)$ Number
     }
     
     class WeightConverter {
-        -conversionFactors: ConversionFactors
-        -units: Units
-        +convert(value: Number, fromUnit: String, toUnit: String): Number
-        +getSupportedUnits(): Array~String~
-        -getConversionFactor(fromUnit: String, toUnit: String): Number
+        <<implemented>>
+        +convert(value: Number, fromUnit: String, toUnit: String)$ Number
+        -convertToKilograms(value: Number, fromUnit: String)$ Number
+        -convertFromKilograms(kilograms: Number, toUnit: String)$ Number
     }
 
-    %% Validators
+    %% Validators (✅ IMPLEMENTED & TESTED)
     class InputValidator {
-        +validateNumericInput(value: Any): Boolean
-        +validateStringInput(value: Any): Boolean
-        +validateRange(value: Number, min: Number, max: Number): Boolean
-        +sanitizeInput(value: Any): Any
+        <<implemented>>
+        +validateNumericInput(value: Any)$ Number
+        +validateStringInput(value: String, options: Object)$ String
+        +validateRange(value: Number, min: Number, max: Number)$ Number
+        +sanitizeStringInput(value: Any)$ Any
+        +sanitizeNumericInput(value: Any)$ Number
     }
     
     class LengthValidator {
-        -units: Units
-        +validateUnit(unit: String): Boolean
-        +validateValue(value: Number): Boolean
-        +validateConversion(value: Number, fromUnit: String, toUnit: String): Boolean
+        <<implemented>>
+        +validateUnit(unit: String)$ String
+        +validateNumericValue(value: Number)$ Number
+        +validate(value: Number, unit: String)$ Object
     }
     
     class TemperatureValidator {
-        -units: Units
-        +validateUnit(unit: String): Boolean
-        +validateValue(value: Number, unit: String): Boolean
-        +validateConversion(value: Number, fromUnit: String, toUnit: String): Boolean
+        <<implemented>>
+        +validateUnit(unit: String)$ String
+        +validateNumericValue(value: Number)$ Number
+        +validate(value: Number, unit: String)$ Object
     }
     
     class WeightValidator {
-        -units: Units
-        +validateUnit(unit: String): Boolean
-        +validateValue(value: Number): Boolean
-        +validateConversion(value: Number, fromUnit: String, toUnit: String): Boolean
+        <<implemented>>
+        +validateUnit(unit: String)$ String
+        +validateValue(value: Number)$ Number
+        +validate(value: Number, unit: String)$ Object
     }
 
-    %% Repositories
+    %% Repositories (✅ IMPLEMENTED)
     class ConversionFactors {
+        <<implemented>>
+        +LINEAR: Object$ 
+        +TEMPERATURE: Object$
         -lengthFactors: Object
         -weightFactors: Object
-        +getLengthFactor(fromUnit: String, toUnit: String): Number
-        +getWeightFactor(fromUnit: String, toUnit: String): Number
-        +getAllLengthFactors(): Object
-        +getAllWeightFactors(): Object
+        -temperatureFactors: Object
     }
     
     class Units {
-        -lengthUnits: Array~String~
-        -temperatureUnits: Array~String~
-        -weightUnits: Array~String~
-        +getLengthUnits(): Array~String~
-        +getTemperatureUnits(): Array~String~
-        +getWeightUnits(): Array~String~
-        +isValidUnit(unit: String, unitType: String): Boolean
-        +getAllUnits(): Object
+        <<implemented>>
+        +CATEGORIES: Object$
+        +LISTS: Object$
+        +getLengthUnits()$ Array~String~
+        +getTemperatureUnits()$ Array~String~
+        +getWeightUnits()$ Array~String~
+        +getAllUnits()$ Array~Array~String~~
+    }
+
+    %% Test Classes (✅ COMPREHENSIVE COVERAGE)
+    class InputValidatorTest {
+        <<test>>
+        +testValidateNumericInput(): void
+        +testValidateStringInput(): void
+        +testValidateRange(): void
+        +testSanitization(): void
+        +testErrorHandling(): void
+    }
+    
+    class LengthValidatorTest {
+        <<test>>
+        +testUnitValidation(): void
+        +testValueValidation(): void
+        +testCompleteValidation(): void
+        +testErrorCases(): void
+    }
+    
+    class TemperatureValidatorTest {
+        <<test>>
+        +testUnitValidation(): void
+        +testValueValidation(): void
+        +testCompleteValidation(): void
+        +testErrorCases(): void
+    }
+    
+    class WeightValidatorTest {
+        <<test>>
+        +testUnitValidation(): void
+        +testValueValidation(): void
+        +testCompleteValidation(): void
+        +testErrorCases(): void
+    }
+    
+    class LengthConverterTest {
+        <<test>>
+        +testMetricConversions(): void
+        +testImperialConversions(): void
+        +testCrossSystemConversions(): void
+        +testPrecisionHandling(): void
+        +testErrorHandling(): void
+    }
+    
+    class TemperatureConverterTest {
+        <<test>>
+        +testCelsiusConversions(): void
+        +testFahrenheitConversions(): void
+        +testKelvinConversions(): void
+        +testSpecialTemperatures(): void
+        +testRoundTripConsistency(): void
+    }
+    
+    class WeightConverterTest {
+        <<test>>
+        +testMetricConversions(): void
+        +testImperialConversions(): void
+        +testCrossSystemConversions(): void
+        +testRealWorldScenarios(): void
+        +testErrorHandling(): void
     }
 
     %% Relationships - Inheritance
