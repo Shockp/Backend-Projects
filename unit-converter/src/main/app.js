@@ -4,6 +4,7 @@
  */
 
 const express = require('express');
+const path = require('path');
 const lengthController = require('./controllers/lengthController');
 const weightController = require('./controllers/weightController');
 const temperatureController = require('./controllers/temperatureController');
@@ -16,6 +17,26 @@ const app = express();
 
 // Parse JSON request bodies
 app.use(express.json());
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve HTML views
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.get('/length', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'length.html'));
+});
+
+app.get('/temperature', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'temperature.html'));
+});
+
+app.get('/weight', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'weight.html'));
+});
 
 /** Mount length conversion routes */
 app.use('/convert/length', /** @type {import('express').Router} */ (lengthController));

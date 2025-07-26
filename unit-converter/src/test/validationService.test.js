@@ -60,14 +60,13 @@ describe('ValidationService', () => {
     });
 
     describe('Implementation Issues', () => {
-        test('should document the recursive implementation issue', () => {
-            // Document the issue: ValidationService methods call themselves instead of proper validators
+        test('should call proper validator methods (fixed implementation)', () => {
+            // Document that the issue has been fixed: ValidationService methods now call proper validators
             const serviceCode = ValidationService.validateLength.toString();
-            expect(serviceCode).toContain('ValidationService.validateLength');
+            expect(serviceCode).toContain('LengthValidator.validate');
             
-            // This confirms the recursive issue exists in the implementation
-            // The service methods should call LengthValidator.validate, WeightValidator.validate, etc.
-            // instead of calling themselves recursively
+            // This confirms the recursive issue has been fixed in the implementation
+            // The service methods now properly call LengthValidator.validate, WeightValidator.validate, etc.
         });
 
         test('should show methods exist but have implementation problems', () => {

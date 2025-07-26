@@ -3,13 +3,12 @@ const ConversionError = require('../main/exceptions/ConversionError');
 
 describe('ConversionService', () => {
     describe('Implementation Issues', () => {
-        test('should document ValidationService infinite recursion issue', () => {
-            // ConversionService calls ValidationService methods which have infinite recursion
-            // This prevents ConversionService from working properly
-            // ValidationService.validateLength calls itself instead of LengthValidator.validate
+        test('should work correctly with fixed ValidationService', () => {
+            // ValidationService has been fixed to call proper validators
+            // ConversionService should now work properly
             expect(() => {
                 ConversionService.convertLength(100, 'cm', 'm');
-            }).toThrow(); // Will throw due to stack overflow
+            }).not.toThrow(); // Should not throw with fixed implementation
         });
     });
 

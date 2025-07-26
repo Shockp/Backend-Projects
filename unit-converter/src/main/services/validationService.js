@@ -5,15 +5,15 @@ const TemperatureValidator  = require('../validators/temperatureValidator');
 
 class ValidationService {
     static validateLength(value, unit) {
-        return ValidationService.validateLength(value, unit);
+        return LengthValidator.validate(value, unit);
     }
 
     static validateWeight(value, unit) {
-        return ValidationService.validateWeight(value, unit);
+        return WeightValidator.validate(value, unit);
     }
 
     static validateTemperature(value, unit) {
-        return ValidationService.validateTemperature(value, unit);
+        return TemperatureValidator.validate(value, unit);
     }
 }
 
