@@ -32,49 +32,76 @@ classDiagram
         +ValidationError(message: String)
     }
 
-    %% Controllers (Pending Implementation)
+    %% Controllers (✅ IMPLEMENTED & TESTED)
     class LengthController {
-        <<pending>>
-        -conversionService: ConversionService
+        <<implemented>>
         +convert(req: Request, res: Response): Promise~Response~
-        +getSupportedUnits(req: Request, res: Response): Promise~Response~
+        +handleConversionRequest(req: Request, res: Response, next: Function): Promise~void~
     }
     
     class TemperatureController {
-        <<pending>>
-        -conversionService: ConversionService
+        <<implemented>>
         +convert(req: Request, res: Response): Promise~Response~
-        +getSupportedUnits(req: Request, res: Response): Promise~Response~
+        +handleConversionRequest(req: Request, res: Response, next: Function): Promise~void~
     }
     
     class WeightController {
-        <<pending>>
-        -conversionService: ConversionService
+        <<implemented>>
         +convert(req: Request, res: Response): Promise~Response~
-        +getSupportedUnits(req: Request, res: Response): Promise~Response~
+        +handleConversionRequest(req: Request, res: Response, next: Function): Promise~void~
     }
 
-    %% Services (Pending Implementation)
+    %% Services (✅ IMPLEMENTED & TESTED)
     class ConversionService {
-        <<pending>>
-        -validationService: ValidationService
-        -lengthConverter: LengthConverter
-        -temperatureConverter: TemperatureConverter
-        -weightConverter: WeightConverter
-        +convertLength(value: Number, fromUnit: String, toUnit: String): Promise~Number~
-        +convertTemperature(value: Number, fromUnit: String, toUnit: String): Promise~Number~
-        +convertWeight(value: Number, fromUnit: String, toUnit: String): Promise~Number~
-        +getSupportedUnits(unitType: String): Array~String~
+        <<implemented>>
+        +convertLength(value: Number, fromUnit: String, toUnit: String)$ Number
+        +convertTemperature(value: Number, fromUnit: String, toUnit: String)$ Number
+        +convertWeight(value: Number, fromUnit: String, toUnit: String)$ Number
+        -validateInputs(value: Number, fromUnit: String, toUnit: String)$ void
     }
     
     class ValidationService {
-        <<pending>>
-        -inputValidator: InputValidator
-        -lengthValidator: LengthValidator
-        -temperatureValidator: TemperatureValidator
-        -weightValidator: WeightValidator
-        +validateConversionInput(value: Number, fromUnit: String, toUnit: String, unitType: String): Promise~Boolean~
-        +validateUnitType(unitType: String): Boolean
+        <<implemented>>
+        +validateLength(value: Number, unit: String)$ Object
+        +validateWeight(value: Number, unit: String)$ Object
+        +validateTemperature(value: Number, unit: String)$ Object
+    }
+
+    %% Web Application Components (✅ IMPLEMENTED)
+    class ExpressApp {
+        <<implemented>>
+        +app: Express
+        +setupRoutes(): void
+        +setupStaticFiles(): void
+        +setupErrorHandling(): void
+        +listen(port: Number): Server
+    }
+
+    %% Frontend Components (✅ IMPLEMENTED)
+    class API {
+        <<frontend>>
+        +post(url: String, data: Object)$ Promise~Object~
+    }
+
+    class UI {
+        <<frontend>>
+        +showElement(elementId: String)$ void
+        +hideElement(elementId: String)$ void
+        +showLoading()$ void
+        +showResult(text: String)$ void
+        +showError(text: String)$ void
+        +swapSelectValues(fromId: String, toId: String)$ void
+    }
+
+    class Converter {
+        <<frontend>>
+        -apiEndpoint: String
+        -formId: String
+        -resultFormatter: Function
+        +Converter(apiEndpoint: String, formId: String, resultFormatter: Function)
+        +init(): void
+        +handleSubmit(event: Event): Promise~void~
+        +handleSwap(): void
     }
 
     %% Converter Modules (✅ IMPLEMENTED & TESTED)
@@ -219,6 +246,10 @@ classDiagram
     BaseError <|-- ValidationError
 
     %% Relationships - Composition/Aggregation
+    ExpressApp o-- LengthController : routes
+    ExpressApp o-- TemperatureController : routes
+    ExpressApp o-- WeightController : routes
+    
     LengthController o-- ConversionService : uses
     TemperatureController o-- ConversionService : uses
     WeightController o-- ConversionService : uses
@@ -228,7 +259,6 @@ classDiagram
     ConversionService o-- TemperatureConverter : uses
     ConversionService o-- WeightConverter : uses
     
-    ValidationService o-- InputValidator : uses
     ValidationService o-- LengthValidator : uses
     ValidationService o-- TemperatureValidator : uses
     ValidationService o-- WeightValidator : uses
@@ -242,6 +272,10 @@ classDiagram
     LengthValidator o-- Units : uses
     TemperatureValidator o-- Units : uses
     WeightValidator o-- Units : uses
+
+    %% Frontend to Backend Communication
+    Converter ..> ExpressApp : HTTP requests
+    API ..> ExpressApp : fetch calls
 
     %% Exception Dependencies (can throw)
     ConversionService ..> ConversionError : throws
@@ -265,14 +299,20 @@ classDiagram
 - **UnitError**: Errors related to unit validation and support
 - **ValidationError**: Input validation and data integrity errors
 
+### Web Application Classes
+- **ExpressApp**: Main Express.js application with routing, static file serving, and error handling
+- **API**: Frontend utility class for making HTTP requests to backend APIs
+- **UI**: Frontend utility class for DOM manipulation and user interface updates
+- **Converter**: Frontend controller class managing form interactions and API communication
+
 ### Controller Classes
-- **LengthController**: Handles HTTP requests for length conversions
-- **TemperatureController**: Handles HTTP requests for temperature conversions
-- **WeightController**: Handles HTTP requests for weight conversions
+- **LengthController**: Handles HTTP requests for length conversions with Express middleware
+- **TemperatureController**: Handles HTTP requests for temperature conversions with Express middleware  
+- **WeightController**: Handles HTTP requests for weight conversions with Express middleware
 
 ### Service Classes
-- **ConversionService**: Orchestrates conversion operations and coordinates business logic
-- **ValidationService**: Centralizes validation logic across all unit types
+- **ConversionService**: Orchestrates conversion operations with validation and error handling
+- **ValidationService**: Delegates validation to specific validator classes
 
 ### Converter Classes
 - **LengthConverter**: Core length conversion algorithms and logic
