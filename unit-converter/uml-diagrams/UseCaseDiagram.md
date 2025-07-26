@@ -1,95 +1,66 @@
 # Use Case Diagram - Unit Converter System
 
-**Implementation Status**: Core logic use cases (✅ **fully implemented**), Web interface use cases (❌ **pending implementation**)
-
 ```mermaid
-graph TB
+graph TD
     %% Actors
-    USER[👤 User]
-    ADMIN[👨‍💼 System Administrator]
+    User((User))
+    WebBrowser[Web Browser]
+    API[REST API]
     
-    %% System Boundary
-    subgraph "Unit Converter System"
-        %% Primary Use Cases (✅ Core Logic Implemented)
-        UC1[📏 Convert Length Units<br/>✅ Core Logic]
-        UC2[🌡️ Convert Temperature Units<br/>✅ Core Logic]
-        UC3[⚖️ Convert Weight Units<br/>✅ Core Logic]
-        UC4[📋 View Supported Units<br/>✅ Repository]
-        UC5[🔍 Validate Input Values<br/>✅ Implemented]
-        UC6[📊 Get Conversion History<br/>❌ Web Interface]
-        
-        %% Secondary Use Cases
-        UC7[⚠️ Handle Conversion Errors<br/>✅ Exception System]
-        UC8[🔧 Configure Unit Preferences<br/>❌ Pending]
-        UC9[📱 Access Mobile Interface<br/>❌ Pending]
-        UC10[💾 Save Conversion Results<br/>❌ Pending]
-        
-        %% Administrative Use Cases
-        UC11[📈 Monitor System Usage<br/>❌ Pending]
-        UC12[⚙️ Manage Configuration<br/>❌ Pending]
-        UC13[🔄 Update Conversion Factors<br/>✅ Repository]
-        UC14[📝 View System Logs<br/>❌ Pending]
-        
-        %% Testing Use Cases (✅ Implemented)
-        UC15[🧪 Automated Testing<br/>✅ 251 Test Cases]
-        UC16[🔍 Direct Module Usage<br/>✅ Working Now]
-    end
+    %% Main Use Cases
+    UC1[Convert Length Units]
+    UC2[Convert Temperature Units]
+    UC3[Convert Weight Units]
+    UC4[Access Home Page]
+    UC5[Navigate Between Converters]
+    UC6[View Conversion Interface]
     
-    %% External Systems
-    BROWSER[🌐 Web Browser]
-    DEPLOY[☁️ Deployment Platform]
+    %% Validation Use Cases
+    UC7[Validate Input Data]
+    UC8[Handle Conversion Errors]
+    UC9[Display Error Messages]
     
-    %% User Relationships
-    USER --> UC1
-    USER --> UC2
-    USER --> UC3
-    USER --> UC4
-    USER --> UC5
-    USER --> UC6
-    USER --> UC8
-    USER --> UC9
-    USER --> UC10
+    %% System Use Cases
+    UC10[Serve Static Files]
+    UC11[Process API Requests]
+    UC12[Return JSON Responses]
     
-    %% Admin Relationships
-    ADMIN --> UC11
-    ADMIN --> UC12
-    ADMIN --> UC13
-    ADMIN --> UC14
+    %% Relationships
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
     
-    %% Developer Relationships
-    DEV[👨‍💻 Developer] --> UC15
-    DEV --> UC16
+    %% Browser interactions
+    WebBrowser --> UC4
+    WebBrowser --> UC6
+    WebBrowser --> UC10
     
-    %% System Relationships
-    UC1 ..> UC5 : includes
-    UC2 ..> UC5 : includes
-    UC3 ..> UC5 : includes
-    UC1 ..> UC7 : extends
-    UC2 ..> UC7 : extends
-    UC3 ..> UC7 : extends
-    UC6 ..> UC10 : extends
+    %% API interactions
+    API --> UC11
+    API --> UC12
     
-    %% External Dependencies
-    USER -.-> BROWSER : uses
-    BROWSER -.-> UC1 : accesses
-    BROWSER -.-> UC2 : accesses
-    BROWSER -.-> UC3 : accesses
-    DEPLOY -.-> UC11 : provides metrics
+    %% Include relationships
+    UC1 -.-> UC7
+    UC2 -.-> UC7
+    UC3 -.-> UC7
+    
+    %% Extend relationships
+    UC1 -.-> UC8
+    UC2 -.-> UC8
+    UC3 -.-> UC8
+    UC8 -.-> UC9
     
     %% Styling
-    classDef actor fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef implemented fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
-    classDef pending fill:#ffebee,stroke:#d32f2f,stroke-width:2px
-    classDef admin fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef external fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef test fill:#e1f5fe,stroke:#0277bd,stroke-width:3px
+    classDef actorStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef usecaseStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef systemStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
     
-    class USER,DEV actor
-    class ADMIN admin
-    class UC1,UC2,UC3,UC4,UC5,UC7,UC13 implemented
-    class UC6,UC8,UC9,UC10,UC11,UC12,UC14 pending
-    class UC15,UC16 test
-    class BROWSER,DEPLOY external
+    class User,WebBrowser actorStyle
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9 usecaseStyle
+    class API,UC10,UC11,UC12 systemStyle
 ```
 
 ## Use Case Descriptions
@@ -99,186 +70,178 @@ graph TB
 #### UC1: Convert Length Units
 - **Actor**: User
 - **Goal**: Convert a value from one length unit to another
-- **Preconditions**: User has access to the system
+- **Preconditions**: User has access to the length conversion page
 - **Main Flow**:
-  1. User selects length conversion page
-  2. User enters numeric value
-  3. User selects source unit (e.g., meters)
-  4. User selects target unit (e.g., feet)
-  5. System validates input
-  6. System performs conversion calculation
-  7. System displays converted value
+  1. User navigates to /length endpoint
+  2. User enters numeric value in the form
+  3. User selects source unit (mm, cm, m, km, in, ft, yd, mi)
+  4. User selects target unit from available options
+  5. System validates input via ValidationService
+  6. System calls LengthConverter.convert() method
+  7. System returns JSON response with converted value
 - **Extensions**: 
-  - Invalid input → Handle Conversion Errors
-- **Postconditions**: Conversion result is displayed to user
+  - Invalid input → ValidationError (400 status)
+  - Conversion failure → ConversionError (500 status)
+- **Postconditions**: Conversion result is returned as JSON: `{ result: number }`
 
 #### UC2: Convert Temperature Units
 - **Actor**: User
 - **Goal**: Convert a temperature value between different scales
-- **Preconditions**: User has access to the system
+- **Preconditions**: User has access to the temperature conversion page
 - **Main Flow**:
-  1. User selects temperature conversion page
-  2. User enters temperature value
-  3. User selects source scale (Celsius, Fahrenheit, Kelvin)
-  4. User selects target scale
-  5. System validates temperature range
-  6. System applies conversion formula
-  7. System displays converted temperature
+  1. User navigates to /temperature endpoint
+  2. User enters temperature value in the form
+  3. User selects source scale (c=Celsius, f=Fahrenheit, k=Kelvin)
+  4. User selects target scale from available options
+  5. System validates temperature value and units
+  6. System calls TemperatureConverter.convert() method
+  7. System returns JSON response with converted temperature
 - **Extensions**: 
-  - Temperature below absolute zero → Handle Conversion Errors
-- **Postconditions**: Temperature conversion result is displayed
+  - Invalid temperature input → ValidationError (400 status)
+  - Conversion failure → ConversionError (500 status)
+- **Postconditions**: Temperature conversion result is returned as JSON: `{ result: number }`
 
 #### UC3: Convert Weight Units
 - **Actor**: User
 - **Goal**: Convert a weight/mass value between different units
-- **Preconditions**: User has access to the system
+- **Preconditions**: User has access to the weight conversion page
 - **Main Flow**:
-  1. User selects weight conversion page
-  2. User enters weight value
-  3. User selects source unit (kg, lbs, oz, etc.)
-  4. User selects target unit
-  5. System validates positive value
-  6. System calculates conversion using factors
-  7. System displays converted weight
+  1. User navigates to /weight endpoint
+  2. User enters weight value in the form
+  3. User selects source unit (mg, g, kg, t, oz, lb, st, ton)
+  4. User selects target unit from available options
+  5. System validates weight value and units
+  6. System calls WeightConverter.convert() method
+  7. System returns JSON response with converted weight
 - **Extensions**: 
-  - Negative weight value → Handle Conversion Errors
-- **Postconditions**: Weight conversion result is displayed
+  - Invalid weight input → ValidationError (400 status)
+  - Conversion failure → ConversionError (500 status)
+- **Postconditions**: Weight conversion result is returned as JSON: `{ result: number }`
 
-#### UC4: View Supported Units
+#### UC4: Access Home Page
 - **Actor**: User
-- **Goal**: See all available units for each conversion type
-- **Preconditions**: User has access to the system
+- **Goal**: Access the main landing page of the unit converter
+- **Preconditions**: User has web browser access
 - **Main Flow**:
-  1. User requests supported units list
-  2. System retrieves units from repository
-  3. System displays categorized unit lists
-  4. User can view unit abbreviations and full names
-- **Postconditions**: Complete unit listing is displayed
+  1. User navigates to / (root) endpoint
+  2. System serves index.html from views directory
+  3. User sees three conversion options: Length, Weight, Temperature
+  4. User can navigate to any specific converter page
+- **Postconditions**: Home page is displayed with navigation options
 
-#### UC5: Validate Input Values
-- **Actor**: System (included by conversion use cases)
-- **Goal**: Ensure input data is valid before conversion
-- **Main Flow**:
-  1. System receives input data
-  2. System validates numeric format
-  3. System checks unit validity
-  4. System verifies value constraints
-  5. System confirms data integrity
-- **Extensions**: 
-  - Invalid data → Throw validation error
-- **Postconditions**: Input is validated or error is raised
-
-#### UC6: Get Conversion History
+#### UC5: Navigate Between Converters
 - **Actor**: User
-- **Goal**: View previously performed conversions
-- **Preconditions**: User has performed conversions
+- **Goal**: Move between different conversion interfaces
+- **Preconditions**: User is on any page of the system
 - **Main Flow**:
-  1. User requests conversion history
-  2. System retrieves stored conversions
-  3. System displays chronological list
-  4. User can review past calculations
-- **Extensions**: 
-  - Save results → UC10
-- **Postconditions**: Conversion history is displayed
+  1. User clicks navigation links in header
+  2. System routes to appropriate page (/length, /weight, /temperature)
+  3. System serves corresponding HTML view
+  4. User sees conversion interface for selected type
+- **Postconditions**: User is on the desired conversion page
+
+#### UC6: View Conversion Interface
+- **Actor**: User
+- **Goal**: Access the web interface for performing conversions
+- **Preconditions**: User has navigated to a conversion page
+- **Main Flow**:
+  1. System serves static HTML page (length.html, weight.html, or temperature.html)
+  2. System loads associated CSS and JavaScript files
+  3. User sees input forms, unit selectors, and result display
+  4. Interface is ready for user input
+- **Postconditions**: Conversion interface is loaded and functional
 
 ### Secondary Use Cases
 
-#### UC7: Handle Conversion Errors
-- **Actor**: System
-- **Goal**: Gracefully handle and display conversion errors
+#### UC7: Validate Input Data
+- **Actor**: System (included by all conversion use cases)
+- **Goal**: Ensure input data is valid before conversion
 - **Main Flow**:
-  1. System detects error condition
-  2. System determines error type
-  3. System formats user-friendly error message
-  4. System displays error to user
-  5. System suggests corrective action
-- **Postconditions**: Error is communicated clearly to user
+  1. System receives conversion request with value, from, and to parameters
+  2. ValidationService validates numeric format of value
+  3. ValidationService checks if units exist in Units repository
+  4. ValidationService verifies value constraints (e.g., positive for weight)
+  5. System confirms data integrity
+- **Extensions**: 
+  - Invalid data → Throw ValidationError
+- **Postconditions**: Input is validated or ValidationError is thrown
 
-#### UC8: Configure Unit Preferences
-- **Actor**: User
-- **Goal**: Set default or preferred units for conversions
+#### UC8: Handle Conversion Errors
+- **Actor**: System (extended from conversion use cases)
+- **Goal**: Gracefully handle and return conversion errors
 - **Main Flow**:
-  1. User accesses settings/preferences
-  2. User selects default units per category
-  3. System saves user preferences
-  4. System applies preferences to future conversions
-- **Postconditions**: User preferences are saved and applied
+  1. System detects error during conversion process
+  2. System determines error type (ValidationError or ConversionError)
+  3. System formats appropriate HTTP status code (400 or 500)
+  4. System returns JSON error response: `{ error: string }`
+  5. Global error handler logs unexpected errors
+- **Postconditions**: Error is returned as structured JSON response
 
-#### UC9: Access Mobile Interface
-- **Actor**: User
-- **Goal**: Use the converter on mobile devices
+#### UC9: Display Error Messages
+- **Actor**: System (extended from error handling)
+- **Goal**: Provide user-friendly error messages
 - **Main Flow**:
-  1. User accesses system via mobile browser
-  2. System detects mobile device
-  3. System provides responsive mobile interface
-  4. User performs conversions with touch interface
-- **Postconditions**: Mobile-optimized interface is provided
+  1. System catches validation or conversion errors
+  2. System determines appropriate HTTP status code
+  3. System formats error message in JSON format
+  4. System returns error response to client
+  5. Client receives structured error information
+- **Postconditions**: Error message is communicated to client
 
-#### UC10: Save Conversion Results
-- **Actor**: User
-- **Goal**: Save or export conversion results
+#### UC10: Serve Static Files
+- **Actor**: Web Browser
+- **Goal**: Load CSS, JavaScript, and other static assets
 - **Main Flow**:
-  1. User performs conversion
-  2. User requests to save result
-  3. System formats result for storage/export
-  4. System provides save/download option
-  5. Result is saved locally or downloaded
-- **Postconditions**: Conversion result is saved/exported
+  1. Browser requests static files (CSS, JS, images)
+  2. Express server serves files from public directory
+  3. Files are cached by browser for performance
+  4. Static assets enhance user interface functionality
+- **Postconditions**: Static files are served to browser
 
-### Administrative Use Cases
+### System Use Cases
 
-#### UC11: Monitor System Usage
-- **Actor**: System Administrator
-- **Goal**: Track system performance and usage metrics
+#### UC11: Process API Requests
+- **Actor**: REST API
+- **Goal**: Handle incoming HTTP requests for conversions
 - **Main Flow**:
-  1. Admin accesses monitoring dashboard
-  2. System displays usage statistics
-  3. Admin reviews performance metrics
-  4. Admin identifies usage patterns
-- **Postconditions**: System usage insights are provided
+  1. API receives POST request to conversion endpoint
+  2. Express router directs request to appropriate controller
+  3. Controller extracts request parameters (value, from, to)
+  4. Controller calls ConversionService method
+  5. Response is formatted and returned
+- **Postconditions**: API request is processed and response is sent
 
-#### UC12: Manage Configuration
-- **Actor**: System Administrator
-- **Goal**: Update system settings and configuration
+#### UC12: Return JSON Responses
+- **Actor**: REST API
+- **Goal**: Provide structured responses to clients
 - **Main Flow**:
-  1. Admin accesses configuration interface
-  2. Admin modifies system settings
-  3. System validates configuration changes
-  4. System applies new configuration
-- **Postconditions**: System configuration is updated
-
-#### UC13: Update Conversion Factors
-- **Actor**: System Administrator
-- **Goal**: Maintain accuracy of conversion calculations
-- **Main Flow**:
-  1. Admin accesses conversion factor repository
-  2. Admin updates or adds conversion factors
-  3. System validates factor accuracy
-  4. System deploys updated factors
-- **Postconditions**: Conversion factors are updated
-
-#### UC14: View System Logs
-- **Actor**: System Administrator
-- **Goal**: Monitor system health and troubleshoot issues
-- **Main Flow**:
-  1. Admin accesses system logs
-  2. System displays error logs and activities
-  3. Admin analyzes log entries
-  4. Admin identifies issues or patterns
-- **Postconditions**: System logs are reviewed
+  1. System completes conversion or error handling
+  2. Result is formatted as JSON object
+  3. Appropriate HTTP status code is set
+  4. Response headers are configured
+  5. JSON response is sent to client
+- **Postconditions**: Structured JSON response is delivered
 
 ## Use Case Relationships
 
 ### Include Relationships
-- All conversion use cases include input validation
-- Input validation ensures data integrity before processing
+- UC1 (Convert Length Units) includes UC7 (Validate Input Data)
+- UC2 (Convert Temperature Units) includes UC7 (Validate Input Data)  
+- UC3 (Convert Weight Units) includes UC7 (Validate Input Data)
+- All conversion use cases include input validation to ensure data integrity
 
 ### Extend Relationships
-- Conversion use cases extend to error handling when issues occur
-- Conversion history extends to save results functionality
+- UC1, UC2, UC3 extend to UC8 (Handle Conversion Errors) when validation or conversion fails
+- UC8 (Handle Conversion Errors) extends to UC9 (Display Error Messages)
+- Error handling provides graceful failure recovery for all conversion operations
 
 ### Actor Interactions
-- **User**: Primary system user performing conversions
-- **System Administrator**: Manages system configuration and monitoring
-- **Web Browser**: External interface for user access
-- **Deployment Platform**: External system providing hosting and metrics
+- **User**: Primary system user who navigates pages and performs conversions
+- **Web Browser**: External client that requests static files and displays interfaces
+- **REST API**: Internal system actor that processes conversion requests and returns responses
+
+### Technical Architecture
+- **Frontend**: HTML pages with JavaScript for user interaction
+- **Backend**: Express.js server with controllers, services, and validation layers
+- **API Endpoints**: POST /convert/length, /convert/weight, /convert/temperature
+- **Static Content**: GET /, /length, /weight, /temperature for HTML pages

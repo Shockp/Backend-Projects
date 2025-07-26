@@ -148,3 +148,36 @@ A production-ready Spring Boot microservice that wraps the Visual Crossing Weath
 - Production-ready configuration and deployment support
 
 ---
+
+### 6. Unit Converter (Web Application)
+[🔗 Project Page](https://roadmap.sh/projects/unit-converter) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/unit-converter)
+
+A production-ready full-stack web application for converting between different units including length, weight, and temperature. Built with Node.js/Express backend and modern vanilla JavaScript frontend with responsive design.
+
+**Tech Stack:**
+- Node.js 16+
+- Express 4.19.2
+- Vanilla JavaScript
+- Tailwind CSS
+- Jest (testing)
+- Vercel (deployment)
+
+**Architecture:**
+- Layered Architecture (Presentation, Business, Data)
+- Repository Pattern for data access
+- Service Layer for business logic
+- Validation Chain with sanitization
+- Error Hierarchy with structured exception handling
+
+**Features:**
+- RESTful API endpoints for all conversion types
+- Responsive web interface with mobile support
+- Accurate conversions using standard mathematical formulas
+- Cross-unit support between metric and imperial systems
+- Comprehensive input validation and error handling
+- Express static file serving for frontend assets
+- 500+ test cases including unit, integration, and E2E tests
+- Vercel serverless deployment configuration
+- Complete UML diagrams and professional documentation
+
+---
