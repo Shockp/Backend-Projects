@@ -150,7 +150,7 @@ A production-ready Spring Boot microservice that wraps the Visual Crossing Weath
 ---
 
 ### 6. Unit Converter (Web Application)
-[🔗 Project Page](https://roadmap.sh/projects/unit-converter) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/unit-converter)
+[🔗 Project Page](https://roadmap.sh/projects/unit-converter) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/unit-converter) • [🌐 Live Demo](https://unit-converter-ac0or8cq7-shockps-projects.vercel.app)
 
 A production-ready full-stack web application for converting between different units including length, weight, and temperature. Built with Node.js/Express backend and modern vanilla JavaScript frontend with responsive design.
 

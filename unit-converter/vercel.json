@@ -9,13 +9,15 @@
   ],
   "routes": [
     {
+      "src": "/src/main/public/(.*)",
+      "dest": "/src/main/public/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/server.js"
     }
   ],
-  "functions": {
-    "server.js": {
-      "maxDuration": 30
-    }
+  "env": {
+    "NODE_ENV": "production"
   }
 }

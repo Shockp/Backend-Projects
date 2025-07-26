@@ -4,6 +4,8 @@
 [![Express](https://img.shields.io/badge/Express-4.19.2-blue.svg)](https://expressjs.com/)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black.svg)](https://vercel.com/)
 
+> **Live Demo**: [https://unit-converter-ac0or8cq7-shockps-projects.vercel.app](https://unit-converter-ac0or8cq7-shockps-projects.vercel.app)
+> 
 > **Project Reference**: [roadmap.sh/projects/unit-converter](https://roadmap.sh/projects/unit-converter)
 
 A production-ready full-stack web application for converting between different units including length, weight, and temperature. Built with Node.js/Express backend and modern vanilla JavaScript frontend with responsive design and comprehensive testing coverage.
