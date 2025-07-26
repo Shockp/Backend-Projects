@@ -4,11 +4,11 @@
  */
 
 const express = require('express');
-lengthController = require('./controllers/lengthController');
+const lengthController = require('./controllers/lengthController');
 const weightController = require('./controllers/weightController');
 const temperatureController = require('./controllers/temperatureController');
-const { ValidationError } = require('./exceptions/ValidationError');
-const { ConversionError } = require('./exceptions/ConversionError');
+const ValidationError = require('./exceptions/ValidationError');
+const ConversionError = require('./exceptions/ConversionError');
 const BaseError = require('./exceptions/BaseError');
 
 /** @type {import('express').Application} */
