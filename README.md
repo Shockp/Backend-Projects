@@ -181,3 +181,8 @@ A production-ready full-stack web application for converting between different u
 - Complete UML diagrams and professional documentation
 
 ---
+
+### 6. Unit Converter (Web Application) (*On Progress*)
+[🔗 Project Page](https://roadmap.sh/projects/personal-blog) • [📁 Code Repo](https://github.com/Shockp/Backend-Projects/tree/main/personal-blog)
+
+A self‑hosted blog platform featuring a guest view (list of articles and individual posts) and an admin interface for managing content.
