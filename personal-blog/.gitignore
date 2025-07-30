@@ -24,7 +24,11 @@ hs_err_pid*
 replay_pid*
 
 # Maven
+HELP.md
 target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -36,16 +40,28 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/maven-wrapper.properties
 
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
 # IDE - IntelliJ IDEA
 .idea/
 *.iws
 *.iml
 *.ipr
 out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 # IDE - Eclipse
 .metadata
+.apt_generated
 bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 tmp/
 *.tmp
 *.bak
@@ -57,6 +73,9 @@ local.properties
 .recommenders
 .project
 .classpath
+.factorypath
+.springBeans
+.sts4-cache
 
 # IDE - VS Code
 .vscode/
@@ -69,6 +88,25 @@ local.properties
 /dist/
 /nbdist/
 /.nb-gradle/
+
+# Spring Boot
+*.pid
+*.pid.lock
+
+# Application specific
+/uploads/
+/logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+*.trace.db
+*.lock.db
+
+# Redis dump
+dump.rdb
 
 # Operating System Files
 # macOS
@@ -108,8 +146,14 @@ $RECYCLE.BIN/
 # Environment and configuration files
 .env
 *.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 config.properties
 secrets.properties
+application-local.properties
+application-local.yml
 
 # Temporary files
 *.tmp
@@ -122,3 +166,60 @@ secrets.properties
 *~
 .#*
 \#*#
+
+# Coverage reports
+/coverage/
+*.lcov
+/target/site/jacoco/
+
+# Test results
+/test-results/
+/junit/
+
+# SonarQube
+.sonar/
+
+# Application logs
+application*.log
+spring.log
+
+# Cache directories
+.cache/
+
+# Generated documentation
+/docs/generated/
+
+# Docker
+.dockerignore
+
+# Node modules (if any frontend tools are used)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Backup files
+*.backup
+
+# Kubernetes
+*.yaml.bak
+*.yml.bak
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# AWS
+.aws/
+
+# Local development scripts
+dev-scripts/
+local-setup.sh
+local-teardown.sh
