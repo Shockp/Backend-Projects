@@ -6,88 +6,69 @@ This diagram illustrates the functional requirements and user interactions withi
 
 ```mermaid
 graph TB
-    %% Actors
-    subgraph "External Actors"
-        V[Visitor]
+    %% External Actors
+    V[Visitor]
     RU[Registered User]
     A[Admin]
     SA[Super Admin]
     ES[Email System]
     SS[Search Engine]
-    end
 
-    %% System Boundary
-    subgraph "Personal Blog System"
-        %% Public Use Cases
-        subgraph "Public Features"
-            UC1[View Blog Posts]
-            UC2[Search Posts]
-            UC3[View Post Details]
-            UC4[Browse by Category]
-            UC5[Browse by Tags]
-            UC6[View Archives]
-            UC7[Subscribe to Newsletter]
-            UC8[Contact Admin]
-        end
+    %% Public Features
+    UC1[View Blog Posts]
+    UC2[Search Posts]
+    UC3[View Post Details]
+    UC4[Browse by Category]
+    UC5[Browse by Tags]
+    UC6[View Archives]
+    UC7[Subscribe to Newsletter]
+    UC8[Contact Admin]
 
-        %% Authentication Use Cases
-        subgraph "Authentication"
-            UC9[Register Account]
-            UC10[Login]
-            UC11[Logout]
-            UC12[Reset Password]
-            UC13[Verify Email]
-            UC14[Refresh Token]
-        end
+    %% Authentication
+    UC9[Register Account]
+    UC10[Login]
+    UC11[Logout]
+    UC12[Reset Password]
+    UC13[Verify Email]
+    UC14[Refresh Token]
 
-        %% User Management
-        subgraph "User Features"
-            UC15[Update Profile]
-            UC16[Change Password]
-            UC17[Manage Preferences]
-            UC18[View Reading History]
-            UC19[Bookmark Posts]
-            UC20[Submit Comments]
-        end
+    %% User Features
+    UC15[Update Profile]
+    UC16[Change Password]
+    UC17[Manage Preferences]
+    UC18[View Reading History]
+    UC19[Bookmark Posts]
+    UC20[Submit Comments]
 
-        %% Content Management
-        subgraph "Content Management"
-            UC21[Create Blog Post]
-            UC22[Edit Blog Post]
-            UC23[Delete Blog Post]
-            UC24[Publish/Unpublish Post]
-            UC25[Schedule Post]
-            UC26[Manage Categories]
-            UC27[Manage Tags]
-            UC28[Upload Media]
-            UC29[Manage Comments]
-        end
+    %% Content Management
+    UC21[Create Blog Post]
+    UC22[Edit Blog Post]
+    UC23[Delete Blog Post]
+    UC24[Publish/Unpublish Post]
+    UC25[Schedule Post]
+    UC26[Manage Categories]
+    UC27[Manage Tags]
+    UC28[Upload Media]
+    UC29[Manage Comments]
 
-        %% Administration
-        subgraph "Administration"
-            UC30[Manage Users]
-            UC31[View Analytics]
-            UC32[Moderate Comments]
-            UC33[Manage Site Settings]
-            UC34[Backup Data]
-            UC35[Monitor System]
-            UC36[Manage Roles]
-            UC37[Security Audit]
-        end
+    %% Administration
+    UC30[Manage Users]
+    UC31[View Analytics]
+    UC32[Moderate Comments]
+    UC33[Manage Site Settings]
+    UC34[Backup Data]
+    UC35[Monitor System]
+    UC36[Manage Roles]
+    UC37[Security Audit]
 
-        %% System Features
-        subgraph "System Features"
-            UC38[Send Notifications]
-            UC39[Generate Sitemap]
-            UC40[Cache Management]
-            UC41[SEO Optimization]
-            UC42[Rate Limiting]
-        end
-    end
+    %% System Features
+    UC38[Send Notifications]
+    UC39[Generate Sitemap]
+    UC40[Cache Management]
+    UC41[SEO Optimization]
+    UC42[Rate Limiting]
 
-    %% Actor-Use Case Relationships
-    
-    %% Visitor relationships
+    %% Visitor Relationships
     V --> UC1
     V --> UC2
     V --> UC3
@@ -100,7 +81,7 @@ graph TB
     V --> UC10
     V --> UC12
 
-    %% Registered User relationships (inherits Visitor + additional)
+    %% Registered User Relationships
     RU --> UC1
     RU --> UC2
     RU --> UC3
@@ -119,7 +100,7 @@ graph TB
     RU --> UC19
     RU --> UC20
 
-    %% Admin relationships (inherits Registered User + additional)
+    %% Admin Relationships
     A --> UC1
     A --> UC2
     A --> UC3
@@ -140,7 +121,7 @@ graph TB
     A --> UC32
     A --> UC33
 
-    %% Super Admin relationships (inherits Admin + additional)
+    %% Super Admin Relationships
     SA --> UC21
     SA --> UC22
     SA --> UC23
@@ -157,23 +138,22 @@ graph TB
     SA --> UC36
     SA --> UC37
 
-    %% External System relationships
+    %% External Systems
     ES --> UC38
     SS --> UC39
     SS --> UC41
 
-    %% Use Case Dependencies (extends/includes)
-    UC20 -.-> UC13 %% Submit Comments extends Verify Email
-    UC21 -.-> UC28 %% Create Post includes Upload Media
-    UC22 -.-> UC28 %% Edit Post includes Upload Media
-    UC24 -.-> UC39 %% Publish Post includes Generate Sitemap
-    UC31 -.-> UC35 %% View Analytics includes Monitor System
-    UC32 -.-> UC38 %% Moderate Comments includes Send Notifications
+    %% Simplified Use Case Notes (instead of .-.->
+    UC20 --> UC13
+    UC21 --> UC28
+    UC22 --> UC28
+    UC24 --> UC39
+    UC31 --> UC35
+    UC32 --> UC38
 
-    %% Styling
+    %% Styling (has no effect on GitHub but kept for completeness)
     classDef actor fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef usecase fill:#f3e5f5,stroke:#4a148c,stroke-width:1px
-    classDef system fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
     classDef extends stroke:#ff5722,stroke-width:2px,stroke-dasharray: 5 5
 
     class V,RU,A,SA,ES,SS actor
