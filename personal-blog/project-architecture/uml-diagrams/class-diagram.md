@@ -45,8 +45,8 @@ classDiagram
         - Integer viewCount
         - User author
         - Category category
-        - Set_of_Tag tags
-        - List_of_Comment comments
+        - Set~Tag~ tags
+        - List~Comment~ comments
         + isPublished() boolean
         + incrementViewCount() void
         + addTag(Tag) void
@@ -58,7 +58,7 @@ classDiagram
         - String slug
         - String description
         - String color
-        - List_of_BlogPost posts
+        - List~BlogPost~ posts
         + getPostCount() int
     }
 
@@ -66,7 +66,7 @@ classDiagram
         - String name
         - String slug
         - String color
-        - Set_of_BlogPost posts
+        - Set~BlogPost~ posts
         + getPostCount() int
     }
 
@@ -78,7 +78,7 @@ classDiagram
         - CommentStatus status
         - BlogPost post
         - Comment parentComment
-        - List_of_Comment replies
+        - List~Comment~ replies
         + isApproved() boolean
         + addReply(Comment) void
     }
@@ -117,7 +117,7 @@ classDiagram
         - String featuredImage
         - PostStatus status
         - Long categoryId
-        - Set_of_Long tagIds
+        - Set~Long~ tagIds
         + validate() void
         + toEntity() BlogPost
     }
@@ -162,8 +162,8 @@ classDiagram
         - Integer viewCount
         - UserResponse author
         - CategoryResponse category
-        - Set_of_TagResponse tags
-        - List_of_CommentResponse comments
+        - Set~TagResponse~ tags
+        - List~CommentResponse~ comments
         + fromEntity(BlogPost) BlogPostResponse
     }
 
@@ -205,7 +205,7 @@ classDiagram
     }
 
     class BlogPostService {
-        + findAll(Pageable) Page_of_BlogPostResponse
+        + findAll(Pageable) Page~BlogPostResponse~
         + findBySlug(String) BlogPostResponse
         + create(BlogPostRequest) BlogPostResponse
         + update(Long, BlogPostRequest) BlogPostResponse
@@ -214,7 +214,7 @@ classDiagram
     }
 
     class CategoryService {
-        + findAll() List_of_CategoryResponse
+        + findAll() List~CategoryResponse~
         + findBySlug(String) CategoryResponse
         + create(CategoryRequest) CategoryResponse
         + update(Long, CategoryRequest) CategoryResponse
@@ -222,24 +222,24 @@ classDiagram
     }
 
     class SearchService {
-        + searchPosts(String, Pageable) Page_of_BlogPostResponse
-        + searchByCategory(String, Pageable) Page_of_BlogPostResponse
-        + searchByTag(String, Pageable) Page_of_BlogPostResponse
+        + searchPosts(String, Pageable) Page~BlogPostResponse~
+        + searchByCategory(String, Pageable) Page~BlogPostResponse~
+        + searchByTag(String, Pageable) Page~BlogPostResponse~
     }
 
     %% Controllers
     class AuthController {
-        + login(LoginRequest) ResponseEntity_of_AuthResponse
-        + refreshToken(RefreshTokenRequest) ResponseEntity_of_AuthResponse
-        + logout(HttpServletRequest) ResponseEntity_of_Void
+        + login(LoginRequest) ResponseEntity~AuthResponse~
+        + refreshToken(RefreshTokenRequest) ResponseEntity~AuthResponse~
+        + logout(HttpServletRequest) ResponseEntity~Void~
     }
 
     class BlogPostController {
-        + getAllPosts(Pageable) ResponseEntity_of_Page_of_BlogPostResponse
-        + getPostBySlug(String) ResponseEntity_of_BlogPostResponse
-        + createPost(BlogPostRequest) ResponseEntity_of_BlogPostResponse
-        + updatePost(Long, BlogPostRequest) ResponseEntity_of_BlogPostResponse
-        + deletePost(Long) ResponseEntity_of_Void
+        + getAllPosts(Pageable) ResponseEntity~Page_BlogPostResponse_~
+        + getPostBySlug(String) ResponseEntity~BlogPostResponse~
+        + createPost(BlogPostRequest) ResponseEntity~BlogPostResponse~
+        + updatePost(Long, BlogPostRequest) ResponseEntity~BlogPostResponse~
+        + deletePost(Long) ResponseEntity~Void~
     }
 
     class HomeController {
