@@ -18,9 +18,16 @@ project-architecture/
 ├── operations/                  # Deployment and operational guides
 │   ├── deployment_guide.md      # Deployment procedures
 │   └── security_guidelines.md   # Security implementation
-└── standards/                   # Project standards and rules
-    ├── project_rules.md         # Technical standards
-    └── user_rules.md           # AI collaboration preferences
+├── standards/                   # Project standards and rules
+│   ├── project_rules.md         # Technical standards
+│   └── user_rules.md           # AI collaboration preferences
+└── uml-diagrams/               # UML Documentation
+    ├── README.md               # UML diagrams overview
+    ├── class-diagram.md        # Static structure diagram
+    ├── component-diagram.md    # High-level architecture
+    ├── sequence-diagram.md     # Interaction flows
+    ├── use-case-diagram.md     # Functional requirements
+    └── package-diagram.md      # Module organization
 ```
 
 ## 📁 Documentation Overview
@@ -124,6 +131,12 @@ All documentation follows semantic versioning and is tracked in Git alongside th
 | "Why did we choose this architecture?" | [`architecture_decisions.md`](./core/architecture_decisions.md) |
 | "What is the project about?" | [`project_overview.md`](./core/project_overview.md) |
 | "How should I collaborate with AI?" | [`user_rules.md`](./standards/user_rules.md) |
+| "What UML diagrams are available?" | [`uml-diagrams/README.md`](./uml-diagrams/README.md) |
+| "How is the system structured?" | [`uml-diagrams/class-diagram.md`](./uml-diagrams/class-diagram.md) |
+| "What are the system components?" | [`uml-diagrams/component-diagram.md`](./uml-diagrams/component-diagram.md) |
+| "How do components interact?" | [`uml-diagrams/sequence-diagram.md`](./uml-diagrams/sequence-diagram.md) |
+| "What are the use cases?" | [`uml-diagrams/use-case-diagram.md`](./uml-diagrams/use-case-diagram.md) |
+| "How are packages organized?" | [`uml-diagrams/package-diagram.md`](./uml-diagrams/package-diagram.md) |
 
 ## 🤖 AI Agent Guidelines
 
