@@ -187,13 +187,13 @@ classDiagram
         + fromEntity(User) UserResponse
     }
 
-    class ApiResponse<T> {
+    class ApiResponse_T_ {
         - boolean success
         - String message
         - T data
         - LocalDateTime timestamp
-        + success(T) ApiResponse<T>
-        + error(String) ApiResponse<T>
+        + success(T) ApiResponse_T_
+        + error(String) ApiResponse_T_
     }
 
     %% Services
