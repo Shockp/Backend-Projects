@@ -2,7 +2,7 @@
 
 This diagram shows the static structure of the Personal Blog application, including entities, DTOs, services, controllers, and their relationships.
 
-## 🏗️ Domain Model & Architecture
+## Domain Model & Architecture
 
 ```mermaid
 classDiagram
@@ -351,7 +351,7 @@ classDiagram
     CustomUserDetailsService --> UserRepository
 ```
 
-## 🔍 Key Design Patterns
+## Key Design Patterns
 
 ### 1. **Repository Pattern**
 - Clean separation between data access and business logic
@@ -373,7 +373,7 @@ classDiagram
 - Immutable response objects where appropriate
 - Fluent API for complex object creation
 
-## 🏛️ Architectural Layers
+## Architectural Layers
 
 ### **Controller Layer**
 - REST API endpoints and web controllers
@@ -395,7 +395,7 @@ classDiagram
 - JPA mappings and relationships
 - Business rules and constraints
 
-## 🔐 Security Integration
+## Security Integration
 
 ### **Authentication Flow**
 1. `AuthController` receives login request
@@ -408,7 +408,7 @@ classDiagram
 - Method-level security annotations
 - JWT token validation in security filters
 
-## 📊 Data Relationships
+## Data Relationships
 
 ### **Core Relationships**
 - **User → BlogPost**: One-to-Many (author relationship)

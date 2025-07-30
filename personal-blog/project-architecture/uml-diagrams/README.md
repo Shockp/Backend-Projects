@@ -2,7 +2,7 @@
 
 This directory contains UML diagrams and the complete project structure for the Personal Blog application.
 
-## 📁 Complete Project Structure
+## Complete Project Structure
 
 ```
 personal-blog/
@@ -234,48 +234,48 @@ personal-blog/
     └── restore-db.sh
 ```
 
-## 📊 UML Diagrams Overview
+## UML Diagrams Overview
 
 This directory contains comprehensive UML diagrams for the Personal Blog application, providing visual documentation of the system architecture, design patterns, and component relationships.
 
-### 🎯 Available Diagrams
+### Available Diagrams
 
-#### **1. Class Diagram** ✅
+#### **1. Class Diagram**
 - **File**: [`class-diagram.md`](./class-diagram.md)
 - **Purpose**: Show the static structure of the system
 - **Content**: Entities, DTOs, Services, Controllers, and their relationships
 - **Focus**: Object-oriented design and data model relationships
 - **Key Features**: JPA entities, service layer design, DTO patterns, repository interfaces
 
-#### **2. Component Diagram** ✅
+#### **2. Component Diagram**
 - **File**: [`component-diagram.md`](./component-diagram.md)
 - **Purpose**: Illustrate high-level system architecture
 - **Content**: Application layers, external systems, and interfaces
 - **Focus**: System decomposition and component interactions
 - **Key Features**: Layered architecture, external integrations, deployment view
 
-#### **3. Sequence Diagram** ✅
+#### **3. Sequence Diagram**
 - **File**: [`sequence-diagram.md`](./sequence-diagram.md)
 - **Purpose**: Show interaction flows for key use cases
 - **Content**: Authentication, blog post creation, search functionality, comment submission
 - **Focus**: Time-ordered interactions between system components
 - **Key Features**: JWT authentication flow, caching strategies, async operations
 
-#### **4. Use Case Diagram** ✅
+#### **4. Use Case Diagram**
 - **File**: [`use-case-diagram.md`](./use-case-diagram.md)
 - **Purpose**: Define functional requirements and user interactions
 - **Content**: User roles, system boundaries, and use case relationships
 - **Focus**: System functionality from user perspective
 - **Key Features**: Role-based access control, inheritance relationships, business rules
 
-#### **5. Package Diagram** ✅
+#### **5. Package Diagram**
 - **File**: [`package-diagram.md`](./package-diagram.md)
 - **Purpose**: Show the organization of system modules
 - **Content**: Package structure, dependencies, and architectural layers
 - **Focus**: Code organization and module relationships
 - **Key Features**: Clean architecture layers, dependency flow, Spring Boot patterns
 
-## 🎯 Key Features Represented
+## Key Features Represented
 
 ### Core Functionality
 - **Blog Management**: Create, read, update, delete blog posts
@@ -299,7 +299,7 @@ This directory contains comprehensive UML diagrams for the Personal Blog applica
 - **Database Migration**: Flyway for version control
 - **Environment Configuration**: Profile-based configuration
 
-## 🔧 Technology Stack Integration
+## Technology Stack Integration
 
 - **Java 21**: Virtual threads, pattern matching, records
 - **Spring Boot 3.5.4**: Latest features and security updates
@@ -310,7 +310,7 @@ This directory contains comprehensive UML diagrams for the Personal Blog applica
 - **Maven**: Dependency management and build tool
 - **Docker**: Containerization and deployment
 
-## 📝 Diagram Creation Guidelines
+## Diagram Creation Guidelines
 
 1. **Mermaid Syntax**: All diagrams use Mermaid.js syntax for consistency
 2. **Clarity**: Focus on essential elements, avoid overcomplification

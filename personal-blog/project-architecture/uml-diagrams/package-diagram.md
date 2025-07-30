@@ -2,174 +2,174 @@
 
 This diagram illustrates the high-level organization of the Spring Boot application modules and their dependencies, following clean architecture principles.
 
-## 🏗️ Application Package Structure
+## Application Package Structure
 
 ```mermaid
 graph TB
     %% Main Application Package
     subgraph "com.personalblog"
-        APP["📱 PersonalBlogApplication<br/>(Main Class)"]
+        APP["PersonalBlogApplication<br/>(Main Class)"]
     end
 
     %% Web Layer
     subgraph "com.personalblog.web"
         subgraph "controllers"
-            WC1["🎮 AuthController"]
-            WC2["🎮 BlogPostController"]
-            WC3["🎮 CommentController"]
-            WC4["🎮 CategoryController"]
-            WC5["🎮 TagController"]
-            WC6["🎮 UserController"]
-            WC7["🎮 SearchController"]
-            WC8["🎮 HomeController"]
+            WC1["AuthController"]
+    WC2["BlogPostController"]
+    WC3["CommentController"]
+    WC4["CategoryController"]
+    WC5["TagController"]
+    WC6["UserController"]
+    WC7["SearchController"]
+    WC8["HomeController"]
         end
         
         subgraph "dto"
-            DTO1["📄 AuthRequest/Response"]
-            DTO2["📄 BlogPostRequest/Response"]
-            DTO3["📄 CommentRequest/Response"]
-            DTO4["📄 CategoryRequest/Response"]
-            DTO5["📄 TagRequest/Response"]
-            DTO6["📄 UserRequest/Response"]
-            DTO7["📄 SearchRequest/Response"]
-            DTO8["📄 ErrorResponse"]
+            DTO1["AuthRequest/Response"]
+    DTO2["BlogPostRequest/Response"]
+    DTO3["CommentRequest/Response"]
+    DTO4["CategoryRequest/Response"]
+    DTO5["TagRequest/Response"]
+    DTO6["UserRequest/Response"]
+    DTO7["SearchRequest/Response"]
+    DTO8["ErrorResponse"]
         end
         
         subgraph "exception"
-            EX1["⚠️ GlobalExceptionHandler"]
-            EX2["⚠️ CustomExceptions"]
+            EX1["GlobalExceptionHandler"]
+    EX2["CustomExceptions"]
         end
         
         subgraph "validation"
-            VAL1["✅ CustomValidators"]
-            VAL2["✅ ValidationGroups"]
+            VAL1["CustomValidators"]
+    VAL2["ValidationGroups"]
         end
     end
 
     %% Security Layer
     subgraph "com.personalblog.security"
         subgraph "config"
-            SEC1["🔐 SecurityConfig"]
-            SEC2["🔐 JwtConfig"]
-            SEC3["🔐 CorsConfig"]
+            SEC1["SecurityConfig"]
+        SEC2["JwtConfig"]
+        SEC3["CorsConfig"]
         end
         
         subgraph "jwt"
-            JWT1["🎫 JwtTokenProvider"]
-            JWT2["🎫 JwtAuthenticationFilter"]
-            JWT3["🎫 JwtAuthenticationEntryPoint"]
+            JWT1["JwtTokenProvider"]
+        JWT2["JwtAuthenticationFilter"]
+        JWT3["JwtAuthenticationEntryPoint"]
         end
         
         subgraph "service"
-            SECS1["🛡️ UserDetailsServiceImpl"]
-            SECS2["🛡️ AuthenticationService"]
+            SECS1["UserDetailsServiceImpl"]
+        SECS2["AuthenticationService"]
         end
     end
 
     %% Service Layer
     subgraph "com.personalblog.service"
         subgraph "interfaces"
-            SI1["📋 BlogPostService"]
-            SI2["📋 CommentService"]
-            SI3["📋 CategoryService"]
-            SI4["📋 TagService"]
-            SI5["📋 UserService"]
-            SI6["📋 SearchService"]
-            SI7["📋 EmailService"]
-            SI8["📋 CacheService"]
+            SI1["BlogPostService"]
+        SI2["CommentService"]
+        SI3["CategoryService"]
+        SI4["TagService"]
+        SI5["UserService"]
+        SI6["SearchService"]
+        SI7["EmailService"]
+        SI8["CacheService"]
         end
         
         subgraph "impl"
-            IMPL1["⚙️ BlogPostServiceImpl"]
-            IMPL2["⚙️ CommentServiceImpl"]
-            IMPL3["⚙️ CategoryServiceImpl"]
-            IMPL4["⚙️ TagServiceImpl"]
-            IMPL5["⚙️ UserServiceImpl"]
-            IMPL6["⚙️ SearchServiceImpl"]
-            IMPL7["⚙️ EmailServiceImpl"]
-            IMPL8["⚙️ CacheServiceImpl"]
+            IMPL1["BlogPostServiceImpl"]
+        IMPL2["CommentServiceImpl"]
+        IMPL3["CategoryServiceImpl"]
+        IMPL4["TagServiceImpl"]
+        IMPL5["UserServiceImpl"]
+        IMPL6["SearchServiceImpl"]
+        IMPL7["EmailServiceImpl"]
+        IMPL8["CacheServiceImpl"]
         end
     end
 
     %% Repository Layer
     subgraph "com.personalblog.repository"
-        REPO1["🗄️ BlogPostRepository"]
-        REPO2["🗄️ CommentRepository"]
-        REPO3["🗄️ CategoryRepository"]
-        REPO4["🗄️ TagRepository"]
-        REPO5["🗄️ UserRepository"]
-        REPO6["🗄️ RefreshTokenRepository"]
+        REPO1["BlogPostRepository"]
+        REPO2["CommentRepository"]
+        REPO3["CategoryRepository"]
+        REPO4["TagRepository"]
+        REPO5["UserRepository"]
+        REPO6["RefreshTokenRepository"]
         
         subgraph "custom"
-            CUSTOM1["🔍 BlogPostCustomRepository"]
-            CUSTOM2["🔍 SearchRepository"]
+            CUSTOM1["BlogPostCustomRepository"]
+        CUSTOM2["SearchRepository"]
         end
     end
 
     %% Domain/Entity Layer
     subgraph "com.personalblog.entity"
-        ENT1["🏛️ BlogPost"]
-        ENT2["🏛️ Comment"]
-        ENT3["🏛️ Category"]
-        ENT4["🏛️ Tag"]
-        ENT5["🏛️ User"]
-        ENT6["🏛️ RefreshToken"]
+        ENT1["BlogPost"]
+        ENT2["Comment"]
+        ENT3["Category"]
+        ENT4["Tag"]
+        ENT5["User"]
+        ENT6["RefreshToken"]
         
         subgraph "enums"
-            ENUM1["📝 PostStatus"]
-            ENUM2["📝 CommentStatus"]
-            ENUM3["📝 UserRole"]
+            ENUM1["PostStatus"]
+        ENUM2["CommentStatus"]
+        ENUM3["UserRole"]
         end
         
         subgraph "audit"
-            AUD1["📅 BaseEntity"]
-            AUD2["📅 AuditableEntity"]
+            AUD1["BaseEntity"]
+        AUD2["AuditableEntity"]
         end
     end
 
     %% Configuration Layer
     subgraph "com.personalblog.config"
-        CONF1["⚙️ DatabaseConfig"]
-        CONF2["⚙️ RedisConfig"]
-        CONF3["⚙️ EmailConfig"]
-        CONF4["⚙️ CacheConfig"]
-        CONF5["⚙️ AsyncConfig"]
-        CONF6["⚙️ WebMvcConfig"]
-        CONF7["⚙️ OpenApiConfig"]
+        CONF1["DatabaseConfig"]
+        CONF2["RedisConfig"]
+        CONF3["EmailConfig"]
+        CONF4["CacheConfig"]
+        CONF5["AsyncConfig"]
+        CONF6["WebMvcConfig"]
+        CONF7["OpenApiConfig"]
     end
 
     %% Utility Layer
     subgraph "com.personalblog.util"
-        UTIL1["🔧 SlugGenerator"]
-        UTIL2["🔧 PasswordGenerator"]
-        UTIL3["🔧 DateTimeUtil"]
-        UTIL4["🔧 FileUtil"]
-        UTIL5["🔧 ValidationUtil"]
-        UTIL6["🔧 SecurityUtil"]
-        UTIL7["🔧 CacheKeyGenerator"]
+        UTIL1["SlugGenerator"]
+        UTIL2["PasswordGenerator"]
+        UTIL3["DateTimeUtil"]
+        UTIL4["FileUtil"]
+        UTIL5["ValidationUtil"]
+        UTIL6["SecurityUtil"]
+        UTIL7["CacheKeyGenerator"]
     end
 
     %% Constants
     subgraph "com.personalblog.constant"
-        CONST1["📌 ApiConstants"]
-        CONST2["📌 SecurityConstants"]
-        CONST3["📌 CacheConstants"]
-        CONST4["📌 ValidationConstants"]
-        CONST5["📌 EmailConstants"]
+        CONST1["ApiConstants"]
+        CONST2["SecurityConstants"]
+        CONST3["CacheConstants"]
+        CONST4["ValidationConstants"]
+        CONST5["EmailConstants"]
     end
 
     %% External Dependencies
     subgraph "External Libraries"
-        EXT1["🌐 Spring Boot Starter Web"]
-        EXT2["🔒 Spring Security"]
-        EXT3["🗃️ Spring Data JPA"]
-        EXT4["🐘 PostgreSQL Driver"]
-        EXT5["🔴 Redis"]
-        EXT6["📧 Spring Mail"]
-        EXT7["📊 Micrometer"]
-        EXT8["📝 Validation API"]
-        EXT9["🎯 MapStruct"]
-        EXT10["📋 Lombok"]
+        EXT1["Spring Boot Starter Web"]
+        EXT2["Spring Security"]
+        EXT3["Spring Data JPA"]
+        EXT4["PostgreSQL Driver"]
+        EXT5["Redis"]
+        EXT6["Spring Mail"]
+        EXT7["Micrometer"]
+        EXT8["Validation API"]
+        EXT9["MapStruct"]
+        EXT10["Lombok"]
     end
 
     %% Package Dependencies
@@ -302,7 +302,7 @@ graph TB
 - Consistent API response format
 - Proper HTTP status codes
 
-### **🔐 Security Layer (`com.personalblog.security`)**
+### **Security Layer (`com.personalblog.security`)**
 **Purpose**: Authentication, authorization, and security configuration
 
 - **Config**: Security configuration classes
@@ -315,7 +315,7 @@ graph TB
 - CORS configuration
 - Security headers and CSRF protection
 
-### **⚙️ Service Layer (`com.personalblog.service`)**
+### **Service Layer (`com.personalblog.service`)**
 **Purpose**: Business logic implementation and transaction management
 
 - **Interfaces**: Service contracts defining business operations
@@ -327,7 +327,7 @@ graph TB
 - Business rule enforcement
 - Integration with external services
 
-### **🗄️ Repository Layer (`com.personalblog.repository`)**
+### **Repository Layer (`com.personalblog.repository`)**
 **Purpose**: Data access abstraction and database operations
 
 - **Standard Repositories**: Spring Data JPA repositories
@@ -339,7 +339,7 @@ graph TB
 - Database transaction support
 - Query optimization
 
-### **🏛️ Entity Layer (`com.personalblog.entity`)**
+### **Entity Layer (`com.personalblog.entity`)**
 **Purpose**: Domain model and data structure definition
 
 - **Entities**: JPA entity classes
@@ -352,7 +352,7 @@ graph TB
 - Audit trail support
 - Domain-driven design principles
 
-### **⚙️ Configuration Layer (`com.personalblog.config`)**
+### **Configuration Layer (`com.personalblog.config`)**
 **Purpose**: Application configuration and bean definitions
 
 **Configurations**:
@@ -363,7 +363,7 @@ graph TB
 - Web MVC customization
 - API documentation setup
 
-### **🔧 Utility Layer (`com.personalblog.util`)**
+### **Utility Layer (`com.personalblog.util`)**
 **Purpose**: Common utility functions and helper methods
 
 **Utilities**:
@@ -384,7 +384,7 @@ graph TB
 - Validation messages and patterns
 - Email templates and subjects
 
-## 🔄 Dependency Flow
+## Dependency Flow
 
 ### **Layered Architecture Dependencies**
 ```
@@ -399,7 +399,7 @@ Web Layer → Security Layer → Service Layer → Repository Layer → Entity L
 3. **Dependency Injection**: All dependencies injected via Spring's IoC container
 4. **External Library Isolation**: External dependencies isolated in specific layers
 
-## 🏗️ Architectural Patterns
+## Architectural Patterns
 
 ### **Clean Architecture Principles**
 - **Separation of Concerns**: Each layer has distinct responsibilities
@@ -419,7 +419,7 @@ Web Layer → Security Layer → Service Layer → Repository Layer → Entity L
 - **Security by Default**: Secure defaults with explicit overrides
 - **Defense in Depth**: Multiple security layers
 
-## 📊 Package Metrics
+## Package Metrics
 
 ### **Complexity Distribution**
 - **Web Layer**: 25% - Request/response handling

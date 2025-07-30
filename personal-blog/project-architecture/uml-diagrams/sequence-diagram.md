@@ -2,7 +2,7 @@
 
 This diagram shows the interaction flows for key use cases in the Personal Blog application, illustrating time-ordered interactions between system components.
 
-## 🔐 User Authentication Flow
+## User Authentication Flow
 
 ```mermaid
 sequenceDiagram
@@ -68,7 +68,7 @@ sequenceDiagram
     end
 ```
 
-## 📝 Blog Post Creation Flow
+## Blog Post Creation Flow
 
 ```mermaid
 sequenceDiagram
@@ -153,7 +153,7 @@ sequenceDiagram
     end
 ```
 
-## 🔍 Search Functionality Flow
+## Search Functionality Flow
 
 ```mermaid
 sequenceDiagram
@@ -214,7 +214,7 @@ sequenceDiagram
     end
 ```
 
-## 📖 Blog Post Viewing Flow
+## Blog Post Viewing Flow
 
 ```mermaid
 sequenceDiagram
@@ -290,7 +290,7 @@ sequenceDiagram
     end
 ```
 
-## 💬 Comment Submission Flow
+## Comment Submission Flow
 
 ```mermaid
 sequenceDiagram
@@ -349,7 +349,7 @@ sequenceDiagram
     end
 ```
 
-## 🔄 Token Refresh Flow
+## Token Refresh Flow
 
 ```mermaid
 sequenceDiagram
@@ -416,7 +416,7 @@ sequenceDiagram
     end
 ```
 
-## 🎯 Key Interaction Patterns
+## Key Interaction Patterns
 
 ### **Security-First Approach**
 - Every API request goes through JWT validation

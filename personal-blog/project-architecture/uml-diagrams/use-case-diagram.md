@@ -2,18 +2,18 @@
 
 This diagram illustrates the functional requirements and user interactions within the Personal Blog application, showing different user roles and their capabilities.
 
-## 🎭 System Actors and Use Cases
+## System Actors and Use Cases
 
 ```mermaid
 graph TB
     %% Actors
     subgraph "External Actors"
-        V[👤 Visitor]
-        RU[👤 Registered User]
-        A[👨‍💼 Admin]
-        SA[👨‍💻 Super Admin]
-        ES[📧 Email System]
-        SS[🔍 Search Engine]
+        V[Visitor]
+    RU[Registered User]
+    A[Admin]
+    SA[Super Admin]
+    ES[Email System]
+    SS[Search Engine]
     end
 
     %% System Boundary
@@ -180,9 +180,9 @@ graph TB
     class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC18,UC19,UC20,UC21,UC22,UC23,UC24,UC25,UC26,UC27,UC28,UC29,UC30,UC31,UC32,UC33,UC34,UC35,UC36,UC37,UC38,UC39,UC40,UC41,UC42 usecase
 ```
 
-## 📋 Detailed Use Case Descriptions
+## Detailed Use Case Descriptions
 
-### **👤 Visitor (Anonymous User)**
+### **Visitor (Anonymous User)**
 
 | Use Case | Description | Preconditions | Postconditions |
 |----------|-------------|---------------|----------------|
@@ -198,7 +198,7 @@ graph TB
 | **Login** | Authenticate with credentials | Valid credentials | User authenticated, session created |
 | **Reset Password** | Request password reset | Valid email address | Reset link sent to email |
 
-### **👤 Registered User (Authenticated)**
+### **Registered User (Authenticated)**
 *Inherits all Visitor capabilities plus:*
 
 | Use Case | Description | Preconditions | Postconditions |
@@ -213,7 +213,7 @@ graph TB
 | **Bookmark Posts** | Save posts for later reading | User is authenticated, post exists | Post bookmarked |
 | **Submit Comments** | Add comments to blog posts | User is authenticated, email verified | Comment submitted for moderation |
 
-### **👨‍💼 Admin (Content Manager)**
+### **Admin (Content Manager)**
 *Inherits Registered User capabilities plus:*
 
 | Use Case | Description | Preconditions | Postconditions |
@@ -231,7 +231,7 @@ graph TB
 | **Moderate Comments** | Review and approve comments | Admin is authenticated | Comments moderated |
 | **Manage Site Settings** | Configure site parameters | Admin is authenticated | Settings updated |
 
-### **👨‍💻 Super Admin (System Administrator)**
+### **Super Admin (System Administrator)**
 *Inherits Admin capabilities plus:*
 
 | Use Case | Description | Preconditions | Postconditions |
@@ -242,14 +242,14 @@ graph TB
 | **Manage Roles** | Assign and modify user roles | Super Admin authenticated | User roles updated |
 | **Security Audit** | Review security logs and events | Super Admin authenticated | Security report generated |
 
-### **📧 External Systems**
+### **External Systems**
 
 | Actor | Use Cases | Description |
 |-------|-----------|-------------|
 | **Email System** | Send Notifications | Handles all email communications (registration, password reset, comment notifications) |
 | **Search Engine** | Generate Sitemap, SEO Optimization | Crawls and indexes site content for search visibility |
 
-## 🔄 Use Case Relationships
+## Use Case Relationships
 
 ### **Inheritance Relationships**
 - **Registered User** inherits all **Visitor** capabilities
@@ -266,7 +266,7 @@ graph TB
 - **Publish Post** includes **Generate Sitemap**
 - **All authenticated actions** include **Refresh Token**
 
-## 🎯 Business Rules and Constraints
+## Business Rules and Constraints
 
 ### **Authentication Rules**
 1. Users must verify email before commenting
@@ -292,7 +292,7 @@ graph TB
 3. Cache invalidation occurs on content changes
 4. Audit logs are maintained for all admin actions
 
-## 📊 Use Case Priorities
+## Use Case Priorities
 
 ### **High Priority (MVP)**
 - View Blog Posts, Search Posts, View Post Details

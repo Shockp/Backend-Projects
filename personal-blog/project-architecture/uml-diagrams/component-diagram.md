@@ -2,21 +2,21 @@
 
 This diagram illustrates the high-level architecture and component interactions of the Personal Blog application, showing the system's modular structure and external dependencies.
 
-## 🏗️ System Architecture Overview
+## System Architecture Overview
 
 ```mermaid
 graph TB
     %% External Actors
     subgraph "External Actors"
-        USER[👤 Blog Visitors]
-        ADMIN[👨‍💼 Admin Users]
-        SEARCH[🔍 Search Engines]
+        USER[Blog Visitors]
+        ADMIN[Admin Users]
+        SEARCH[Search Engines]
     end
 
     %% Load Balancer / Reverse Proxy
     subgraph "Infrastructure Layer"
-        LB[🔄 Load Balancer/Nginx]
-        SSL[🔒 SSL Termination]
+        LB[Load Balancer/Nginx]
+        SSL[SSL Termination]
     end
 
     %% Application Layer
@@ -24,46 +24,46 @@ graph TB
         
         %% Web Layer
         subgraph "Web Layer"
-            WEB[🌐 Thymeleaf Templates]
-            STATIC[📁 Static Resources]
+            WEB[Thymeleaf Templates]
+            STATIC[Static Resources]
         end
 
         %% API Layer
         subgraph "API Layer"
-            REST[🔌 REST Controllers]
-            AUTH[🔐 Auth Controller]
-            ADMIN_API[⚙️ Admin API]
+            REST[REST Controllers]
+            AUTH[Auth Controller]
+            ADMIN_API[Admin API]
         end
 
         %% Security Layer
         subgraph "Security Layer"
-            JWT[🎫 JWT Filter]
-            SECURITY[🛡️ Spring Security]
-            RATE[⏱️ Rate Limiting]
+            JWT[JWT Filter]
+            SECURITY[Spring Security]
+            RATE[Rate Limiting]
         end
 
         %% Business Layer
         subgraph "Business Layer"
-            BLOG_SVC[📝 Blog Service]
-            AUTH_SVC[🔑 Auth Service]
-            SEARCH_SVC[🔍 Search Service]
-            CATEGORY_SVC[📂 Category Service]
-            COMMENT_SVC[💬 Comment Service]
-            EMAIL_SVC[📧 Email Service]
+            BLOG_SVC[Blog Service]
+            AUTH_SVC[Auth Service]
+            SEARCH_SVC[Search Service]
+            CATEGORY_SVC[Category Service]
+            COMMENT_SVC[Comment Service]
+            EMAIL_SVC[Email Service]
         end
 
         %% Data Access Layer
         subgraph "Data Access Layer"
-            REPO[🗃️ JPA Repositories]
-            CACHE_SVC[⚡ Cache Service]
-            FILE_SVC[📎 File Service]
+            REPO[JPA Repositories]
+            CACHE_SVC[Cache Service]
+            FILE_SVC[File Service]
         end
 
         %% Configuration
         subgraph "Configuration Layer"
-            CONFIG[⚙️ Spring Configuration]
-            PROPS[📋 Application Properties]
-            PROFILES[🎯 Environment Profiles]
+            CONFIG[Spring Configuration]
+            PROPS[Application Properties]
+            PROFILES[Environment Profiles]
         end
 
     end
@@ -73,41 +73,41 @@ graph TB
         
         %% Database
         subgraph "Database Layer"
-            POSTGRES[(🐘 PostgreSQL)]
-            FLYWAY[🔄 Flyway Migrations]
+            POSTGRES[(PostgreSQL)]
+            FLYWAY[Flyway Migrations]
         end
 
         %% Caching
         subgraph "Caching Layer"
-            REDIS[(⚡ Redis Cache)]
+            REDIS[(Redis Cache)]
         end
 
         %% File Storage
         subgraph "Storage Layer"
-            S3[☁️ AWS S3/MinIO]
-            LOCAL[💾 Local Storage]
+            S3[AWS S3/MinIO]
+            LOCAL[Local Storage]
         end
 
         %% Email Service
         subgraph "Communication"
-            SMTP[📧 SMTP Server]
-            MAILGUN[📮 Mailgun API]
+            SMTP[SMTP Server]
+            MAILGUN[Mailgun API]
         end
 
         %% Monitoring
         subgraph "Observability"
-            ACTUATOR[📊 Spring Actuator]
-            PROMETHEUS[📈 Prometheus]
-            GRAFANA[📊 Grafana]
-            LOGS[📝 Centralized Logging]
+            ACTUATOR[Spring Actuator]
+            PROMETHEUS[Prometheus]
+            GRAFANA[Grafana]
+            LOGS[Centralized Logging]
         end
 
     end
 
     %% Container Platform
     subgraph "Container Platform"
-        DOCKER[🐳 Docker Container]
-        K8S[☸️ Kubernetes/Railway]
+        DOCKER[Docker Container]
+        K8S[Kubernetes/Railway]
     end
 
     %% Connections - External to Infrastructure
@@ -217,7 +217,7 @@ graph TB
     class DOCKER,K8S container
 ```
 
-## 🔧 Component Descriptions
+## Component Descriptions
 
 ### **Web Layer Components**
 
@@ -249,7 +249,7 @@ graph TB
   - `/api/search` - Search functionality
   - `/api/comments` - Comment management
 
-#### 🔐 Auth Controller
+#### Auth Controller
 - **Purpose**: Authentication and authorization endpoints
 - **Technology**: Spring Security + JWT
 - **Endpoints**:
@@ -257,7 +257,7 @@ graph TB
   - `/api/auth/refresh` - Token refresh
   - `/api/auth/logout` - Session termination
 
-#### ⚙️ Admin API
+#### Admin API
 - **Purpose**: Administrative operations
 - **Technology**: Spring Web MVC with role-based access
 - **Endpoints**:
@@ -275,7 +275,7 @@ graph TB
   - User authentication context setup
   - Request/response token handling
 
-#### 🛡️ Spring Security
+#### Spring Security
 - **Purpose**: Comprehensive security framework
 - **Technology**: Spring Security 6.5.2
 - **Features**:
@@ -284,7 +284,7 @@ graph TB
   - CORS configuration
   - Password encoding (Argon2)
 
-#### ⏱️ Rate Limiting
+#### Rate Limiting
 - **Purpose**: API rate limiting and DDoS protection
 - **Technology**: Custom filter with Redis
 - **Features**:
@@ -294,7 +294,7 @@ graph TB
 
 ### **Business Layer Components**
 
-#### 📝 Blog Service
+#### Blog Service
 - **Purpose**: Core blog functionality
 - **Responsibilities**:
   - Post CRUD operations
@@ -310,7 +310,7 @@ graph TB
   - Refresh token management
   - Password reset functionality
 
-#### 🔍 Search Service
+#### Search Service
 - **Purpose**: Full-text search capabilities
 - **Responsibilities**:
   - Content indexing
@@ -320,7 +320,7 @@ graph TB
 
 ### **Data Access Layer Components**
 
-#### 🗃️ JPA Repositories
+#### JPA Repositories
 - **Purpose**: Database abstraction layer
 - **Technology**: Spring Data JPA
 - **Features**:
@@ -329,7 +329,7 @@ graph TB
   - Transaction management
   - Audit trail support
 
-#### ⚡ Cache Service
+#### Cache Service
 - **Purpose**: Performance optimization through caching
 - **Technology**: Spring Cache + Redis
 - **Cached Data**:
@@ -347,7 +347,7 @@ graph TB
   - CDN integration
   - Storage optimization
 
-## 🔄 Data Flow Patterns
+## Data Flow Patterns
 
 ### **Read Operations (Blog Post Retrieval)**
 1. User requests blog post via web interface
@@ -385,7 +385,7 @@ graph TB
 - **Auto-scaling**: Traffic-based scaling
 - **Load balancing**: High availability
 
-## 📊 Monitoring and Observability
+## Monitoring and Observability
 
 ### **Application Metrics**
 - **Spring Actuator**: Health checks and metrics
@@ -397,7 +397,7 @@ graph TB
 - **Grafana**: Visualization and alerting
 - **Centralized logging**: ELK stack or similar
 
-## 🔐 Security Integration
+## Security Integration
 
 ### **Defense in Depth**
 1. **Infrastructure**: SSL/TLS termination
