@@ -165,20 +165,6 @@ When making changes, AI agents should:
 - Follow the established documentation format
 - Include proper examples and code snippets
 
-## 📞 Support & Contact
-
-### Internal Team
-- **Project Lead**: [Contact Information]
-- **Lead Developer**: [Contact Information]
-- **DevOps Engineer**: [Contact Information]
-- **Security Engineer**: [Contact Information]
-
-### External Resources
-- **Spring Boot Documentation**: https://spring.io/projects/spring-boot
-- **Java 21 Documentation**: https://docs.oracle.com/en/java/javase/21/
-- **PostgreSQL Documentation**: https://www.postgresql.org/docs/
-- **Security Best Practices**: https://owasp.org/
-
 ## 📈 Continuous Improvement
 
 This documentation is a living resource that evolves with the project. We encourage:
