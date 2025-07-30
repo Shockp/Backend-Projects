@@ -45,8 +45,8 @@ classDiagram
         - Integer viewCount
         - User author
         - Category category
-        - Set<Tag> tags
-        - List<Comment> comments
+        - Set_of_Tag tags
+        - List_of_Comment comments
         + isPublished() boolean
         + incrementViewCount() void
         + addTag(Tag) void
@@ -58,7 +58,7 @@ classDiagram
         - String slug
         - String description
         - String color
-        - List<BlogPost> posts
+        - List_of_BlogPost posts
         + getPostCount() int
     }
 
@@ -66,7 +66,7 @@ classDiagram
         - String name
         - String slug
         - String color
-        - Set<BlogPost> posts
+        - Set_of_BlogPost posts
         + getPostCount() int
     }
 
@@ -78,7 +78,7 @@ classDiagram
         - CommentStatus status
         - BlogPost post
         - Comment parentComment
-        - List<Comment> replies
+        - List_of_Comment replies
         + isApproved() boolean
         + addReply(Comment) void
     }
@@ -117,7 +117,7 @@ classDiagram
         - String featuredImage
         - PostStatus status
         - Long categoryId
-        - Set<Long> tagIds
+        - Set_of_Long tagIds
         + validate() void
         + toEntity() BlogPost
     }
@@ -162,8 +162,8 @@ classDiagram
         - Integer viewCount
         - UserResponse author
         - CategoryResponse category
-        - Set<TagResponse> tags
-        - List<CommentResponse> comments
+        - Set_of_TagResponse tags
+        - List_of_CommentResponse comments
         + fromEntity(BlogPost) BlogPostResponse
     }
 
@@ -187,13 +187,13 @@ classDiagram
         + fromEntity(User) UserResponse
     }
 
-    class ApiResponse<T> {
+    class ApiResponse_Generic {
         - boolean success
         - String message
-        - T data
+        - Object data
         - LocalDateTime timestamp
-        + success(T) ApiResponse<T>
-        + error(String) ApiResponse<T>
+        + success(data: Object) ApiResponse_Generic
+        + error(message: String) ApiResponse_Generic
     }
 
     %% Services
@@ -205,7 +205,7 @@ classDiagram
     }
 
     class BlogPostService {
-        + findAll(Pageable) Page<BlogPostResponse>
+        + findAll(Pageable) Page_of_BlogPostResponse
         + findBySlug(String) BlogPostResponse
         + create(BlogPostRequest) BlogPostResponse
         + update(Long, BlogPostRequest) BlogPostResponse
@@ -214,7 +214,7 @@ classDiagram
     }
 
     class CategoryService {
-        + findAll() List<CategoryResponse>
+        + findAll() List_of_CategoryResponse
         + findBySlug(String) CategoryResponse
         + create(CategoryRequest) CategoryResponse
         + update(Long, CategoryRequest) CategoryResponse
@@ -222,24 +222,24 @@ classDiagram
     }
 
     class SearchService {
-        + searchPosts(String, Pageable) Page<BlogPostResponse>
-        + searchByCategory(String, Pageable) Page<BlogPostResponse>
-        + searchByTag(String, Pageable) Page<BlogPostResponse>
+        + searchPosts(String, Pageable) Page_of_BlogPostResponse
+        + searchByCategory(String, Pageable) Page_of_BlogPostResponse
+        + searchByTag(String, Pageable) Page_of_BlogPostResponse
     }
 
     %% Controllers
     class AuthController {
-        + login(LoginRequest) ResponseEntity<AuthResponse>
-        + refreshToken(RefreshTokenRequest) ResponseEntity<AuthResponse>
-        + logout(HttpServletRequest) ResponseEntity<Void>
+        + login(LoginRequest) ResponseEntity_of_AuthResponse
+        + refreshToken(RefreshTokenRequest) ResponseEntity_of_AuthResponse
+        + logout(HttpServletRequest) ResponseEntity_of_Void
     }
 
     class BlogPostController {
-        + getAllPosts(Pageable) ResponseEntity<Page<BlogPostResponse>>
-        + getPostBySlug(String) ResponseEntity<BlogPostResponse>
-        + createPost(BlogPostRequest) ResponseEntity<BlogPostResponse>
-        + updatePost(Long, BlogPostRequest) ResponseEntity<BlogPostResponse>
-        + deletePost(Long) ResponseEntity<Void>
+        + getAllPosts(Pageable) ResponseEntity_of_Page_of_BlogPostResponse
+        + getPostBySlug(String) ResponseEntity_of_BlogPostResponse
+        + createPost(BlogPostRequest) ResponseEntity_of_BlogPostResponse
+        + updatePost(Long, BlogPostRequest) ResponseEntity_of_BlogPostResponse
+        + deletePost(Long) ResponseEntity_of_Void
     }
 
     class HomeController {
