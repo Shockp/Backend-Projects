@@ -35,6 +35,15 @@ personal-blog/
 │       ├── sequence-diagram.md
 │       ├── use-case-diagram.md
 │       └── package-diagram.md
+├── roadmap/
+│   ├── README.md
+│   ├── phase-1-foundation.md
+│   ├── phase-2-core-backend.md
+│   ├── phase-3-security.md
+│   ├── phase-4-advanced-features.md
+│   ├── phase-5-testing.md
+│   ├── phase-6-deployment.md
+│   └── phase-7-monitoring.md
 ├── src/
 │   ├── main/
 │   │   ├── java/
