@@ -32,6 +32,7 @@
         <module>number-guessing-game</module>
         <module>weather-api-wrapper-service</module>
         <module>unit-converter</module>
+        <module>personal-blog</module>
     </modules>
 
 </project>
