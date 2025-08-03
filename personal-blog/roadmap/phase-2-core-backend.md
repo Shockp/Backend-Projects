@@ -13,7 +13,7 @@ Implement the core backend functionality including entities, repositories, servi
 ### 1. Entity Implementation ⏳
 
 #### 1.1 Base Entity ⏳
-- [ ] Implement `BaseEntity` with:
+- [x] Implement `BaseEntity` with:
   - UUID primary key
   - Created/updated timestamps
   - Version field for optimistic locking
