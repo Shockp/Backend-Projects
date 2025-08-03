@@ -1,6 +1,7 @@
 package com.personalblog.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,7 +29,7 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
     
-    private static final long serialVersionID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Primary key for all entities.
@@ -68,6 +69,7 @@ public abstract class BaseEntity implements Serializable {
      * but remains in the database for audit purposes.
      */
     @Column(name = "deleted", nullable = false)
+    @NotNull
     private Boolean deleted = Boolean.FALSE;
 
     // ==================== Constructors ====================
@@ -173,5 +175,117 @@ public abstract class BaseEntity implements Serializable {
      */
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted != null ? deleted : Boolean.FALSE;
+    }
+
+    // ==================== Utility Methods ====================
+
+    /**
+     * Check if this entity is new (not yet persisted).
+     * 
+     * @return true if the entity is new (ID is null), false otherwise
+     */
+    public boolean isNew() {
+        return this.id == null;
+    }
+
+    /**
+     * Checks if this entity is soft deleted.
+     * 
+     * @return true if the entity is soft deleted, false otherwise
+     */
+    public boolean isDeleted() {
+        return Boolean.TRUE.equals(this.deleted);
+    }
+
+    /**
+     * Marks this entity as soft deleted
+     */
+    public void markAsDeleted() {
+        this.deleted = Boolean.TRUE;
+    }
+
+    /**
+     * Restore this entity from soft deleted state
+     */
+    public void restore() {
+        this.deleted = Boolean.FALSE;
+    }
+
+    // ==================== Object Methods ====================
+
+    /**
+     * Equals method based on ID for entity comparison.
+     * Two entities are equal if they have the same ID and are not null.
+     * 
+     * @param obj the object to compare
+     * @return true if the entities are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        BaseEntity other = (BaseEntity) obj;
+        return Objects.equals(this.id, other.id) && id != null;
+    }
+
+    /**
+     * HashCode method based on ID.
+     * Uses a constant for new entities to maintain consistency.
+     * 
+     * @return hash code of the entity
+     */
+    @Override
+    public int hashCode() {
+        return id != null ? Objects.hash(id) : 31;
+    }
+
+    /**
+     * String representation of the entity.
+     * 
+     * @return string representation including class name and ID
+     */
+    @Override
+    public String toString() {
+        return String.format("%s{id=%s, version=%s, createdAt=%s, updatedAt=%s, deleted=%s}",
+            this.getClass().getSimpleName(),
+            id,
+            version,
+            createdAt,
+            updatedAt,
+            deleted
+        );
+    }
+
+    // ==================== JPA Lifecycle Callbacks ====================
+
+    /**
+     * Pre-persist callback to set default values before entity creation.
+     * Called automatically by JPA before the entity is persisted.
+     */
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
+        if (this.deleted == null) {
+            this.deleted = Boolean.FALSE;
+        }
+    }
+
+    /**
+     * Pre-update callback to update the timestamp before entity update.
+     * Called automatically by JPA before the entity is updated.
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
