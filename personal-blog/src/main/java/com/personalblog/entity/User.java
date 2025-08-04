@@ -1,5 +1,7 @@
 package com.personalblog.entity;
 
+import com.personalblog.entity.Role;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.management.relation.Role;
 
 /**
  * User entity representing blog users with comprehensive profile and
@@ -40,7 +40,7 @@ import javax.management.relation.Role;
     @Index(name = "idx_user_email", columnList = "email"),
     @Index(name = "idx_user_created_at", columnList = "created_at")
 })
-public class User {
+public class User extends BaseEntity implements UserDetails {
     
     // ==================== Basic User Information ====================
 
@@ -86,13 +86,224 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     // ==================== Account Status Fields ====================
+
+    /**
+     * Whether the user account is enabled.
+     * Disabled accounts cannot log in.
+     */
+    @Column(name = "account_enabled", nullable = false)
+    private boolean enabled = Boolean.TRUE;
+
+    /**
+     * Whether the user account is locked.
+     * Locked accounts cannot log in.
+     */
+    @Column(name = "account_locked", nullable = false)
+    private boolean locked = Boolean.FALSE;
+
+    /**
+     * Whether the user account is expired.
+     * Expired accounts cannot log in.
+     */
+    @Column(name = "account_expired", nullable = false)
+    private boolean expired = Boolean.FALSE;
+
+    /**
+     * Whether the user account credentials are expired.
+     * Expired credentials require password reset.
+     */
+    @Column(name = "credentials_expired", nullable = false)
+    private boolean credentialsExpired = Boolean.FALSE;
+
     // ==================== Profile Information ====================
+
+    /**
+     * User's biography or about section.
+     */
+    @Size(max = 1000, message = "Biography must not exceed 1000 characters")
+    @Column(name = "bio", columnDefinition = "TEXT", length = 1000)
+    private String bio;
+
+    /**
+     * URL or path to user's profile avatar image.
+     */
+    @Size(max = 500, message = "Avatar URL must not exceed 500 characters")
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
+    /**
+     * User's website or personal blog URL.
+     */
+    @Size(max = 255, message = "Website URL must not exceed 255 characters")
+    @Pattern(
+    regexp = "^(https?://)?(www\\.)?[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}([/?#].*)?$|^$",
+    message = "Invalid website URL format")
+    @Column(name = "website_url", length = 255)
+    private String websiteUrl;
+
     // ==================== Social Media Links ====================
+
+    /**
+     * Twitter/X profile URL.
+     */
+    @Size(max = 255, message = "Twitter/X profile URL must not exceed 255 characters")
+    @Pattern(
+    regexp = "^(https?://)?(www\\.)?(twitter\\.com|x\\.com)/[A-Za-z0-9_]{1,15}$",
+    message = "Invalid Twitter/X profile URL")
+    @Column(name = "twitter_url", length = 255)
+    private String twitterUrl;
+
+    /**
+     * LinkedIn profile URL.
+     */
+    @Size(max = 255, message = "LinkedIn profile URL must not exceed 255 characters")
+    @Pattern(
+        regexp = "^(https?://)?(www\\.)?linkedin\\.com/in/[A-Za-z0-9-_%]+/?$",
+        message = "Invalid LinkedIn profile URL")
+    @Column(name = "linkedin_url", length = 255)
+    private String linkedinUrl;
+
+    /**
+     * GitHub profile URL.
+     */
+    @Size(max = 255, message = "GitHub profile URL must not exceed 255 characters")
+    @Pattern(
+        regexp = "^(https?://)?(www\\.)?github\\.com/(?=.{1,39}$)(?!-)[A-Za-z0-9-]+(?<!-)$",
+        message = "Invalid GitHub profile URL")
+    @Column(name = "github_url", length = 255)
+    private String githubUrl;
+
+    /**
+     * YouTube profile URL.
+     */
+    @Size(max = 255, message = "YouTube profile URL must not exceed 255 characters")
+    @Pattern(
+        regexp = "^(https?://)?(www\\.)?youtube\\.com/(channel/UC[\\w-]{22}|user/[\\w-]+|c/[\\w-]+|@\\w+)(/)?$",
+        message = "Invalid YouTube profile URL")
+    @Column(name = "youtube_url", length = 255)
+    private String youtubeUrl;
+
+    /**
+     * Instagram profile URL.
+     */
+    @Size(max = 255, message = "Instagram profile URL must not exceed 255 characters")
+    @Pattern(
+        regexp = "^(https?://)?(www\\.)?instagram\\.com/(?=.{1,30}$)(?![.])[A-Za-z0-9._]+(?<![.])$",
+        message = "Invalid Instagram profile URL")
+    @Column(name = "instagram_url", length = 255)
+    private String instagramUrl;
+
     // ==================== Email Verification ====================
+
+    /**
+     * Whether the user's email is verified.
+     */
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = Boolean.FALSE;
+
+    /**
+     * The verification token for the user's email.
+     */
+    @Size(max = 255, message = "Verification token must not exceed 255 characters")
+    @Column(name = "email_verification_token", length = 255)
+    private String emailVerificationToken;
+
+    /**
+     * The date and time when the user's email was verified.
+     */
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
     // ==================== Login Tracking ====================
+
+    /**
+     * Timestamp of the user's last successful login.
+     */
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    /**
+     * IP adrdress from the user's last login
+     */
+    @Size(max = 45, message = "IP address must not exceed 45 characters")
+    @Column(name = "last_login_ip", length = 45)
+    private String lastLoginIp;
+
+    /**
+     * Number of failed login attempts.
+     * Used for account locking after multiple failures.
+     */
+    @Min(value = 0, message = "Failed login attempts must be non-negative")
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
     // ==================== Password Reset ====================
+
+    /**
+     * Token used for password reset.
+     * Should be cleared after use.
+     */
+    @Size(max = 255, message = "Password reset token must not exceed 255 characters")
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+
+    /**
+     * Date and time when the password reset token expires.
+     */
+    @Column(name = "password_reset_token_expires_at")
+    private LocalDateTime passwordResetTokenExpiresAt;
+
     // ==================== JPA Relationships ====================
+
+    /**
+     * Blog posts authored by this user.
+     * One user can have many blog posts.
+     */
+    @OneToMany(
+    mappedBy = "author", cascade = CascadeType.ALL, 
+    fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<BlogPost> blogPosts = new HashSet<>();
+
+    /**
+     * Comments made by this user.
+     * One user can have many comments.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, 
+    fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
+
+    /**
+     * Refresh tokens for this user.
+     * Used for JWT authentication.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, 
+    fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
+
     // ==================== Constructors ====================
+
+    /**
+     * Default constructor required by JPA.
+     */
+    public User() {
+        super();
+        this.roles.add(Role.USER);
+    }
+
+    /**
+     * Constructor for creating a new user with basic information.
+     * 
+     * @param username the user's username
+     * @param email the user's email address
+     * @param password the user's password
+     */
+    public User(String username, String email, String password) {
+        this();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
     // ==================== UserDetails Implementation ====================
     // ==================== Utility Methods ====================
     // ==================== Getters and Setters ====================
