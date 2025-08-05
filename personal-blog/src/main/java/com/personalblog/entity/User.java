@@ -90,28 +90,28 @@ public class User extends BaseEntity implements UserDetails {
      * Disabled accounts cannot log in.
      */
     @Column(name = "account_enabled", nullable = false)
-    private boolean accountEnabled = Boolean.TRUE;
+    private boolean accountEnabled = true;
 
     /**
      * Whether the user account is locked.
      * Locked accounts cannot log in.
      */
     @Column(name = "account_locked", nullable = false)
-    private boolean accountLocked = Boolean.FALSE;
+    private boolean accountLocked = false;
 
     /**
      * Whether the user account is expired.
      * Expired accounts cannot log in.
      */
     @Column(name = "account_expired", nullable = false)
-    private boolean accountExpired = Boolean.FALSE;
+    private boolean accountExpired = false;
 
     /**
      * Whether the user account credentials are expired.
      * Expired credentials require password reset.
      */
     @Column(name = "credentials_expired", nullable = false)
-    private boolean credentialsExpired = Boolean.FALSE;
+    private boolean credentialsExpired = false;
 
     // ==================== Profile Information ====================
 
@@ -197,7 +197,7 @@ public class User extends BaseEntity implements UserDetails {
      * Whether the user's email is verified.
      */
     @Column(name = "email_verified", nullable = false)
-    private boolean emailVerified = Boolean.FALSE;
+    private boolean emailVerified = false;
 
     /**
      * The verification token for the user's email.
@@ -310,6 +310,19 @@ public class User extends BaseEntity implements UserDetails {
         this.password = password;
     }
 
+    /**
+     * Constructor for creating a new user with basic information and roles.
+     * 
+     * @param username the user's username
+     * @param email the user's email address
+     * @param password the user's password
+     * @param roles the user's roles
+     */
+    public User(String username, String email, String password, Set<Role> roles) {
+        this(username, email, password);
+        this.roles = new HashSet<>(roles);
+    }
+
     // ==================== UserDetails Implementation ====================
 
     /**
@@ -352,7 +365,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        return !Boolean.TRUE.equals(accountExpired);
+        return !accountExpired;
     }
 
     /**
@@ -362,7 +375,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return !Boolean.TRUE.equals(accountLocked);
+        return !accountLocked;
     }
 
     /**
@@ -372,7 +385,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        return !Boolean.TRUE.equals(credentialsExpired);
+        return !credentialsExpired;
     }
 
     /**
@@ -382,7 +395,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(accountEnabled);
+        return accountEnabled;
     }
 
     // ==================== Utility Methods ====================
