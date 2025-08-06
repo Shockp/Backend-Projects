@@ -18,8 +18,9 @@ import static org.assertj.core.api.Assertions.*;
  * Tests the actual JPA lifecycle callbacks, auditing functionality,
  * and database interactions using TestEntityManager.
  * 
- * @author Test Suite
+ * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
+ * @since 1.0
  */
 @DataJpaTest
 @ActiveProfiles("test")

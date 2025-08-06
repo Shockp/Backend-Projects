@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.*;
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
- * @since 2025-01-15
+ * @since 1.0
  */
 @DisplayName("User Entity Tests")
 class UserTest {

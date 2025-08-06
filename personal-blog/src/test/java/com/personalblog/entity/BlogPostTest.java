@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.*;
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
- * @since 2025-01-15
+ * @since 1.0
  */
 @DisplayName("BlogPost Entity Tests")
 class BlogPostTest {
@@ -925,7 +925,7 @@ class BlogPostTest {
             String maxMetaTitle = "A".repeat(70);
             String maxMetaDescription = "A".repeat(160);
             String maxMetaKeywords = "A".repeat(255);
-            String maxFeaturedImageUrl = "A".repeat(500);
+            String maxFeaturedImageUrl = "https://example.com/" + "A".repeat(480);
 
             // When
             blogPost.setTitle(maxTitle);

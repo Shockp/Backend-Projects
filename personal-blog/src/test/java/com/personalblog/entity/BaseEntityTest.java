@@ -26,8 +26,9 @@ import static org.assertj.core.api.Assertions.*;
  * 
  * Following BDD patterns with given-when-then structure.
  * 
- * @author Test Suite
+ * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
+ * @since 1.0
  */
 @SpringBootTest
 @ActiveProfiles("test")

@@ -52,6 +52,19 @@ import java.util.*;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "blogPosts")
 public class BlogPost extends BaseEntity {
 
+    // ==================== Validation Constants ====================
+    
+    public static final int TITLE_MIN_LENGTH = 3;
+    public static final int TITLE_MAX_LENGTH = 100;
+    public static final int CONTENT_MIN_LENGTH = 50;
+    public static final int CONTENT_MAX_LENGTH = 50000;
+    public static final int EXCERPT_MAX_LENGTH = 500;
+    public static final int SLUG_MAX_LENGTH = 200;
+    public static final int FEATURED_IMAGE_URL_MAX_LENGTH = 500;
+    public static final int META_TITLE_MAX_LENGTH = 70;
+    public static final int META_DESCRIPTION_MAX_LENGTH = 160;
+    public static final int META_KEYWORDS_MAX_LENGTH = 255;
+
     public interface Create {}
     public interface Update {}
     public interface Publish {}
@@ -65,43 +78,43 @@ public class BlogPost extends BaseEntity {
     // ==================== Core Fields ====================
 
     @NotBlank(groups = Create.class)
-    @Size(min = 3, max = 100, groups = {Create.class, Update.class})
+    @Size(min = TITLE_MIN_LENGTH, max = TITLE_MAX_LENGTH, groups = {Create.class, Update.class})
     @Pattern(
         regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{3,100}$",
         message = "Title must be 3–100 characters, letters, numbers, punctuation, spaces only",
         groups = {Create.class, Update.class}
     )
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false, length = TITLE_MAX_LENGTH)
     private String title;
 
     @NotBlank(groups = {Create.class, Publish.class})
-    @Size(max = 200, groups = {Create.class, Update.class})
+    @Size(max = SLUG_MAX_LENGTH, groups = {Create.class, Update.class})
     @Pattern(
         regexp = "^[a-z0-9\\-]+$",
         message = "Slug must be lowercase alphanumeric and hyphens",
         groups = {Create.class, Update.class}
     )
-    @Column(name = "slug", nullable = false, unique = true, length = 200)
+    @Column(name = "slug", nullable = false, unique = true, length = SLUG_MAX_LENGTH)
     private String slug;
 
     @NotBlank(groups = Create.class)
     @Lob
-    @Size(min = 50, max = 50000, groups = {Create.class, Update.class})
+    @Size(min = CONTENT_MIN_LENGTH, max = CONTENT_MAX_LENGTH, groups = {Create.class, Update.class})
     @Pattern(
-        regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{50,50000}$",
-        message = "Content must be 50-50000 characters, letters, numbers, punctuation and spaces only",
+        regexp = "^(?!.*<script)(?!.*<iframe)(?!.*javascript:)(?!.*on\\w+\\s*=)[\\s\\S]*$",
+        message = "Content cannot contain script tags, iframes, javascript protocols, or event handlers",
         groups = {Create.class, Update.class}
     )
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Size(max = 500, groups = {Create.class, Update.class})
+    @Size(max = EXCERPT_MAX_LENGTH, groups = {Create.class, Update.class})
     @Pattern(
-        regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{0,500}$",
-        message = "Excerpt must be 0-500 characters, letters, numbers, punctuation and spaces only",
+        regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;\\n\\r]*$",
+        message = "Excerpt must contain only letters, numbers, punctuation, spaces, and line breaks",
         groups = {Create.class, Update.class}
     )
-    @Column(name = "excerpt", length = 500)
+    @Column(name = "excerpt", length = EXCERPT_MAX_LENGTH)
     private String excerpt;
 
     @NotNull(groups = {Create.class, Update.class})
@@ -115,22 +128,27 @@ public class BlogPost extends BaseEntity {
     @Column(name = "published_date")
     private LocalDateTime publishedDate;
 
-    @Size(max = 500, groups = {Create.class, Update.class})
-    @Column(name = "featured_image_url", length = 500)
+    @Size(max = FEATURED_IMAGE_URL_MAX_LENGTH, groups = {Create.class, Update.class})
+    @Pattern(
+        regexp = "^$|^https?://.*",
+        message = "Must be a valid HTTP/HTTPS URL or empty",
+        groups = {Create.class, Update.class}
+    )
+    @Column(name = "featured_image_url", length = FEATURED_IMAGE_URL_MAX_LENGTH)
     private String featuredImageUrl;
 
     // ==================== SEO Metadata ====================
 
-    @Size(max = 70, groups = {Create.class, Update.class})
-    @Column(name = "meta_title", length = 70)
+    @Size(max = META_TITLE_MAX_LENGTH, groups = {Create.class, Update.class})
+    @Column(name = "meta_title", length = META_TITLE_MAX_LENGTH)
     private String metaTitle;
 
-    @Size(max = 160, groups = {Create.class, Update.class})
-    @Column(name = "meta_description", length = 160)
+    @Size(max = META_DESCRIPTION_MAX_LENGTH, groups = {Create.class, Update.class})
+    @Column(name = "meta_description", length = META_DESCRIPTION_MAX_LENGTH)
     private String metaDescription;
 
-    @Size(max = 255, groups = {Create.class, Update.class})
-    @Column(name = "meta_keywords", length = 255)
+    @Size(max = META_KEYWORDS_MAX_LENGTH, groups = {Create.class, Update.class})
+    @Column(name = "meta_keywords", length = META_KEYWORDS_MAX_LENGTH)
     private String metaKeywords;
 
      // ==================== Statistics ====================
@@ -338,6 +356,56 @@ public class BlogPost extends BaseEntity {
         if (content != null && wordsPerMinute > 0) {
             int wordCount = content.split("\\s+").length;
             this.readingTimeMinutes = (int) Math.ceil((double) wordCount / wordsPerMinute);
+        }
+    }
+
+    // ==================== Relationship Helper Methods ====================
+
+    /**
+     * Add a tag to this blog post.
+     * Note: Bidirectional relationship maintenance should be handled at the service layer.
+     * 
+     * @param tag the tag to add
+     */
+    public void addTag(Tag tag) {
+        if (tag != null) {
+            tags.add(tag);
+        }
+    }
+
+    /**
+     * Remove a tag from this blog post.
+     * Note: Bidirectional relationship maintenance should be handled at the service layer.
+     * 
+     * @param tag the tag to remove
+     */
+    public void removeTag(Tag tag) {
+        if (tag != null) {
+            tags.remove(tag);
+        }
+    }
+
+    /**
+     * Add a comment to this blog post.
+     * Note: Bidirectional relationship maintenance should be handled at the service layer.
+     * 
+     * @param comment the comment to add
+     */
+    public void addComment(Comment comment) {
+        if (comment != null) {
+            comments.add(comment);
+        }
+    }
+
+    /**
+     * Remove a comment from this blog post.
+     * Note: Bidirectional relationship maintenance should be handled at the service layer.
+     * 
+     * @param comment the comment to remove
+     */
+    public void removeComment(Comment comment) {
+        if (comment != null) {
+            comments.remove(comment);
         }
     }
 
