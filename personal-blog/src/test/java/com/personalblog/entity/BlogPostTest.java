@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.*;
  * Tests cover:
  * - Entity construction and initialization
  * - Bean validation constraints with validation groups
- * - Utility methods (incrementViewCount, estimatedReadingTime)
+ * - Utility methods (incrementViewCount, calculateReadingTime)
  * - Relationships with User, Category, Tag, and Comment entities
  * - Status management and publication workflow
  * - SEO metadata handling
@@ -706,7 +706,7 @@ class BlogPostTest {
             blogPost.setContent(content);
 
             // When
-            blogPost.estimatedReadingTime(wordsPerMinute);
+            blogPost.calculateReadingTime(wordsPerMinute);
 
             // Then
             assertThat(blogPost.getReadingTimeMinutes()).isEqualTo(expectedMinutes);
@@ -720,7 +720,7 @@ class BlogPostTest {
             int initialReadingTime = blogPost.getReadingTimeMinutes();
 
             // When
-            blogPost.estimatedReadingTime(200);
+            blogPost.calculateReadingTime(200);
 
             // Then
             assertThat(blogPost.getReadingTimeMinutes()).isEqualTo(initialReadingTime);
@@ -735,7 +735,7 @@ class BlogPostTest {
             int initialReadingTime = blogPost.getReadingTimeMinutes();
 
             // When
-            blogPost.estimatedReadingTime(0);
+            blogPost.calculateReadingTime(0);
 
             // Then
             assertThat(blogPost.getReadingTimeMinutes()).isEqualTo(initialReadingTime);
@@ -750,7 +750,7 @@ class BlogPostTest {
             int initialReadingTime = blogPost.getReadingTimeMinutes();
 
             // When
-            blogPost.estimatedReadingTime(-100);
+            blogPost.calculateReadingTime(-100);
 
             // Then
             assertThat(blogPost.getReadingTimeMinutes()).isEqualTo(initialReadingTime);

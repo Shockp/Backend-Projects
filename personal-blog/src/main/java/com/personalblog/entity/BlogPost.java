@@ -42,7 +42,8 @@ import java.util.*;
     @Index(name = "idx_blogpost_title", columnList = "title"),
     @Index(name = "idx_blogpost_slug", columnList = "slug"),
     @Index(name = "idx_blogpost_status", columnList = "status"),
-    @Index(name = "idx_blogpost_published_date", columnList = "published_date")
+    @Index(name = "idx_blogpost_published_date", columnList = "published_date"),
+    @Index(name = "idx_blogpost_status_published_date", columnList = "status, published_date")
 })
 @NamedQuery(
     name = "BlogPost.findPublishedByDateDesc",
@@ -130,7 +131,7 @@ public class BlogPost extends BaseEntity {
 
     @Size(max = FEATURED_IMAGE_URL_MAX_LENGTH, groups = {Create.class, Update.class})
     @Pattern(
-        regexp = "^$|^https?://.*",
+        regexp = "^$|^https?://[\\w\\-]+(\\.[\\w\\-]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?$",
         message = "Must be a valid HTTP/HTTPS URL or empty",
         groups = {Create.class, Update.class}
     )
@@ -348,11 +349,11 @@ public class BlogPost extends BaseEntity {
     }
 
     /**
-     * Estimate reading time based on word count.
+     * Calculate reading time based on word count.
      * 
      * @param wordsPerMinute reading speed based on average words per minute
      */
-    public void estimatedReadingTime(int wordsPerMinute) {
+    public void calculateReadingTime(int wordsPerMinute) {
         if (content != null && wordsPerMinute > 0) {
             int wordCount = content.split("\\s+").length;
             this.readingTimeMinutes = (int) Math.ceil((double) wordCount / wordsPerMinute);
