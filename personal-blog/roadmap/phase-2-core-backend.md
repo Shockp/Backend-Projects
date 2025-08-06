@@ -22,7 +22,7 @@ Implement the core backend functionality including entities, repositories, servi
   - Audit fields
 
 #### 1.2 User Entity ⏳
-- [ ] Implement `User` entity with:
+- [x] Implement `User` entity with:
   - Basic user information (username, email, firstName, lastName)
   - Password field with validation
   - Role enumeration (ADMIN, AUTHOR, USER)
