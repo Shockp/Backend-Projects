@@ -35,7 +35,7 @@ Implement the core backend functionality including entities, repositories, servi
   - Bean validation annotations
 
 #### 1.3 BlogPost Entity ⏳
-- [ ] Implement `BlogPost` entity with:
+- [x] Implement `BlogPost` entity with:
   - Title and slug (URL-friendly)
   - Content (rich text support)
   - Excerpt/summary
