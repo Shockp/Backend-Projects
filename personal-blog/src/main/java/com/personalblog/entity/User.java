@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
- * @since 2025-08-03
+ * @since 1.0
  */
 @Entity
 @Table(name = "users", indexes = {

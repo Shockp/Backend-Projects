@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
  * @version 1.0
- * @since 2025-08-02
+ * @since 1.0
  */
 @SpringBootApplication
 @EnableJpaAuditing
