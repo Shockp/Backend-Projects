@@ -2,6 +2,9 @@ package com.personalblog.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -20,12 +23,18 @@ import java.util.*;
  * - View count
  * - Estimated reading time
  * - Relationships: author, category, tags, comments
- * - Database indexes for performance
+ * - Database indexes and caching for performance
  * 
  * Inherits audit fields (id, createdAt, updatedAt, deleted) from BaseEntity.
  * 
+ * Validation groups:
+ *  Create.class, Update.class, Publish.class
+ * 
+ * Named queries:
+ *  findPublishedByDateDesc
+ * 
  * @author Adrián Feito Blázquez (github.com/shockp)
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 @Entity
@@ -35,7 +44,17 @@ import java.util.*;
     @Index(name = "idx_blogpost_status", columnList = "status"),
     @Index(name = "idx_blogpost_published_date", columnList = "published_date")
 })
+@NamedQuery(
+    name = "BlogPost.findPublishedByDateDesc",
+    query = "SELECT b FROM BlogPost b WHERE b.status = :status ORDER BY b.publishedDate DESC"
+)
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "blogPosts")
 public class BlogPost extends BaseEntity {
+
+    public interface Create {}
+    public interface Update {}
+    public interface Publish {}
     
     public enum Status {
         DRAFT,
@@ -45,88 +64,94 @@ public class BlogPost extends BaseEntity {
 
     // ==================== Core Fields ====================
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(groups = Create.class)
+    @Size(min = 3, max = 100, groups = {Create.class, Update.class})
     @Pattern(
         regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{3,100}$",
-        message = "Titles must be 3-100 characters, letters, numbers, punctuation and spaces only"
+        message = "Title must be 3–100 characters, letters, numbers, punctuation, spaces only",
+        groups = {Create.class, Update.class}
     )
     @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @NotBlank
-    @Size(max = 200)
+    @NotBlank(groups = {Create.class, Publish.class})
+    @Size(max = 200, groups = {Create.class, Update.class})
     @Pattern(
-        regexp = "^[a-z0-9-]+$", 
-        message = "Slug must be lowercase alphanumeric and hyphens"
+        regexp = "^[a-z0-9\\-]+$",
+        message = "Slug must be lowercase alphanumeric and hyphens",
+        groups = {Create.class, Update.class}
     )
     @Column(name = "slug", nullable = false, unique = true, length = 200)
     private String slug;
 
-    @NotBlank
+    @NotBlank(groups = Create.class)
     @Lob
+    @Size(min = 50, max = 50000, groups = {Create.class, Update.class})
     @Pattern(
         regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{50,50000}$",
-        message = "Content must be 50-50000 characters, letters, numbers, punctuation and spaces only"
+        message = "Content must be 50-50000 characters, letters, numbers, punctuation and spaces only",
+        groups = {Create.class, Update.class}
     )
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Size(max = 500)
+    @Size(max = 500, groups = {Create.class, Update.class})
     @Pattern(
         regexp = "^[\\p{L}0-9 .,'\"!?()\\-:;]{0,500}$",
-        message = "Excerpt must be 0-500 characters, letters, numbers, punctuation and spaces only"
+        message = "Excerpt must be 0-500 characters, letters, numbers, punctuation and spaces only",
+        groups = {Create.class, Update.class}
     )
     @Column(name = "excerpt", length = 500)
     private String excerpt;
 
-    @NotNull
+    @NotNull(groups = {Create.class, Update.class})
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private Status status = Status.DRAFT;
 
     // ==================== Publication & Media ====================
 
+    @NotNull(groups = Publish.class)
     @Column(name = "published_date")
     private LocalDateTime publishedDate;
 
-    @Size(max = 500)
+    @Size(max = 500, groups = {Create.class, Update.class})
     @Column(name = "featured_image_url", length = 500)
     private String featuredImageUrl;
 
     // ==================== SEO Metadata ====================
 
-    @Size(max = 70)
+    @Size(max = 70, groups = {Create.class, Update.class})
     @Column(name = "meta_title", length = 70)
     private String metaTitle;
 
-    @Size(max = 160)
+    @Size(max = 160, groups = {Create.class, Update.class})
     @Column(name = "meta_description", length = 160)
     private String metaDescription;
 
-    @Size(max = 255)
+    @Size(max = 255, groups = {Create.class, Update.class})
     @Column(name = "meta_keywords", length = 255)
     private String metaKeywords;
 
      // ==================== Statistics ====================
 
-     @Min(0)
-     @Column(name = "view_count")
-     private Long viewCount = 0L;
+    @Min(value = 0, groups = Update.class)
+    @Column(name = "view_count", nullable = false)
+    private Long viewCount = 0L;
 
-     @Min(0)
-     @Column(name = "reading_time_minutes", nullable = false)
-     private Integer readingTimeMinutes = 0;
+    @Min(value = 0, groups = Update.class)
+    @Column(name = "reading_time_minutes", nullable = false)
+    private Integer readingTimeMinutes = 0;
 
      // ==================== Relationships ====================
 
-     @NotNull
-     @ManyToOne(fetch = FetchType.LAZY)
+     @NotNull(groups = {Create.class, Update.class})
+     @ManyToOne(fetch = FetchType.LAZY, optional = false)
      @JoinColumn(name = "author_id", nullable = false)
      private User author;
 
-     @NotNull
-     @ManyToOne(fetch = FetchType.LAZY)
+     @NotNull(groups = {Create.class, Update.class})
+     @ManyToOne(fetch = FetchType.LAZY, optional = false)
      @JoinColumn(name = "category_id", nullable = false)
      private Category category;
 
@@ -326,6 +351,6 @@ public class BlogPost extends BaseEntity {
     @Override
     public String toString() {
         return String.format("BlogPost{id=%d, title='%s', slug='%s', status=%s, publishedAt=%s}",
-                             getId(), getTitle(), getSlug(), getStatus(), getPublishedDate());
+                             getId(), title, slug, status, publishedDate);
     }
 }
