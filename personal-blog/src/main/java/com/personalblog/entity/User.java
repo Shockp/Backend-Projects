@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * - Comprehensive Bean Validation
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
- * @version 1.0
+ * @version 1.0a
  * @since 1.0
  */
 @Entity

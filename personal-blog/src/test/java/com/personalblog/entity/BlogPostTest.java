@@ -874,37 +874,159 @@ class BlogPostTest {
     @DisplayName("Object Methods Tests")
     class ObjectMethodsTests {
 
-        @Test
-        @DisplayName("Should generate correct toString representation")
-        void shouldGenerateCorrectToStringRepresentation() {
-            // Given
-            blogPost.setPublishedDate(LocalDateTime.of(2025, 1, 15, 10, 30));
+        @Nested
+        @DisplayName("ToString Tests")
+        class ToStringTests {
 
-            // When
-            String toString = blogPost.toString();
+            @Test
+            @DisplayName("Should generate correct toString representation")
+            void shouldGenerateCorrectToStringRepresentation() {
+                // Given
+                blogPost.setPublishedDate(LocalDateTime.of(2025, 1, 15, 10, 30));
 
-            // Then
-            assertThat(toString)
-                .contains("BlogPost{")
-                .contains("title='Test Blog Post Title'")
-                .contains("slug='test-blog-post-title'")
-                .contains("status=DRAFT")
-                .contains("publishedAt=2025-01-15T10:30");
+                // When
+                String toString = blogPost.toString();
+
+                // Then
+                assertThat(toString)
+                    .contains("BlogPost{")
+                    .contains("title='Test Blog Post Title'")
+                    .contains("slug='test-blog-post-title'")
+                    .contains("status=DRAFT")
+                    .contains("publishedAt=2025-01-15T10:30");
+            }
+
+            @Test
+            @DisplayName("Should handle null published date in toString")
+            void shouldHandleNullPublishedDateInToString() {
+                // Given
+                blogPost.setPublishedDate(null);
+
+                // When
+                String toString = blogPost.toString();
+
+                // Then
+                assertThat(toString)
+                    .contains("BlogPost{")
+                    .contains("publishedAt=null");
+            }
         }
 
-        @Test
-        @DisplayName("Should handle null published date in toString")
-        void shouldHandleNullPublishedDateInToString() {
-            // Given
-            blogPost.setPublishedDate(null);
+        @Nested
+        @DisplayName("Equals Tests")
+        class EqualsTests {
 
-            // When
-            String toString = blogPost.toString();
+            @Test
+            @DisplayName("Should return true for blog posts with same id")
+            void shouldReturnTrueForBlogPostsWithSameId() throws Exception {
+                // Given
+                BlogPost post1 = new BlogPost("Post 1", "post-1", "Content for post 1 with sufficient length to meet validation requirements.", mockAuthor, mockCategory);
+                BlogPost post2 = new BlogPost("Post 2", "post-2", "Content for post 2 with sufficient length to meet validation requirements.", mockAuthor, mockCategory);
+                
+                // Set same ID using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(post1, 1L);
+                idField.set(post2, 1L);
 
-            // Then
-            assertThat(toString)
-                .contains("BlogPost{")
-                .contains("publishedAt=null");
+                // When & Then
+                assertThat(post1).isEqualTo(post2);
+                assertThat(post2).isEqualTo(post1);
+            }
+
+            @Test
+            @DisplayName("Should return false for blog posts with different ids")
+            void shouldReturnFalseForBlogPostsWithDifferentIds() throws Exception {
+                // Given
+                BlogPost post1 = new BlogPost("Same Post", "same-post", "Same content with sufficient length to meet validation requirements.", mockAuthor, mockCategory);
+                BlogPost post2 = new BlogPost("Same Post", "same-post", "Same content with sufficient length to meet validation requirements.", mockAuthor, mockCategory);
+                
+                // Set different IDs using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(post1, 1L);
+                idField.set(post2, 2L);
+
+                // When & Then
+                assertThat(post1).isNotEqualTo(post2);
+            }
+
+            @Test
+            @DisplayName("Should return false when comparing with null")
+            void shouldReturnFalseWhenComparingWithNull() {
+                // When & Then
+                assertThat(blogPost).isNotEqualTo(null);
+            }
+
+            @Test
+            @DisplayName("Should return false when comparing with different class")
+            void shouldReturnFalseWhenComparingWithDifferentClass() {
+                // Given
+                String notABlogPost = "not a blog post";
+
+                // When & Then
+                assertThat(blogPost).isNotEqualTo(notABlogPost);
+            }
+
+            @Test
+            @DisplayName("Should return false when id is null")
+            void shouldReturnFalseWhenIdIsNull() {
+                // Given
+                BlogPost post1 = new BlogPost("Post 1", "post-1", "Content 1 with sufficient length.", mockAuthor, mockCategory);
+                BlogPost post2 = new BlogPost("Post 1", "post-1", "Content 1 with sufficient length.", mockAuthor, mockCategory);
+                // IDs are null by default
+
+                // When & Then
+                assertThat(post1).isNotEqualTo(post2);
+            }
+        }
+
+        @Nested
+        @DisplayName("HashCode Tests")
+        class HashCodeTests {
+
+            @Test
+            @DisplayName("Should return same hash code for equal objects")
+            void shouldReturnSameHashCodeForEqualObjects() throws Exception {
+                // Given
+                BlogPost post1 = new BlogPost("Post 1", "post-1", "Content 1 with sufficient length.", mockAuthor, mockCategory);
+                BlogPost post2 = new BlogPost("Post 2", "post-2", "Content 2 with sufficient length.", mockAuthor, mockCategory);
+                
+                // Set same ID using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(post1, 1L);
+                idField.set(post2, 1L);
+
+                // When & Then
+                assertThat(post1.hashCode()).isEqualTo(post2.hashCode());
+            }
+
+            @Test
+            @DisplayName("Should handle null id in hashCode")
+            void shouldHandleNullIdInHashCode() {
+                // Given - ID is null by default
+
+                // When & Then
+                assertThat(blogPost.hashCode()).isEqualTo(31);
+            }
+
+            @Test
+            @DisplayName("Should return different hash codes for different ids")
+            void shouldReturnDifferentHashCodesForDifferentIds() throws Exception {
+                // Given
+                BlogPost post1 = new BlogPost("Post 1", "post-1", "Content 1 with sufficient length.", mockAuthor, mockCategory);
+                BlogPost post2 = new BlogPost("Post 2", "post-2", "Content 2 with sufficient length.", mockAuthor, mockCategory);
+                
+                // Set different IDs using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(post1, 1L);
+                idField.set(post2, 2L);
+
+                // When & Then
+                assertThat(post1.hashCode()).isNotEqualTo(post2.hashCode());
+            }
         }
     }
 
@@ -963,6 +1085,55 @@ class BlogPostTest {
         }
 
         @Test
+        @DisplayName("Should handle null collections gracefully")
+        void shouldHandleNullCollectionsGracefully() {
+            // Given
+            BlogPost postWithNullCollections = new BlogPost();
+            postWithNullCollections.setTitle("Test Post");
+            postWithNullCollections.setSlug("test-post");
+            postWithNullCollections.setContent("Test content with sufficient length to meet validation requirements.");
+            postWithNullCollections.setAuthor(mockAuthor);
+            postWithNullCollections.setCategory(mockCategory);
+
+            // When & Then
+            assertThat(postWithNullCollections.getTags()).isNotNull().isEmpty();
+            assertThat(postWithNullCollections.getComments()).isNotNull().isEmpty();
+        }
+
+        @Test
+        @DisplayName("Should handle special characters in content")
+        void shouldHandleSpecialCharactersInContent() {
+            // Given
+            String specialContent = "Content with special chars: àáâãäåæçèéêë ñòóôõöøùúûüý ¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ";
+
+            // When
+            blogPost.setContent(specialContent);
+            Set<ConstraintViolation<BlogPost>> violations = validator.validate(blogPost);
+
+            // Then
+            assertThat(violations).isEmpty();
+            assertThat(blogPost.getContent()).isEqualTo(specialContent);
+        }
+
+        @Test
+        @DisplayName("Should handle emoji in title and content")
+        void shouldHandleEmojiInTitleAndContent() {
+            // Given
+            String emojiTitle = "My Amazing Blog Post 🚀✨🎉";
+            String emojiContent = "This is content with emojis 😊👍🔥 and it should work perfectly fine with sufficient length to meet validation requirements.";
+
+            // When
+            blogPost.setTitle(emojiTitle);
+            blogPost.setContent(emojiContent);
+            Set<ConstraintViolation<BlogPost>> violations = validator.validate(blogPost);
+
+            // Then
+            assertThat(violations).isEmpty();
+            assertThat(blogPost.getTitle()).isEqualTo(emojiTitle);
+            assertThat(blogPost.getContent()).isEqualTo(emojiContent);
+        }
+
+        @Test
         @DisplayName("Should handle concurrent view count increments")
         void shouldHandleConcurrentViewCountIncrements() {
             // Given
@@ -978,6 +1149,38 @@ class BlogPostTest {
 
             // Then
             assertThat(blogPost.getViewCount()).isEqualTo(initialViewCount + (threadCount * incrementsPerThread));
+        }
+
+        @Test
+        @DisplayName("Should handle performance with large content")
+        void shouldHandlePerformanceWithLargeContent() {
+            // Given
+            String largeContent = generateContentWithWordCount(5000); // Large but valid content
+            long startTime = System.currentTimeMillis();
+
+            // When
+            blogPost.setContent(largeContent);
+            blogPost.calculateReadingTime(200); // Calculate with 200 words per minute
+            long endTime = System.currentTimeMillis();
+
+            // Then
+            assertThat(endTime - startTime).isLessThan(100); // Should complete within 100ms
+            assertThat(blogPost.getReadingTimeMinutes()).isGreaterThan(0);
+            assertThat(blogPost.getContent()).isEqualTo(largeContent);
+        }
+
+        @Test
+        @DisplayName("Should handle rapid status changes")
+        void shouldHandleRapidStatusChanges() {
+            // Given
+            BlogPost.Status[] statuses = BlogPost.Status.values();
+
+            // When & Then
+            for (int i = 0; i < 1000; i++) {
+                BlogPost.Status status = statuses[i % statuses.length];
+                blogPost.setStatus(status);
+                assertThat(blogPost.getStatus()).isEqualTo(status);
+            }
         }
     }
 
@@ -1038,5 +1241,23 @@ class BlogPostTest {
             }
         }
         return content.toString();
+    }
+
+    /**
+     * Creates a mock Tag for testing purposes.
+     */
+    private Tag createMockTag(String name, String slug) {
+        Tag tag = new Tag();
+        // Since Tag is not implemented, we'll use a simple mock
+        return tag;
+    }
+
+    /**
+     * Creates a mock Comment for testing purposes.
+     */
+    private Comment createMockComment(String content) {
+        Comment comment = new Comment();
+        // Since Comment is not implemented, we'll use a simple mock
+        return comment;
     }
 }

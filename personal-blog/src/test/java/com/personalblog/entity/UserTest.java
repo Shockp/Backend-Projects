@@ -934,6 +934,57 @@ class UserTest {
             // Then - Should not be enabled
             assertThat(secureUser.isEnabled()).isFalse();
         }
+
+        @Test
+        @DisplayName("Should handle password reset workflow")
+        void shouldHandlePasswordResetWorkflow() {
+            // Given
+            User user = new User("resetuser", "reset@example.com", "OldPass123!", Set.of(Role.USER));
+            String resetToken = "reset-token-123";
+            LocalDateTime resetExpiry = LocalDateTime.now().plusHours(1);
+
+            // When - Initiate password reset
+            user.setPasswordResetToken(resetToken);
+            user.setPasswordResetTokenExpiresAt(resetExpiry);
+
+            // Then - Reset token should be set
+            assertThat(user.getPasswordResetToken()).isEqualTo(resetToken);
+            assertThat(user.getPasswordResetTokenExpiresAt()).isEqualTo(resetExpiry);
+
+            // When - Complete password reset
+            user.setPassword("NewPass123!");
+            user.setPasswordResetToken(null);
+            user.setPasswordResetTokenExpiresAt(null);
+
+            // Then - Password should be updated and reset token cleared
+            assertThat(user.getPassword()).isEqualTo("NewPass123!");
+            assertThat(user.getPasswordResetToken()).isNull();
+            assertThat(user.getPasswordResetTokenExpiresAt()).isNull();
+        }
+
+        @Test
+        @DisplayName("Should handle user profile completion workflow")
+        void shouldHandleUserProfileCompletionWorkflow() {
+            // Given
+            User user = new User("profileuser", "profile@example.com", "SecurePass123!", Set.of(Role.AUTHOR));
+
+            // When - Complete profile information
+            user.setBio("Experienced software developer and technical writer");
+            user.setWebsiteUrl("https://johndoe.dev");
+            user.setTwitterUrl("https://twitter.com/johndoe");
+            user.setLinkedinUrl("https://linkedin.com/in/johndoe");
+            user.setGithubUrl("https://github.com/johndoe");
+
+            // Then - Profile should be complete
+            assertThat(user)
+                .satisfies(u -> {
+                    assertThat(u.getBio()).isNotBlank();
+                    assertThat(u.getWebsiteUrl()).startsWith("https://");
+                    assertThat(u.getTwitterUrl()).contains("twitter.com");
+                    assertThat(u.getLinkedinUrl()).contains("linkedin.com");
+                    assertThat(u.getGithubUrl()).contains("github.com");
+                });
+        }
     }
 
     // ==================== ToString Method Tests ====================
@@ -978,6 +1029,178 @@ class UserTest {
                 .doesNotContain("supersecretpassword")
                 .doesNotContain("secret-token")
                 .doesNotContain("reset-token");
+        }
+    }
+
+    // ==================== Object Methods Tests ====================
+
+    @Nested
+    @DisplayName("Object Methods Tests")
+    class ObjectMethodsTests {
+
+        @Nested
+        @DisplayName("Equals Tests")
+        class EqualsTests {
+
+            @Test
+            @DisplayName("Should return true for users with same id")
+            void shouldReturnTrueForUsersWithSameId() throws Exception {
+                // Given
+                User user1 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                User user2 = new User("user2", "user2@example.com", "password456", Set.of(Role.ADMIN));
+                
+                // Set same ID using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(user1, 1L);
+                idField.set(user2, 1L);
+
+                // When & Then
+                assertThat(user1).isEqualTo(user2);
+                assertThat(user2).isEqualTo(user1);
+            }
+
+            @Test
+            @DisplayName("Should return false for users with different ids")
+            void shouldReturnFalseForUsersWithDifferentIds() throws Exception {
+                // Given
+                User user1 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                User user2 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                
+                // Set different IDs using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(user1, 1L);
+                idField.set(user2, 2L);
+
+                // When & Then
+                assertThat(user1).isNotEqualTo(user2);
+            }
+
+            @Test
+            @DisplayName("Should return false when comparing with null")
+            void shouldReturnFalseWhenComparingWithNull() {
+                // Given
+                User user = new User("testuser", "test@example.com", "password123", Set.of(Role.USER));
+
+                // When & Then
+                assertThat(user).isNotEqualTo(null);
+            }
+
+            @Test
+            @DisplayName("Should return false when comparing with different class")
+            void shouldReturnFalseWhenComparingWithDifferentClass() {
+                // Given
+                User user = new User("testuser", "test@example.com", "password123", Set.of(Role.USER));
+                String notAUser = "not a user";
+
+                // When & Then
+                assertThat(user).isNotEqualTo(notAUser);
+            }
+
+            @Test
+            @DisplayName("Should return false when id is null")
+            void shouldReturnFalseWhenIdIsNull() {
+                // Given
+                User user1 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                User user2 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                // IDs are null by default
+
+                // When & Then
+                assertThat(user1).isNotEqualTo(user2);
+            }
+        }
+
+        @Nested
+        @DisplayName("HashCode Tests")
+        class HashCodeTests {
+
+            @Test
+            @DisplayName("Should return same hash code for equal objects")
+            void shouldReturnSameHashCodeForEqualObjects() throws Exception {
+                // Given
+                User user1 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                User user2 = new User("user2", "user2@example.com", "password456", Set.of(Role.ADMIN));
+                
+                // Set same ID using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(user1, 1L);
+                idField.set(user2, 1L);
+
+                // When & Then
+                assertThat(user1.hashCode()).isEqualTo(user2.hashCode());
+            }
+
+            @Test
+            @DisplayName("Should handle null id in hashCode")
+            void shouldHandleNullIdInHashCode() {
+                // Given
+                User user = new User("testuser", "test@example.com", "password123", Set.of(Role.USER));
+                // ID is null by default
+
+                // When & Then
+                assertThat(user.hashCode()).isEqualTo(31);
+            }
+
+            @Test
+            @DisplayName("Should return different hash codes for different ids")
+            void shouldReturnDifferentHashCodesForDifferentIds() throws Exception {
+                // Given
+                User user1 = new User("user1", "user1@example.com", "password123", Set.of(Role.USER));
+                User user2 = new User("user2", "user2@example.com", "password456", Set.of(Role.ADMIN));
+                
+                // Set different IDs using reflection
+                java.lang.reflect.Field idField = BaseEntity.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(user1, 1L);
+                idField.set(user2, 2L);
+
+                // When & Then
+                assertThat(user1.hashCode()).isNotEqualTo(user2.hashCode());
+            }
+        }
+    }
+
+    // ==================== Performance and Edge Cases Tests ====================
+
+    @Nested
+    @DisplayName("Performance and Edge Cases Tests")
+    class PerformanceAndEdgeCasesTests {
+
+        @Test
+        @DisplayName("Should handle concurrent role modifications")
+        void shouldHandleConcurrentRoleModifications() {
+            // Given
+            User user = new User("concurrentuser", "concurrent@example.com", "password123", new HashSet<>());
+            Set<Role> rolesToAdd = Set.of(Role.USER, Role.AUTHOR, Role.ADMIN);
+
+            // When - Simulate concurrent role additions
+            rolesToAdd.forEach(user::addRole);
+
+            // Then
+            assertThat(user.getRoles())
+                .hasSize(3)
+                .containsExactlyInAnyOrderElementsOf(rolesToAdd);
+        }
+
+        @Test
+        @DisplayName("Should maintain role collection integrity")
+        void shouldMaintainRoleCollectionIntegrity() {
+            // Given
+            User user = new User("integrityuser", "integrity@example.com", "password123", Set.of(Role.USER));
+
+            // When - Add and remove roles multiple times
+            user.addRole(Role.AUTHOR);
+            user.addRole(Role.ADMIN);
+            user.removeRole(Role.USER);
+            user.addRole(Role.USER);
+            user.removeRole(Role.ADMIN);
+
+            // Then
+            assertThat(user.getRoles())
+                .hasSize(2)
+                .containsExactlyInAnyOrder(Role.USER, Role.AUTHOR);
         }
     }
 }

@@ -34,8 +34,8 @@ import java.util.*;
  *  findPublishedByDateDesc
  * 
  * @author Adrián Feito Blázquez (github.com/shockp)
- * @version 1.1
- * @since 1.0
+ * @version 1.0a
+ * @since 1.0.0
  */
 @Entity
 @Table(name = "blog_posts", indexes = {
