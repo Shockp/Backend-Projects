@@ -2,7 +2,7 @@
 
 **Status**: 🔄 In Progress  
 **Duration**: 1-2 weeks  
-**Completion**: 0%
+**Completion**: 25%
 
 ## 🎯 Objectives
 
@@ -12,7 +12,7 @@ Implement the core backend functionality including entities, repositories, servi
 
 ### 1. Entity Implementation ⏳
 
-#### 1.1 Base Entity ⏳
+#### 1.1 Base Entity ✅
 - [x] Implement `BaseEntity` with:
   - UUID primary key
   - Created/updated timestamps
@@ -21,7 +21,7 @@ Implement the core backend functionality including entities, repositories, servi
   - JPA annotations
   - Audit fields
 
-#### 1.2 User Entity ⏳
+#### 1.2 User Entity ✅
 - [x] Implement `User` entity with:
   - Basic user information (username, email, firstName, lastName)
   - Password field with validation
@@ -34,7 +34,7 @@ Implement the core backend functionality including entities, repositories, servi
   - JPA relationships
   - Bean validation annotations
 
-#### 1.3 BlogPost Entity ⏳
+#### 1.3 BlogPost Entity ✅
 - [x] Implement `BlogPost` entity with:
   - Title and slug (URL-friendly)
   - Content (rich text support)
@@ -51,8 +51,8 @@ Implement the core backend functionality including entities, repositories, servi
   - Comments relationship (One-to-Many with Comment)
   - JPA annotations and indexes
 
-#### 1.4 Category Entity ⏳
-- [ ] Implement `Category` entity with:
+#### 1.4 Category Entity ✅
+- [x] Implement `Category` entity with:
   - Name and slug
   - Description
   - Color code for UI
@@ -61,6 +61,10 @@ Implement the core backend functionality including entities, repositories, servi
   - SEO metadata
   - Blog posts relationship (One-to-Many)
   - JPA annotations
+  - Hierarchical relationship management
+  - Circular reference prevention
+  - Proper equals/hashCode implementation
+  - Comprehensive toString method
 
 #### 1.5 Tag Entity ⏳
 - [ ] Implement `Tag` entity with:
