@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * User entity representing blog users with comprehensive profile and
@@ -242,6 +243,13 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "failed_login_attempts", nullable = false)
     private Integer failedLoginAttempts = 0;
 
+    /**
+     * Atomic counter for thread-safe failed login attempts operations.
+     * Transient field that mirrors the persistent failedLoginAttempts field.
+     */
+    @Transient
+    private transient AtomicInteger atomicFailedLoginAttempts;
+
     // ==================== Password Reset ====================
 
     /**
@@ -294,6 +302,7 @@ public class User extends BaseEntity implements UserDetails {
     public User() {
         super();
         this.roles.add(Role.USER);
+        initializeAtomicCounter();
     }
 
     /**
@@ -308,6 +317,7 @@ public class User extends BaseEntity implements UserDetails {
         this.username = username;
         this.email = email;
         this.password = password;
+        initializeAtomicCounter();
     }
 
     /**
@@ -458,17 +468,34 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     /**
-     * Increments the failed login attempts counter.
+     * Initializes the atomic counter with the current failed login attempts value.
+     * Called during entity loading and construction.
      */
-    public void incrementFailedLoginAttempts() {
-        this.failedLoginAttempts = 
-            (this.failedLoginAttempts == null ? 0 : this.failedLoginAttempts + 1);
+    private void initializeAtomicCounter() {
+        int currentValue = (this.failedLoginAttempts != null) ? this.failedLoginAttempts : 0;
+        this.atomicFailedLoginAttempts = new AtomicInteger(currentValue);
     }
 
     /**
-     * Resets the failed login attempts counter.
+     * Increments the failed login attempts counter atomically.
+     * Thread-safe operation that updates both the atomic counter and persistent field.
+     */
+    public void incrementFailedLoginAttempts() {
+        if (this.atomicFailedLoginAttempts == null) {
+            initializeAtomicCounter();
+        }
+        this.failedLoginAttempts = this.atomicFailedLoginAttempts.incrementAndGet();
+    }
+
+    /**
+     * Resets the failed login attempts counter atomically.
+     * Thread-safe operation that updates both the atomic counter and persistent field.
      */
     public void resetFailedLoginAttempts() {
+        if (this.atomicFailedLoginAttempts == null) {
+            initializeAtomicCounter();
+        }
+        this.atomicFailedLoginAttempts.set(0);
         this.failedLoginAttempts = 0;
     }
 
@@ -859,6 +886,11 @@ public class User extends BaseEntity implements UserDetails {
      */
     public void setFailedLoginAttempts(Integer failedLoginAttempts) {
         this.failedLoginAttempts = failedLoginAttempts;
+        if (this.atomicFailedLoginAttempts == null) {
+            initializeAtomicCounter();
+        } else {
+            this.atomicFailedLoginAttempts.set(failedLoginAttempts != null ? failedLoginAttempts : 0);
+        }
     }
 
     /**

@@ -375,7 +375,7 @@ class UserTest {
             user.incrementFailedLoginAttempts();
 
             // Then
-            assertThat(user.getFailedLoginAttempts()).isEqualTo(0);
+            assertThat(user.getFailedLoginAttempts()).isEqualTo(1);
         }
 
         @Test

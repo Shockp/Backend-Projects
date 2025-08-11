@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * BlogPost entity representing a blog post with rich content,
@@ -158,6 +159,13 @@ public class BlogPost extends BaseEntity {
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    /**
+     * Atomic counter for thread-safe view count operations.
+     * Transient field that mirrors the persistent viewCount field.
+     */
+    @Transient
+    private transient AtomicLong atomicViewCount;
+
     @Min(value = 0, groups = Update.class)
     @Column(name = "reading_time_minutes", nullable = false)
     private Integer readingTimeMinutes = 0;
@@ -193,6 +201,7 @@ public class BlogPost extends BaseEntity {
 
     public BlogPost() {
         super();
+        initializeAtomicCounter();
     }
 
     public BlogPost(String title, String slug, String content, User author, Category category) {
@@ -202,11 +211,13 @@ public class BlogPost extends BaseEntity {
         this.content = content;
         this.author = author;
         this.category = category;
+        initializeAtomicCounter();
     }
 
     public BlogPost(String title, String slug, String content, User author, Category category, Set<Tag> tags) {
         this(title, slug, content, author, category);
         this.tags = tags;
+        initializeAtomicCounter();
     }
 
     // ==================== Getters and Setters ====================
@@ -297,6 +308,9 @@ public class BlogPost extends BaseEntity {
 
     public void setViewCount(Long viewCount) {
         this.viewCount = viewCount;
+        if (atomicViewCount != null) {
+            atomicViewCount.set(viewCount);
+        }
     }
 
     public Integer getReadingTimeMinutes() {
@@ -345,7 +359,17 @@ public class BlogPost extends BaseEntity {
      * Increment view count by one.
      */
     public void incrementViewCount() {
-        this.viewCount++;
+        if (atomicViewCount == null) {
+            initializeAtomicCounter();
+        }
+        this.viewCount = atomicViewCount.incrementAndGet();
+    }
+
+    /**
+     * Initialize the atomic counter with the current view count value.
+     */
+    private void initializeAtomicCounter() {
+        this.atomicViewCount = new AtomicLong(this.viewCount != null ? this.viewCount : 0L);
     }
 
     /**
