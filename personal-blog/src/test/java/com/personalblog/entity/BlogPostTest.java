@@ -1242,22 +1242,4 @@ class BlogPostTest {
         }
         return content.toString();
     }
-
-    /**
-     * Creates a mock Tag for testing purposes.
-     */
-    private Tag createMockTag(String name, String slug) {
-        Tag tag = new Tag();
-        // Since Tag is not implemented, we'll use a simple mock
-        return tag;
-    }
-
-    /**
-     * Creates a mock Comment for testing purposes.
-     */
-    private Comment createMockComment(String content) {
-        Comment comment = new Comment();
-        // Since Comment is not implemented, we'll use a simple mock
-        return comment;
-    }
 }
