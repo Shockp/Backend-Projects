@@ -67,7 +67,7 @@ Implement the core backend functionality including entities, repositories, servi
   - Comprehensive toString method
 
 #### 1.5 Tag Entity ⏳
-- [ ] Implement `Tag` entity with:
+- [x] Implement `Tag` entity with:
   - Name and slug
   - Description
   - Color code
