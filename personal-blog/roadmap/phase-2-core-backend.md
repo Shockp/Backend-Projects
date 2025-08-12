@@ -76,7 +76,7 @@ Implement the core backend functionality including entities, repositories, servi
   - JPA annotations
 
 #### 1.6 Comment Entity ⏳
-- [ ] Implement `Comment` entity with:
+- [x] Implement `Comment` entity with:
   - Content
   - Author information (User or guest)
   - Email for guest comments
@@ -88,7 +88,7 @@ Implement the core backend functionality including entities, repositories, servi
   - JPA annotations
 
 #### 1.7 RefreshToken Entity ⏳
-- [ ] Implement `RefreshToken` entity with:
+- [x] Implement `RefreshToken` entity with:
   - Token value (UUID)
   - Expiry date
   - User relationship
