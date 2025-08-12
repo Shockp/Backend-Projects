@@ -2,7 +2,6 @@
 
 **Status**: 🔄 In Progress  
 **Duration**: 1-2 weeks  
-**Completion**: 25%
 
 ## 🎯 Objectives
 
@@ -353,7 +352,7 @@ Implement the core backend functionality including entities, repositories, servi
 ## 🧪 Testing Tasks ⏳
 
 ### 1. Unit Tests ⏳
-- [ ] Entity tests with validation
+- [x] Entity tests with validation
 - [ ] Repository tests with test data
 - [ ] Service layer tests with mocking
 - [ ] DTO mapper tests
