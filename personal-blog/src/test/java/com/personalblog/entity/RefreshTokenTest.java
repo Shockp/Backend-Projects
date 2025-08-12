@@ -92,7 +92,12 @@ class RefreshTokenTest {
             assertThat(token.getUser()).isEqualTo(testUser);
             assertThat(token.getExpiryDate()).isEqualTo(expiry);
             assertThat(token.getTokenValue()).isNotNull();
+            assertThat(token.getEncryptedTokenValue()).isNotNull();
+            assertThat(token.getEncryptedTokenValue()).isNotEqualTo(token.getTokenValue());
             assertThat(token.getRevoked()).isFalse();
+            assertThat(token.getFailedAttempts()).isEqualTo(0);
+            assertThat(token.getUsageCount()).isEqualTo(0);
+            assertThat(token.getMarkedForCleanup()).isFalse();
         }
 
         @Test
@@ -465,6 +470,206 @@ class RefreshTokenTest {
     }
 
     @Nested
+    @DisplayName("Encryption Tests")
+    class EncryptionTests {
+        
+        @Test
+        @DisplayName("Should encrypt and decrypt token value correctly")
+        void tokenEncryption_ShouldWorkCorrectly() {
+            // Given
+            RefreshToken token = new RefreshToken();
+            String originalToken = "test-token-12345";
+            
+            // When
+            token.setTokenValue(originalToken);
+            
+            // Then
+            assertThat(token.getTokenValue()).isEqualTo(originalToken);
+            assertThat(token.getEncryptedTokenValue()).isNotNull();
+            assertThat(token.getEncryptedTokenValue()).isNotEqualTo(originalToken);
+            assertThat(token.getEncryptedTokenValue().length()).isGreaterThan(originalToken.length());
+        }
+        
+        @Test
+          @DisplayName("Should handle null token value in encryption")
+          void tokenEncryption_WithNullValue_ShouldHandleGracefully() {
+              // Given
+              RefreshToken token = new RefreshToken();
+              String originalToken = token.getTokenValue(); // Constructor generates UUID
+              assertThat(originalToken).isNotNull();
+              assertThat(token.getEncryptedTokenValue()).isNotNull();
+              
+              // When
+              token.setTokenValue(null);
+              
+              // Then
+              assertThat(token.getTokenValue()).isNull();
+              assertThat(token.getEncryptedTokenValue()).isNull();
+          }
+    }
+
+    @Nested
+    @DisplayName("Rate Limiting Tests")
+    class RateLimitingTests {
+        
+        @Test
+        @DisplayName("Should record successful usage correctly")
+        void recordSuccessfulUsage_ShouldUpdateCountersAndTimestamp() {
+            // Given
+            RefreshToken token = new RefreshToken();
+            token.setFailedAttempts(3);
+            token.setUsageCount(5);
+            token.setBlockedUntil(LocalDateTime.now().plusHours(1));
+            
+            // When
+            token.recordSuccessfulUsage();
+            
+            // Then
+            assertThat(token.getFailedAttempts()).isEqualTo(0);
+            assertThat(token.getUsageCount()).isEqualTo(6);
+            assertThat(token.getLastUsedAt()).isNotNull();
+            assertThat(token.getBlockedUntil()).isNull();
+        }
+        
+        @Test
+        @DisplayName("Should record failed attempt and block after max attempts")
+        void recordFailedAttempt_ShouldIncrementAndBlockAfterMax() {
+            // Given
+            RefreshToken token = new RefreshToken();
+            
+            // When - Record 4 failed attempts (below max)
+            for (int i = 0; i < 4; i++) {
+                token.recordFailedAttempt();
+            }
+            
+            // Then - Should not be blocked yet
+            assertThat(token.getFailedAttempts()).isEqualTo(4);
+            assertThat(token.isBlocked()).isFalse();
+            assertThat(token.hasExceededMaxAttempts()).isFalse();
+            
+            // When - Record 5th failed attempt (max reached)
+            token.recordFailedAttempt();
+            
+            
+            // Then - Should be blocked
+            assertThat(token.getFailedAttempts()).isEqualTo(5);
+            assertThat(token.isBlocked()).isTrue();
+            assertThat(token.hasExceededMaxAttempts()).isTrue();
+            assertThat(token.getBlockedUntil()).isNotNull();
+            assertThat(token.getBlockedUntil()).isAfter(LocalDateTime.now());
+        }
+        
+        @Test
+        @DisplayName("Should check if token is blocked correctly")
+        void isBlocked_ShouldReturnCorrectStatus() {
+            // Given
+            RefreshToken token = new RefreshToken();
+            
+            // When & Then - Not blocked initially
+            assertThat(token.isBlocked()).isFalse();
+            
+            // When - Set blocked until future time
+            token.setBlockedUntil(LocalDateTime.now().plusMinutes(30));
+            
+            // Then - Should be blocked
+            assertThat(token.isBlocked()).isTrue();
+            
+            // When - Set blocked until past time
+            token.setBlockedUntil(LocalDateTime.now().minusMinutes(30));
+            
+            // Then - Should not be blocked
+            assertThat(token.isBlocked()).isFalse();
+        }
+        
+        @Test
+        @DisplayName("Should validate token considering all security factors")
+        void isValid_ShouldConsiderAllSecurityFactors() {
+            // Given
+            RefreshToken token = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            
+            // When & Then - Initially valid
+            assertThat(token.isValid()).isTrue();
+            
+            // When - Token is revoked
+            token.revoke();
+            
+            // Then - Should be invalid
+            assertThat(token.isValid()).isFalse();
+            
+            // Given - Reset token
+            token = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            
+            // When - Token is blocked
+            token.setBlockedUntil(LocalDateTime.now().plusHours(1));
+            
+            // Then - Should be invalid
+            assertThat(token.isValid()).isFalse();
+            
+            // Given - Reset token
+            token = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            
+            // When - Max attempts exceeded
+            token.setFailedAttempts(5);
+            
+            // Then - Should be invalid
+            assertThat(token.isValid()).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("Cleanup Tests")
+    class CleanupTests {
+        
+        @Test
+        @DisplayName("Should mark token for cleanup")
+        void markForCleanup_ShouldSetFlag() {
+            // Given
+            RefreshToken token = new RefreshToken();
+            
+            // When
+            token.markForCleanup();
+            
+            // Then
+            assertThat(token.getMarkedForCleanup()).isTrue();
+        }
+        
+        @Test
+        @DisplayName("Should determine cleanup eligibility correctly")
+        void shouldBeCleanedUp_ShouldReturnCorrectStatus() {
+            // Test expired token
+            RefreshToken expiredToken = new RefreshToken(testUser, LocalDateTime.now().minusDays(1));
+            assertThat(expiredToken.shouldBeCleanedUp()).isTrue();
+            
+            // Test revoked token
+            RefreshToken revokedToken = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            revokedToken.revoke();
+            assertThat(revokedToken.shouldBeCleanedUp()).isTrue();
+            
+            // Test marked for cleanup token
+            RefreshToken markedToken = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            markedToken.markForCleanup();
+            assertThat(markedToken.shouldBeCleanedUp()).isTrue();
+            
+            // Test valid token
+            RefreshToken validToken = new RefreshToken(testUser, LocalDateTime.now().plusDays(1));
+            assertThat(validToken.shouldBeCleanedUp()).isFalse();
+        }
+        
+        @Test
+        @DisplayName("Should provide cleanup condition and batch size")
+        void staticCleanupMethods_ShouldProvideCorrectValues() {
+            // When & Then
+            assertThat(RefreshToken.getCleanupCondition()).isNotNull();
+            assertThat(RefreshToken.getCleanupCondition()).contains("expiry_date");
+            assertThat(RefreshToken.getCleanupCondition()).contains("revoked");
+            assertThat(RefreshToken.getCleanupCondition()).contains("marked_for_cleanup");
+            
+            assertThat(RefreshToken.getCleanupBatchSize()).isGreaterThan(0);
+            assertThat(RefreshToken.getCleanupBatchSize()).isEqualTo(1000);
+        }
+    }
+
+    @Nested
     @DisplayName("Edge Cases Tests")
     class EdgeCasesTests {
 
@@ -516,6 +721,18 @@ class RefreshTokenTest {
             
             // Should not throw exception
             assertThatNoException().isThrownBy(() -> UUID.fromString(tokenValue));
+        }
+        
+        @Test
+        @DisplayName("Should handle null expiry date gracefully")
+        void refreshToken_WithNullExpiryDate_ShouldHandleGracefully() {
+            // Given
+            RefreshToken token = new RefreshToken(testUser, null);
+            
+            // When & Then
+            assertThat(token.getExpiryDate()).isNull();
+            assertThat(token.isExpired()).isFalse(); // Should not be expired if no expiry date
+            assertThat(token.isValid()).isTrue(); // Should be valid if not expired and not revoked
         }
     }
 }
