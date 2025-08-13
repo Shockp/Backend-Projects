@@ -27,9 +27,9 @@ spring:
       enabled: true
       path: /h2-console
       
-  # Test Profile
-  profiles:
-    active: test
+  # Test Profile - Profile is activated by @ActiveProfiles annotation
+  # profiles:
+  #   active: test  # Removed - invalid in profile-specific resource
     
 # Logging Configuration
 logging:

@@ -208,8 +208,6 @@ public class RefreshToken extends BaseEntity {
      */
     public RefreshToken() {
         super();
-        this.tokenValue = UUID.randomUUID().toString();
-        this.encryptedTokenValue = encryptToken(this.tokenValue);
         this.revoked = false;
         this.failedAttempts = 0;
         this.usageCount = 0;
@@ -588,10 +586,20 @@ public class RefreshToken extends BaseEntity {
      }
  
      /**
-      * JPA callback to encrypt token before persisting to database.
+      * JPA callback to process token before persisting/updating to database.
+      * Combines validation, encryption, and default value setting.
       */
      @PrePersist
      @PreUpdate
+     private void processToken() {
+         setDefaults();
+         validateToken();
+         encryptTokenValue();
+     }
+     
+     /**
+      * Encrypts token value if needed.
+      */
      private void encryptTokenValue() {
          if (tokenValue != null && (encryptedTokenValue == null || encryptedTokenValue.isEmpty())) {
              this.encryptedTokenValue = encryptToken(tokenValue);
@@ -658,10 +666,8 @@ public class RefreshToken extends BaseEntity {
     // ==================== Validation Methods ====================
 
     /**
-     * Validates token before persist/update operations.
+     * Validates token data.
      */
-    @PrePersist
-    @PreUpdate
     private void validateToken() {
         if (tokenValue == null || tokenValue.trim().isEmpty()) {
             throw new IllegalStateException("Token value cannot be null or empty");
@@ -679,7 +685,6 @@ public class RefreshToken extends BaseEntity {
     /**
      * Sets default values before persisting.
      */
-    @PrePersist
     private void setDefaults() {
         if (revoked == null) {
             revoked = false;

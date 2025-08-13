@@ -282,7 +282,7 @@ public class User extends BaseEntity implements UserDetails {
      * Comments made by this user.
      * One user can have many comments.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, 
+    @OneToMany(mappedBy = "authorUser", cascade = CascadeType.ALL, 
     fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 

@@ -499,11 +499,20 @@ public class Comment extends BaseEntity {
     // ==================== Validation Methods ====================
 
     /**
-     * Validates that either authorUser or guest author information is provided.
-     * Called before persist/update operations.
+     * Validates comment data before persist/update operations.
+     * Combines author validation, hierarchy validation, and content security checks.
      */
     @PrePersist
     @PreUpdate
+    private void validateComment() {
+        validateAuthorInformation();
+        validateCommentHierarchy();
+        validateContent();
+    }
+
+    /**
+     * Validates that either authorUser or guest author information is provided.
+     */
     private void validateAuthorInformation() {
         if (authorUser == null && (authorName == null || authorName.trim().isEmpty())) {
             throw new IllegalStateException("Either authorUser or authorName must be provided");
@@ -515,10 +524,7 @@ public class Comment extends BaseEntity {
 
     /**
      * Validates comment hierarchy to prevent circular references.
-     * Called before persist/update operations.
      */
-    @PrePersist
-    @PreUpdate
     private void validateCommentHierarchy() {
         if (parentComment != null) {
             // Prevent self-reference
@@ -545,10 +551,7 @@ public class Comment extends BaseEntity {
 
     /**
      * Validates content for security and quality.
-     * Called before persist/update operations.
      */
-    @PrePersist
-    @PreUpdate
     private void validateContent() {
         if (content != null) {
             // Check for potential XSS patterns

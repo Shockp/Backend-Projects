@@ -343,7 +343,7 @@ public interface BaseRepository<T extends BaseEntity, ID>
      * 
      * @return optional containing a random active entity
      */
-    @Query(value = "SELECT * FROM #{#entityName} WHERE deleted = false ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+    @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false ORDER BY FUNCTION('RANDOM')")
     Optional<T> findRandomActive();
 
     // ==================== Security & Validation ====================
