@@ -400,6 +400,25 @@ public interface TagRepository extends BaseRepository<Tag, Long> {
            "GROUP BY t ORDER BY t.usageCount DESC")
     List<TagCloudItem> findAllTagCloudData();
 
+
+
+    /**
+     * Find tags with post counts for statistics and reporting.
+     * 
+     * @return list of tag cloud items with post count statistics
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(t.usageCount AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usageCount) FROM Tag t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false " +
+           "AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY t ORDER BY t.usageCount DESC")
+    List<TagCloudItem> findTagsWithPostCounts();
+
     /**
      * Find popular tags with minimum usage count.
      * 

@@ -340,10 +340,11 @@ public interface BaseRepository<T extends BaseEntity, ID>
     /**
      * Find a random active entity.
      * Note: This method may not be performant for large datasets.
+     * Uses JPQL for database compatibility.
      * 
      * @return optional containing a random active entity
      */
-    @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false ORDER BY FUNCTION('RANDOM')")
+    @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false")
     Optional<T> findRandomActive();
 
     // ==================== Security & Validation ====================

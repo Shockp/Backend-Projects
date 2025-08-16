@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -109,9 +110,9 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
                     createRefreshToken(testUser1, "device3", false, true));
 
             // When
-            Optional<RefreshToken> foundValid = refreshTokenRepository.findValidToken(validToken.getTokenValue());
-            Optional<RefreshToken> foundExpired = refreshTokenRepository.findValidToken(expiredToken.getTokenValue());
-            Optional<RefreshToken> foundRevoked = refreshTokenRepository.findValidToken(revokedToken.getTokenValue());
+            Optional<RefreshToken> foundValid = refreshTokenRepository.findValidTokenByValue(validToken.getTokenValue());
+            Optional<RefreshToken> foundExpired = refreshTokenRepository.findValidTokenByValue(expiredToken.getTokenValue());
+            Optional<RefreshToken> foundRevoked = refreshTokenRepository.findValidTokenByValue(revokedToken.getTokenValue());
 
             // Then
             assertThat(foundValid).isPresent();
@@ -135,8 +136,8 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             pastToken = refreshTokenRepository.save(pastToken);
 
             // When
-            Optional<RefreshToken> validFutureToken = refreshTokenRepository.findValidToken(futureToken.getTokenValue());
-            Optional<RefreshToken> invalidPastToken = refreshTokenRepository.findValidToken(pastToken.getTokenValue());
+            Optional<RefreshToken> validFutureToken = refreshTokenRepository.findValidTokenByValue(futureToken.getTokenValue());
+            Optional<RefreshToken> invalidPastToken = refreshTokenRepository.findValidTokenByValue(pastToken.getTokenValue());
 
             // Then
             assertThat(validFutureToken).isPresent();
@@ -155,7 +156,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             refreshTokenRepository.save(token);
 
             // When
-            Optional<RefreshToken> foundToken = refreshTokenRepository.findValidToken(token.getTokenValue());
+            Optional<RefreshToken> foundToken = refreshTokenRepository.findValidTokenByValue(token.getTokenValue());
 
             // Then
             assertThat(foundToken).isEmpty();
@@ -181,8 +182,8 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
                     createRefreshToken(testUser2, "device4", false, false));
 
             // When
-            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
-            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser2.getId());
+            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
+            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser2.getId());
 
             // Then
             assertThat(user1ActiveTokens).hasSize(2);
@@ -206,17 +207,17 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
                     createRefreshToken(testUser2, deviceId, false, false));
 
             // When
-            Optional<RefreshToken> user1DeviceToken = refreshTokenRepository.findByUserIdAndDeviceId(
+            List<RefreshToken> user1DeviceTokens = refreshTokenRepository.findByUserIdAndDeviceId(
                     testUser1.getId(), deviceId);
-            Optional<RefreshToken> user2DeviceToken = refreshTokenRepository.findByUserIdAndDeviceId(
+            List<RefreshToken> user2DeviceTokens = refreshTokenRepository.findByUserIdAndDeviceId(
                     testUser2.getId(), deviceId);
 
             // Then
-            assertThat(user1DeviceToken).isPresent();
-            assertThat(user1DeviceToken.get().getUser().getId()).isEqualTo(testUser1.getId());
+            assertThat(user1DeviceTokens).hasSize(1);
+            assertThat(user1DeviceTokens.get(0).getUser().getId()).isEqualTo(testUser1.getId());
 
-            assertThat(user2DeviceToken).isPresent();
-            assertThat(user2DeviceToken.get().getUser().getId()).isEqualTo(testUser2.getId());
+            assertThat(user2DeviceTokens).hasSize(1);
+            assertThat(user2DeviceTokens.get(0).getUser().getId()).isEqualTo(testUser2.getId());
         }
 
         @Test
@@ -299,7 +300,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             refreshTokenRepository.save(suspiciousToken2);
 
             // When
-            List<RefreshToken> suspiciousTokens = refreshTokenRepository.findTokensWithHighFailedAttempts(5);
+            List<RefreshToken> suspiciousTokens = refreshTokenRepository.findTokensWithFailedAttempts(5);
 
             // Then
             assertThat(suspiciousTokens).hasSize(2);
@@ -329,7 +330,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             refreshTokenRepository.save(markedToken);
 
             // When
-            List<RefreshToken> tokensForCleanup = refreshTokenRepository.findExpiredOrMarkedTokens();
+            List<RefreshToken> tokensForCleanup = refreshTokenRepository.findTokensEligibleForCleanup();
 
             // Then
             assertThat(tokensForCleanup).hasSize(2);
@@ -358,7 +359,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
 
             // When
             LocalDateTime cutoffDate = LocalDateTime.now().minusDays(7);
-            int deletedCount = refreshTokenRepository.permanentlyDeleteOldTokens(cutoffDate);
+            int deletedCount = refreshTokenRepository.cleanupOldTokens(cutoffDate);
 
             // Then
             assertThat(deletedCount).isEqualTo(1); // Only old deleted token
@@ -389,11 +390,11 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(revokedCount).isEqualTo(2);
 
             // Verify user1 tokens are revoked
-            List<RefreshToken> user1Tokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
+            List<RefreshToken> user1Tokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
             assertThat(user1Tokens).isEmpty();
 
             // Verify user2 tokens are still active
-            List<RefreshToken> user2Tokens = refreshTokenRepository.findActiveTokensByUserId(testUser2.getId());
+            List<RefreshToken> user2Tokens = refreshTokenRepository.findValidTokensByUserId(testUser2.getId());
             assertThat(user2Tokens).hasSize(1);
         }
 
@@ -418,11 +419,11 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(revokedCount).isEqualTo(numberOfTokens);
 
             // Verify all user1 tokens are revoked
-            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
+            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
             assertThat(user1ActiveTokens).isEmpty();
 
             // Verify user2 tokens are unaffected
-            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser2.getId());
+            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser2.getId());
             assertThat(user2ActiveTokens).hasSize(2);
         }
     }
@@ -453,7 +454,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             executor.awaitTermination(10, TimeUnit.SECONDS);
 
             // Then
-            List<RefreshToken> userTokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
+            List<RefreshToken> userTokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
             assertThat(userTokens).hasSize(numberOfTokens);
 
             // Verify all device IDs are unique
@@ -465,7 +466,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Should handle concurrent token validation")
-        void shouldHandleConcurrentTokenValidation() throws InterruptedException {
+        void shouldHandleConcurrentTokenValidation() throws InterruptedException, ExecutionException {
             // Given
             RefreshToken token = refreshTokenRepository.save(
                     createRefreshToken(testUser1, "device1", false, false));
@@ -477,7 +478,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             CompletableFuture<Optional<RefreshToken>>[] futures = new CompletableFuture[numberOfValidations];
             for (int i = 0; i < numberOfValidations; i++) {
                 futures[i] = CompletableFuture.supplyAsync(() -> {
-                    return refreshTokenRepository.findValidToken(token.getTokenValue());
+                    return refreshTokenRepository.findValidTokenByValue(token.getTokenValue());
                 }, executor);
             }
 
@@ -495,7 +496,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Should handle concurrent revocation operations")
-        void shouldHandleConcurrentRevocationOperations() throws InterruptedException {
+        void shouldHandleConcurrentRevocationOperations() throws InterruptedException, ExecutionException {
             // Given - Create tokens for multiple users
             for (int i = 0; i < 5; i++) {
                 refreshTokenRepository.save(createRefreshToken(testUser1, "user1-device" + i, false, false));
@@ -522,8 +523,8 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(user2Revocation.get()).isEqualTo(5);
 
             // Verify all tokens are revoked
-            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
-            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findActiveTokensByUserId(testUser2.getId());
+            List<RefreshToken> user1ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
+            List<RefreshToken> user2ActiveTokens = refreshTokenRepository.findValidTokensByUserId(testUser2.getId());
 
             assertThat(user1ActiveTokens).isEmpty();
             assertThat(user2ActiveTokens).isEmpty();
@@ -548,8 +549,8 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             // When - Query operations
             long startTime = System.currentTimeMillis();
             
-            List<RefreshToken> user1Tokens = refreshTokenRepository.findActiveTokensByUserId(testUser1.getId());
-            List<RefreshToken> user2Tokens = refreshTokenRepository.findActiveTokensByUserId(testUser2.getId());
+            List<RefreshToken> user1Tokens = refreshTokenRepository.findValidTokensByUserId(testUser1.getId());
+            List<RefreshToken> user2Tokens = refreshTokenRepository.findValidTokensByUserId(testUser2.getId());
             List<RefreshToken> allTokens = refreshTokenRepository.findAll();
             
             long endTime = System.currentTimeMillis();
@@ -590,7 +591,7 @@ class RefreshTokenRepositoryIntegrationTest extends BaseIntegrationTest {
             // When - Cleanup operations
             long startTime = System.currentTimeMillis();
             
-            List<RefreshToken> tokensForCleanup = refreshTokenRepository.findExpiredOrMarkedTokens();
+            List<RefreshToken> tokensForCleanup = refreshTokenRepository.findTokensEligibleForCleanup();
             
             long endTime = System.currentTimeMillis();
 

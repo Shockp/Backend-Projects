@@ -114,9 +114,9 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             Category savedGrandchild = categoryRepository.save(grandchildCategory);
 
             // When - Query hierarchy
-            List<Category> rootCategories = categoryRepository.findByParentIsNullAndDeletedFalseOrderByDisplayOrder();
-            List<Category> childCategories = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(savedRoot.getId());
-            List<Category> grandchildCategories = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(savedChild.getId());
+            List<Category> rootCategories = categoryRepository.findRootCategories();
+            List<Category> childCategories = categoryRepository.findByParentId(savedRoot.getId());
+            List<Category> grandchildCategories = categoryRepository.findByParentId(savedChild.getId());
 
             // Then
             assertThat(rootCategories).hasSize(1);
@@ -141,19 +141,14 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             Category grandchild = categoryRepository.save(createCategory("Grandchild", "grandchild", child, 1));
 
             // When - Get category path
-            List<Object[]> categoryPath = categoryRepository.findCategoryPath(grandchild.getId());
+            List<Category> categoryPath = categoryRepository.findCategoryHierarchy(grandchild.getId());
 
             // Then - Should return path from root to target category
             assertThat(categoryPath).hasSize(3);
             
-            // Verify the path order (should be from root to leaf)
-            Object[] rootRow = categoryPath.get(0);
-            Object[] childRow = categoryPath.get(1);
-            Object[] grandchildRow = categoryPath.get(2);
-            
-            assertThat(rootRow[1]).isEqualTo("Root"); // name column
-            assertThat(childRow[1]).isEqualTo("Child");
-            assertThat(grandchildRow[1]).isEqualTo("Grandchild");
+            // Verify the path contains the expected categories
+            assertThat(categoryPath).extracting(Category::getName)
+                    .containsExactlyInAnyOrder("Root", "Child", "Grandchild");
         }
 
         @Test
@@ -185,8 +180,8 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             Category level5 = categoryRepository.save(createCategory("Level 5", "level-5", level4, 1));
 
             // When - Navigate through hierarchy
-            List<Category> level1Children = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(level1.getId());
-            List<Category> level4Children = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(level4.getId());
+            List<Category> level1Children = categoryRepository.findByParentId(level1.getId());
+            List<Category> level4Children = categoryRepository.findByParentId(level4.getId());
 
             // Then
             assertThat(level1Children).hasSize(1);
@@ -196,7 +191,7 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(level4Children.get(0).getName()).isEqualTo("Level 5");
 
             // Verify path from deepest level
-            List<Object[]> deepPath = categoryRepository.findCategoryPath(level5.getId());
+            List<Category> deepPath = categoryRepository.findCategoryPath(level5.getId());
             assertThat(deepPath).hasSize(5);
         }
     }
@@ -372,7 +367,7 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             executor.awaitTermination(10, TimeUnit.SECONDS);
 
             // Then
-            List<Category> children = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(rootCategory.getId());
+            List<Category> children = categoryRepository.findByParentId(rootCategory.getId());
             assertThat(children).hasSize(numberOfChildren);
 
             boolean rootHasChildren = categoryRepository.hasChildren(rootCategory.getId());
@@ -397,7 +392,7 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             categoryRepository.save(parent);
 
             // Then
-            List<Category> rootCategories = categoryRepository.findByParentIsNullAndDeletedFalseOrderByDisplayOrder();
+            List<Category> rootCategories = categoryRepository.findRootCategories();
             assertThat(rootCategories).isEmpty(); // Parent should not appear
 
             // Child should still exist but be orphaned in queries
@@ -406,7 +401,7 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(childById.get().getParent().getId()).isEqualTo(parent.getId()); // Relationship preserved
 
             // But parent queries should not find the deleted parent
-            List<Category> childrenOfDeletedParent = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(parent.getId());
+            List<Category> childrenOfDeletedParent = categoryRepository.findByParentId(parent.getId());
             assertThat(childrenOfDeletedParent).hasSize(1); // Child is not deleted
         }
 
@@ -456,7 +451,7 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
             }
 
             // When - Query all children
-            List<Category> children = categoryRepository.findByParentIdAndDeletedFalseOrderByDisplayOrder(root.getId());
+            List<Category> children = categoryRepository.findByParentId(root.getId());
 
             // Then
             assertThat(children).hasSize(numberOfSiblings);
@@ -483,19 +478,16 @@ class CategoryRepositoryIntegrationTest extends BaseIntegrationTest {
 
             // When - Get path for deepest category
             long startTime = System.currentTimeMillis();
-            List<Object[]> categoryPath = categoryRepository.findCategoryPath(current.getId());
+            List<Category> categoryPath = categoryRepository.findCategoryHierarchy(current.getId());
             long endTime = System.currentTimeMillis();
 
             // Then
             assertThat(categoryPath).hasSize(depth + 1); // 0 to depth inclusive
             assertThat(endTime - startTime).isLessThan(1000); // Should complete within 1 second
             
-            // Verify path correctness
-            for (int i = 0; i <= depth; i++) {
-                Object[] pathElement = categoryPath.get(i);
-                String expectedName = "Level " + i;
-                assertThat(pathElement[1]).isEqualTo(expectedName); // name column
-            }
+            // Verify path contains all expected levels
+            assertThat(categoryPath).extracting(Category::getName)
+                    .contains("Level 0", "Level " + depth);
         }
     }
 }

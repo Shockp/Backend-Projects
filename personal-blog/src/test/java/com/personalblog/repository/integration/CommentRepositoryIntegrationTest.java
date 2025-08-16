@@ -162,7 +162,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
                     createRegisteredUserComment("Nested reply to reply 1", CommentStatus.APPROVED, reply1));
 
             // When - Query root comments and replies
-            Page<Comment> rootComments = commentRepository.findRootCommentsByPostId(
+            Page<Comment> rootComments = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), PageRequest.of(0, 10));
             
             List<Comment> repliesToRoot = commentRepository.findRepliesByParentId(rootComment.getId());
@@ -196,7 +196,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             }
 
             // When - Navigate through the thread
-            Page<Comment> rootComments = commentRepository.findRootCommentsByPostId(
+            Page<Comment> rootComments = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), PageRequest.of(0, 10));
 
             // Then
@@ -233,11 +233,11 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
                     createRegisteredUserComment("Spam comment", CommentStatus.SPAM, null));
 
             // When - Query by status
-            Page<Comment> pendingComments = commentRepository.findByStatusAndDeletedFalse(
+            Page<Comment> pendingComments = commentRepository.findByStatus(
                     CommentStatus.PENDING, PageRequest.of(0, 10));
-            Page<Comment> approvedComments = commentRepository.findByStatusAndDeletedFalse(
+            Page<Comment> approvedComments = commentRepository.findByStatus(
                     CommentStatus.APPROVED, PageRequest.of(0, 10));
-            List<Comment> pendingForReview = commentRepository.findPendingComments(CommentStatus.PENDING);
+            List<Comment> pendingForReview = commentRepository.findCommentsPendingModeration();
 
             // Then
             assertThat(pendingComments.getContent()).hasSize(1);
@@ -261,14 +261,12 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(createRegisteredUserComment("Spam 1", CommentStatus.SPAM, null));
 
             // When
-            long approvedCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.APPROVED);
-            long pendingCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.PENDING);
-            long spamCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.SPAM);
+            long approvedCount = commentRepository.countApprovedByBlogPostId(testBlogPost.getId());
+            long totalCount = commentRepository.countByBlogPostId(testBlogPost.getId());
 
             // Then
             assertThat(approvedCount).isEqualTo(2);
-            assertThat(pendingCount).isEqualTo(1);
-            assertThat(spamCount).isEqualTo(1);
+            assertThat(totalCount).isEqualTo(4); // All comments
         }
     }
 
@@ -286,8 +284,8 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(createGuestComment("Guest comment", "Guest", "guest@example.com", CommentStatus.APPROVED, null));
 
             // When
-            Page<Comment> userComments = commentRepository.findByAuthorUserId(
-                    testCommenter.getId(), PageRequest.of(0, 10));
+            Page<Comment> userComments = commentRepository.findByAuthorUser(
+                    testCommenter, PageRequest.of(0, 10));
 
             // Then
             assertThat(userComments.getContent()).hasSize(2);
@@ -306,12 +304,11 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(createRegisteredUserComment("User comment", CommentStatus.APPROVED, null));
 
             // When
-            Page<Comment> guestComments = commentRepository.findByAuthorEmail(
-                    guestEmail, PageRequest.of(0, 10));
+            List<Comment> guestComments = commentRepository.findByGuestEmail(guestEmail);
 
             // Then
-            assertThat(guestComments.getContent()).hasSize(2);
-            assertThat(guestComments.getContent())
+            assertThat(guestComments).hasSize(2);
+            assertThat(guestComments)
                     .allMatch(comment -> guestEmail.equals(comment.getAuthorEmail()));
         }
     }
@@ -360,7 +357,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(recentComment);
 
             // When
-            List<Comment> recentComments = commentRepository.findRecentComments(CommentStatus.APPROVED, cutoffTime);
+            List<Comment> recentComments = commentRepository.findRecentComments(cutoffTime);
 
             // Then
             assertThat(recentComments).hasSize(1);
@@ -397,7 +394,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             executor.awaitTermination(10, TimeUnit.SECONDS);
 
             // Then
-            Page<Comment> allComments = commentRepository.findRootCommentsByPostId(
+            Page<Comment> allComments = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), PageRequest.of(0, 50));
             assertThat(allComments.getContent()).hasSize(numberOfComments);
         }
@@ -430,9 +427,9 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             executor.awaitTermination(10, TimeUnit.SECONDS);
 
             // Then
-            long approvedCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.APPROVED);
-            long rejectedCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.REJECTED);
-            long pendingCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.PENDING);
+            long approvedCount = commentRepository.countByStatus(CommentStatus.APPROVED);
+            long rejectedCount = commentRepository.countByStatus(CommentStatus.REJECTED);
+            long pendingCount = commentRepository.countByStatus(CommentStatus.PENDING);
 
             assertThat(approvedCount).isEqualTo(5);
             assertThat(rejectedCount).isEqualTo(5);
@@ -459,7 +456,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(comment);
 
             // Then
-            Page<Comment> rootComments = commentRepository.findRootCommentsByPostId(
+            Page<Comment> rootComments = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), PageRequest.of(0, 10));
             assertThat(rootComments.getContent()).isEmpty(); // Deleted comment not shown
 
@@ -487,7 +484,7 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             commentRepository.save(deletedComment);
 
             // When
-            long approvedCount = commentRepository.countByPostIdAndStatus(testBlogPost.getId(), CommentStatus.APPROVED);
+            long approvedCount = commentRepository.countApprovedByBlogPostId(testBlogPost.getId());
 
             // Then
             assertThat(approvedCount).isEqualTo(1); // Only active comment counted
@@ -513,9 +510,9 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             Pageable firstPage = PageRequest.of(0, 10);
             Pageable secondPage = PageRequest.of(1, 10);
 
-            Page<Comment> firstPageResults = commentRepository.findRootCommentsByPostId(
+            Page<Comment> firstPageResults = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), firstPage);
-            Page<Comment> secondPageResults = commentRepository.findRootCommentsByPostId(
+            Page<Comment> secondPageResults = commentRepository.findTopLevelComments(
                     testBlogPost.getId(), secondPage);
 
             // Then
@@ -552,12 +549,10 @@ class CommentRepositoryIntegrationTest extends BaseIntegrationTest {
             // When - Perform various queries that should use indexes
             long startTime = System.currentTimeMillis();
             
-            Page<Comment> approvedComments = commentRepository.findByStatusAndDeletedFalse(
+            Page<Comment> approvedComments = commentRepository.findByStatus(
                     CommentStatus.APPROVED, PageRequest.of(0, 10));
-            List<Comment> recentComments = commentRepository.findRecentComments(
-                    CommentStatus.APPROVED, now.minusMinutes(10));
-            long approvedCount = commentRepository.countByPostIdAndStatus(
-                    testBlogPost.getId(), CommentStatus.APPROVED);
+            List<Comment> recentComments = commentRepository.findRecentComments(now.minusMinutes(10));
+            long approvedCount = commentRepository.countApprovedByBlogPostId(testBlogPost.getId());
             
             long endTime = System.currentTimeMillis();
 

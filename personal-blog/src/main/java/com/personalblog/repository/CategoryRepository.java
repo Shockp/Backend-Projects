@@ -48,6 +48,41 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
     Optional<Category> findBySlug(@Param("slug") String slug);
 
     /**
+     * Find non-deleted category by slug.
+     * 
+     * @param slug the category slug
+     * @return optional category
+     */
+    @Query("SELECT c FROM Category c WHERE c.slug = :slug AND c.deleted = false")
+    Optional<Category> findBySlugAndDeletedFalse(@Param("slug") String slug);
+
+    /**
+     * Check if slug exists and is not deleted.
+     * 
+     * @param slug the category slug
+     * @return true if slug exists and is not deleted
+     */
+    @Query("SELECT COUNT(c) > 0 FROM Category c WHERE c.slug = :slug AND c.deleted = false")
+    boolean existsBySlugAndDeletedFalse(@Param("slug") String slug);
+
+    /**
+     * Find category path from root to specified category.
+     * 
+     * @param categoryId the category ID
+     * @return list of categories from root to target
+     */
+    @Query(value = "WITH RECURSIVE category_path AS (" +
+           "  SELECT c.id, c.name, c.slug, c.parent_id, 0 as level " +
+           "  FROM categories c WHERE c.id = :categoryId AND c.deleted = false " +
+           "  UNION ALL " +
+           "  SELECT p.id, p.name, p.slug, p.parent_id, cp.level + 1 " +
+           "  FROM categories p " +
+           "  INNER JOIN category_path cp ON p.id = cp.parent_id " +
+           "  WHERE p.deleted = false" +
+           ") SELECT * FROM categories WHERE id IN (SELECT id FROM category_path) ORDER BY level DESC", nativeQuery = true)
+    List<Category> findCategoryPath(@Param("categoryId") Long categoryId);
+
+    /**
      * Check if slug exists.
      * 
      * @param slug the slug to check
@@ -75,6 +110,14 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
      */
     @Query("SELECT c FROM Category c WHERE c.parent IS NULL AND c.deleted = false ORDER BY c.displayOrder ASC")
     List<Category> findRootCategories();
+
+    /**
+     * Find root categories ordered by display order (alternative method name).
+     * 
+     * @return list of root categories ordered by display order
+     */
+    @Query("SELECT c FROM Category c WHERE c.parent IS NULL AND c.deleted = false ORDER BY c.displayOrder ASC")
+    List<Category> findByParentIsNullAndDeletedFalseOrderByDisplayOrder();
 
     /**
      * Find root categories with pagination.

@@ -9,6 +9,7 @@ import com.personalblog.repository.BlogPostRepository;
 import com.personalblog.repository.CategoryRepository;
 import com.personalblog.repository.TagRepository;
 import com.personalblog.repository.UserRepository;
+import com.personalblog.repository.projection.TagCloudItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -131,8 +132,8 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             Tag savedSpringTag = tagRepository.save(springTag);
 
             // Then
-            Optional<Tag> foundJavaTag = tagRepository.findByNameAndDeletedFalse("Java");
-            Optional<Tag> foundSpringTag = tagRepository.findBySlugAndDeletedFalse("spring");
+            Optional<Tag> foundJavaTag = tagRepository.findByNameIgnoreCase("Java");
+            Optional<Tag> foundSpringTag = tagRepository.findBySlug("spring");
 
             assertThat(foundJavaTag).isPresent();
             assertThat(foundJavaTag.get().getUsageCount()).isEqualTo(5);
@@ -158,7 +159,7 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             }).isInstanceOf(Exception.class);
 
             // Verify original tag still exists
-            Optional<Tag> existing = tagRepository.findBySlugAndDeletedFalse("java");
+            Optional<Tag> existing = tagRepository.findBySlug("java");
             assertThat(existing).isPresent();
             assertThat(existing.get().getName()).isEqualTo("Java");
         }
@@ -171,8 +172,8 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             Tag tag = tagRepository.save(createTag("Python", "python", 2));
 
             // When
-            boolean existsByName = tagRepository.existsByNameAndDeletedFalse("Python");
-            boolean notExistsByName = tagRepository.existsByNameAndDeletedFalse("NonExistent");
+            boolean existsByName = tagRepository.existsByNameIgnoreCase("Python");
+            boolean notExistsByName = tagRepository.existsByNameIgnoreCase("NonExistent");
 
             // Then
             assertThat(existsByName).isTrue();
@@ -196,7 +197,7 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
 
             // When
             Pageable pageable = PageRequest.of(0, 3);
-            Page<Tag> mostUsedTags = tagRepository.findMostUsedTags(pageable);
+            Page<Tag> mostUsedTags = tagRepository.findMostPopular(pageable);
 
             // Then
             assertThat(mostUsedTags.getContent()).hasSize(3); // Excludes unused tag
@@ -222,14 +223,14 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             blogPostRepository.saveAll(Arrays.asList(post1, post2, post3));
 
             // When
-            List<Object[]> tagsWithCounts = tagRepository.findTagsWithPostCounts();
+            List<Object[]> tagsWithCounts = tagRepository.getTagUsageStatistics();
 
             // Then
             assertThat(tagsWithCounts).hasSize(3);
 
             for (Object[] result : tagsWithCounts) {
                 Tag tag = (Tag) result[0];
-                Long count = (Long) result[1];
+                Long count = (Long) result[2]; // Third element is actual post count
 
                 switch (tag.getName()) {
                     case "Java" -> assertThat(count).isEqualTo(3L);
@@ -274,9 +275,9 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             Tag pythonTag = tagRepository.save(createTag("Python", "python", 5));
 
             // When
-            List<Tag> javaResults = tagRepository.findByNameStartingWithIgnoreCase("ja");
-            List<Tag> pythonResults = tagRepository.findByNameStartingWithIgnoreCase("py");
-            List<Tag> noResults = tagRepository.findByNameStartingWithIgnoreCase("xyz");
+            List<Tag> javaResults = tagRepository.searchByName("ja");
+            List<Tag> pythonResults = tagRepository.searchByName("py");
+            List<Tag> noResults = tagRepository.searchByName("xyz");
 
             // Then
             assertThat(javaResults).hasSize(2);
@@ -297,9 +298,9 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             Tag tag = tagRepository.save(createTag("JavaScript", "javascript", 5));
 
             // When
-            List<Tag> upperCaseResults = tagRepository.findByNameStartingWithIgnoreCase("JAVA");
-            List<Tag> lowerCaseResults = tagRepository.findByNameStartingWithIgnoreCase("java");
-            List<Tag> mixedCaseResults = tagRepository.findByNameStartingWithIgnoreCase("JaVa");
+            List<Tag> upperCaseResults = tagRepository.searchByName("JAVA");
+            List<Tag> lowerCaseResults = tagRepository.searchByName("java");
+            List<Tag> mixedCaseResults = tagRepository.searchByName("JaVa");
 
             // Then
             assertThat(upperCaseResults).hasSize(1);
@@ -362,15 +363,15 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             blogPostRepository.saveAll(Arrays.asList(post1, post2, post3));
 
             // When
-            List<Object[]> tagsWithCounts = tagRepository.findTagsWithPostCounts();
+            List<TagCloudItem> tagsWithCounts = tagRepository.findTagsWithPostCounts();
 
             // Then
             assertThat(tagsWithCounts).hasSize(1);
-            Object[] result = tagsWithCounts.get(0);
-            Tag tag = (Tag) result[0];
-            Long count = (Long) result[1];
+            TagCloudItem result = tagsWithCounts.get(0);
+            String tagName = result.getName();
+            Long count = result.getActualPostCount();
 
-            assertThat(tag.getName()).isEqualTo("Popular");
+            assertThat(tagName).isEqualTo("Popular");
             assertThat(count).isEqualTo(3L);
         }
 
@@ -389,13 +390,13 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             blogPostRepository.save(deletedPost);
 
             // When
-            List<Object[]> tagsWithCounts = tagRepository.findTagsWithPostCounts();
+            List<Object[]> tagsWithCounts = tagRepository.getTagUsageStatistics();
 
             // Then
             assertThat(tagsWithCounts).hasSize(1);
             Object[] result = tagsWithCounts.get(0);
             Tag resultTag = (Tag) result[0];
-            Long count = (Long) result[1];
+            Long count = (Long) result[2]; // Third element is actual post count
 
             assertThat(resultTag.getName()).isEqualTo("Test Tag");
             assertThat(count).isEqualTo(1L); // Only active post counted
@@ -488,8 +489,8 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             tagRepository.save(toDeleteTag);
 
             // Then
-            Optional<Tag> foundActive = tagRepository.findByNameAndDeletedFalse("Active Tag");
-            Optional<Tag> foundDeleted = tagRepository.findByNameAndDeletedFalse("To Delete Tag");
+            Optional<Tag> foundActive = tagRepository.findByNameIgnoreCase("Active Tag");
+            Optional<Tag> foundDeleted = tagRepository.findByNameIgnoreCase("To Delete Tag");
 
             assertThat(foundActive).isPresent();
             assertThat(foundDeleted).isEmpty();
@@ -500,7 +501,7 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(deletedById.get().isDeleted()).isTrue();
 
             // Most used tags should not include deleted tags
-            Page<Tag> mostUsedTags = tagRepository.findMostUsedTags(PageRequest.of(0, 10));
+            Page<Tag> mostUsedTags = tagRepository.findMostPopular(PageRequest.of(0, 10));
             assertThat(mostUsedTags.getContent()).hasSize(1);
             assertThat(mostUsedTags.getContent().get(0).getName()).isEqualTo("Active Tag");
         }
@@ -519,7 +520,7 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             tagRepository.save(tag);
 
             // Then
-            Optional<Tag> deletedTag = tagRepository.findByNameAndDeletedFalse("Tag with Posts");
+            Optional<Tag> deletedTag = tagRepository.findByNameIgnoreCase("Tag with Posts");
             assertThat(deletedTag).isEmpty();
 
             // Post should still exist and reference the tag
@@ -529,7 +530,7 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             assertThat(existingPost.get().getTags().iterator().next().getId()).isEqualTo(tag.getId());
 
             // Tag count queries should not include deleted tags
-            List<Object[]> tagsWithCounts = tagRepository.findTagsWithPostCounts();
+            List<Object[]> tagsWithCounts = tagRepository.getTagUsageStatistics();
             assertThat(tagsWithCounts).isEmpty(); // No active tags
         }
     }
@@ -553,8 +554,8 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
             Pageable firstPage = PageRequest.of(0, 10);
             Pageable secondPage = PageRequest.of(1, 10);
 
-            Page<Tag> firstPageResults = tagRepository.findMostUsedTags(firstPage);
-            Page<Tag> secondPageResults = tagRepository.findMostUsedTags(secondPage);
+            Page<Tag> firstPageResults = tagRepository.findMostPopular(firstPage);
+            Page<Tag> secondPageResults = tagRepository.findMostPopular(secondPage);
 
             // Then
             assertThat(firstPageResults.getContent()).hasSize(10);
@@ -581,8 +582,8 @@ class TagRepositoryIntegrationTest extends BaseIntegrationTest {
 
             // When - Perform autocomplete searches
             long startTime = System.currentTimeMillis();
-            List<Tag> javaResults = tagRepository.findByNameStartingWithIgnoreCase("java");
-            List<Tag> pythonResults = tagRepository.findByNameStartingWithIgnoreCase("py");
+            List<Tag> javaResults = tagRepository.searchByName("java");
+            List<Tag> pythonResults = tagRepository.searchByName("py");
             long endTime = System.currentTimeMillis();
 
             // Then

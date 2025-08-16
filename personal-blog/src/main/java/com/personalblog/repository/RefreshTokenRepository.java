@@ -115,6 +115,15 @@ public interface RefreshTokenRepository extends BaseRepository<RefreshToken, Lon
     Page<RefreshToken> findValidTokensByUserId(@Param("userId") Long userId, Pageable pageable);
 
     /**
+     * Find active tokens by user ID ordered by last used date.
+     * 
+     * @param userId the user ID
+     * @return list of active tokens for the user ordered by last used date (most recent first)
+     */
+    @Query("SELECT rt FROM RefreshToken rt WHERE rt.user.id = :userId AND rt.deleted = false AND rt.revoked = false AND rt.expiryDate > CURRENT_TIMESTAMP AND (rt.blockedUntil IS NULL OR rt.blockedUntil < CURRENT_TIMESTAMP) ORDER BY rt.lastUsedAt DESC")
+    List<RefreshToken> findActiveTokensByUserId(@Param("userId") Long userId);
+
+    /**
      * Count tokens by user.
      * 
      * @param user the user
