@@ -61,7 +61,10 @@ local.properties
 # IDE - VS Code
 .vscode/
 *.code-workspace
-.trae
+.trae/
+.kiro/
+.claude/
+.idea/
 
 # IDE - NetBeans
 /nbproject/private/
