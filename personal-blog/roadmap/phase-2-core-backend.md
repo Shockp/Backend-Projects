@@ -96,15 +96,15 @@ Implement the core backend functionality including entities, repositories, servi
 
 ### 2. Repository Layer ⏳
 
-#### 2.1 Base Repository ⏳
-- [ ] Create `BaseRepository` interface with:
+#### 2.1 Base Repository ✅
+- [x] Create `BaseRepository` interface with:
   - Common query methods
   - Soft delete support
   - Pagination utilities
   - Specification support
 
-#### 2.2 User Repository ⏳
-- [ ] Implement `UserRepository` with:
+#### 2.2 User Repository ✅
+- [x] Implement `UserRepository` with:
   - Find by username/email
   - Find by role
   - Search users by name
@@ -112,8 +112,8 @@ Implement the core backend functionality including entities, repositories, servi
   - Custom queries for user statistics
   - Native queries for complex operations
 
-#### 2.3 BlogPost Repository ⏳
-- [ ] Implement `BlogPostRepository` with:
+#### 2.3 BlogPost Repository ✅
+- [x] Implement `BlogPostRepository` with:
   - Find published posts
   - Find by author
   - Find by category/tags
@@ -351,9 +351,10 @@ Implement the core backend functionality including entities, repositories, servi
 
 ## 🧪 Testing Tasks ⏳
 
-### 1. Unit Tests ⏳
+### 1. Unit Tests ✅
 - [x] Entity tests with validation
-- [ ] Repository tests with test data
+- [x] Repository tests with test data (BaseRepository, UserRepository, BlogPostRepository)
+- [x] Repository tests for remaining entities (Category, Tag, Comment, RefreshToken)
 - [ ] Service layer tests with mocking
 - [ ] DTO mapper tests
 - [ ] Validator tests
