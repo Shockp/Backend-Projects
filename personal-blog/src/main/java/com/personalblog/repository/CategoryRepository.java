@@ -1,6 +1,7 @@
 package com.personalblog.repository;
 
 import com.personalblog.entity.Category;
+import com.personalblog.repository.projection.CategoryWithCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -340,4 +341,126 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
             WHERE id IN (SELECT id FROM category_tree) AND deleted = false
             """, nativeQuery = true)
     int softDeleteCategoryAndChildren(@Param("categoryId") Long categoryId);
+
+    // ==================== Projection Methods ====================
+
+    /**
+     * Find all categories with post counts for navigation menus.
+     * Uses projection for optimized performance.
+     * 
+     * @return list of categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription " +
+           "ORDER BY c.displayOrder")
+    List<CategoryWithCount> findCategoriesWithCounts();
+
+    /**
+     * Find root categories with post counts.
+     * 
+     * @return list of root categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.parent IS NULL AND c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription " +
+           "ORDER BY c.displayOrder")
+    List<CategoryWithCount> findRootCategoriesWithCounts();
+
+    /**
+     * Find child categories with post counts by parent ID.
+     * 
+     * @param parentId the parent category ID
+     * @return list of child categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.parent.id = :parentId AND c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription " +
+           "ORDER BY c.displayOrder")
+    List<CategoryWithCount> findChildCategoriesWithCounts(@Param("parentId") Long parentId);
+
+    /**
+     * Find categories with post counts, paginated.
+     * 
+     * @param pageable pagination information
+     * @return page of categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription")
+    Page<CategoryWithCount> findCategoriesWithCounts(Pageable pageable);
+
+    /**
+     * Find popular categories with post counts ordered by published post count.
+     * 
+     * @param pageable pagination information
+     * @return page of popular categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription " +
+           "ORDER BY publishedPostCount DESC")
+    Page<CategoryWithCount> findPopularCategoriesWithCounts(Pageable pageable);
+
+    /**
+     * Search categories with post counts by name.
+     * 
+     * @param searchTerm the search term
+     * @param pageable pagination information
+     * @return page of matching categories with post count statistics
+     */
+    @Query("SELECT c.id as id, c.name as name, c.slug as slug, " +
+           "c.description as description, c.displayOrder as displayOrder, " +
+           "c.parent.id as parentId, c.parent.name as parentName, " +
+           "c.createdAt as createdAt, c.updatedAt as updatedAt, " +
+           "c.metaTitle as metaTitle, c.metaDescription as metaDescription, " +
+           "COUNT(bp) as totalPostCount, " +
+           "SUM(CASE WHEN bp.status = 'PUBLISHED' THEN 1 ELSE 0 END) as publishedPostCount " +
+           "FROM Category c LEFT JOIN c.blogPosts bp " +
+           "WHERE c.deleted = false AND (bp.deleted = false OR bp IS NULL) " +
+           "AND LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "GROUP BY c.id, c.name, c.slug, c.description, c.displayOrder, c.parent.id, c.parent.name, " +
+           "c.createdAt, c.updatedAt, c.metaTitle, c.metaDescription " +
+           "ORDER BY c.displayOrder")
+    Page<CategoryWithCount> searchCategoriesWithCounts(@Param("searchTerm") String searchTerm, Pageable pageable);
 }

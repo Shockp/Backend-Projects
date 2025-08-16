@@ -1,6 +1,7 @@
 package com.personalblog.repository;
 
 import com.personalblog.entity.Tag;
+import com.personalblog.repository.projection.TagCloudItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -357,4 +358,126 @@ public interface TagRepository extends BaseRepository<Tag, Long> {
     @Transactional
     @Query("UPDATE Tag t SET t.deleted = true WHERE t.usageCount = 0 AND t.deleted = false")
     int cleanupUnusedTags();
+
+    // ==================== Projection Methods ====================
+
+    /**
+     * Find tag cloud data with relative popularity calculations.
+     * Uses projection for optimized performance.
+     * 
+     * @param limit maximum number of tags to return
+     * @return list of tag cloud items with popularity metrics
+     */
+    @Query(value = "SELECT * FROM (" +
+           "SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usage_count as usageCount, t.color_code as colorCode, " +
+           "t.description as description, t.created_at as createdAt, t.updated_at as updatedAt, " +
+           "COUNT(bp.id) as actualPostCount, " +
+           "ROUND((CAST(t.usage_count AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usage_count) FROM tags t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM tags t LEFT JOIN blog_post_tags bpt ON t.id = bpt.tag_id " +
+           "LEFT JOIN blog_posts bp ON bp.id = bpt.blog_post_id " +
+           "WHERE t.deleted = false AND t.usage_count > 0 " +
+           "AND (bp.deleted = false AND bp.status = 'PUBLISHED' OR bp.id IS NULL) " +
+           "GROUP BY t.id ORDER BY t.usage_count DESC" +
+           ") LIMIT :limit", nativeQuery = true)
+    List<TagCloudItem> findTagCloudData(@Param("limit") int limit);
+
+    /**
+     * Find all tag cloud data without limit.
+     * 
+     * @return list of all tag cloud items with popularity metrics
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(t.usageCount AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usageCount) FROM Tag t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false AND t.usageCount > 0 " +
+           "AND (bp.deleted = false AND bp.status = 'PUBLISHED' OR bp IS NULL) " +
+           "GROUP BY t ORDER BY t.usageCount DESC")
+    List<TagCloudItem> findAllTagCloudData();
+
+    /**
+     * Find popular tags with minimum usage count.
+     * 
+     * @param minUsage minimum usage count
+     * @param pageable pagination information
+     * @return page of popular tag cloud items
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(t.usageCount AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usageCount) FROM Tag t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false AND t.usageCount >= :minUsage " +
+           "AND (bp.deleted = false AND bp.status = 'PUBLISHED' OR bp IS NULL) " +
+           "GROUP BY t ORDER BY t.usageCount DESC")
+    Page<TagCloudItem> findPopularTagCloudItems(@Param("minUsage") int minUsage, Pageable pageable);
+
+    /**
+     * Search tag cloud items by name.
+     * 
+     * @param searchTerm the search term
+     * @param pageable pagination information
+     * @return page of matching tag cloud items
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(t.usageCount AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usageCount) FROM Tag t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false AND (bp.deleted = false AND bp.status = 'PUBLISHED' OR bp IS NULL) " +
+           "AND LOWER(t.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "GROUP BY t ORDER BY t.usageCount DESC")
+    Page<TagCloudItem> searchTagCloudItems(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+    /**
+     * Find tag cloud items with discrepant usage counts.
+     * Used for data integrity checks.
+     * 
+     * @return list of tag cloud items where usage count doesn't match actual post count
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(t.usageCount AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(t2.usageCount) FROM Tag t2 WHERE t2.deleted = false)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false AND (bp.deleted = false AND bp.status = 'PUBLISHED' OR bp IS NULL) " +
+           "GROUP BY t " +
+           "HAVING t.usageCount != COUNT(bp) " +
+           "ORDER BY ABS(t.usageCount - COUNT(bp)) DESC")
+    List<TagCloudItem> findTagCloudItemsWithDiscrepantCounts();
+
+    /**
+     * Find trending tag cloud items based on recent usage.
+     * 
+     * @param since the date since when to calculate trends
+     * @param pageable pagination information
+     * @return page of trending tag cloud items
+     */
+    @Query("SELECT t.id as id, t.name as name, t.slug as slug, " +
+           "t.usageCount as usageCount, t.colorCode as colorCode, " +
+           "t.description as description, t.createdAt as createdAt, t.updatedAt as updatedAt, " +
+           "COUNT(bp) as actualPostCount, " +
+           "ROUND((CAST(COUNT(bp) AS DOUBLE) * 100.0 / " +
+           "(SELECT MAX(subcount.cnt) FROM " +
+           "(SELECT COUNT(bp2) as cnt FROM Tag t2 LEFT JOIN t2.blogPosts bp2 " +
+           "WHERE t2.deleted = false AND bp2.deleted = false AND bp2.status = 'PUBLISHED' " +
+           "AND bp2.publishedDate >= :since GROUP BY t2) subcount)), 2) as relativePopularity " +
+           "FROM Tag t LEFT JOIN t.blogPosts bp " +
+           "WHERE t.deleted = false AND bp.deleted = false AND bp.status = 'PUBLISHED' " +
+           "AND bp.publishedDate >= :since " +
+           "GROUP BY t " +
+           "HAVING COUNT(bp) > 0 " +
+           "ORDER BY COUNT(bp) DESC")
+    Page<TagCloudItem> findTrendingTagCloudItems(@Param("since") LocalDateTime since, Pageable pageable);
 }

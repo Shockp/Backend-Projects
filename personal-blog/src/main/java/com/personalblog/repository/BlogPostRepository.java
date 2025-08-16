@@ -1,6 +1,7 @@
 package com.personalblog.repository;
 
 import com.personalblog.entity.BlogPost;
+import com.personalblog.repository.projection.BlogPostSummary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -444,4 +445,123 @@ public interface BlogPostRepository extends BaseRepository<BlogPost, Long> {
     @Query("SELECT bp FROM BlogPost bp WHERE bp.readingTimeMinutes IS NULL " +
            "AND bp.deleted = false ORDER BY bp.updatedAt DESC")
     List<BlogPost> findPostsWithoutReadingTime();
+
+    // ==================== Projection Methods ====================
+
+    /**
+     * Find published blog post summaries for listing pages.
+     * Uses projection for optimized performance.
+     * 
+     * @param pageable pagination information (must not be null)
+     * @return page of blog post summaries
+     */
+    @Query("SELECT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c " +
+           "WHERE bp.status = 'PUBLISHED' AND bp.deleted = false " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> findPublishedPostSummaries(@NonNull Pageable pageable);
+
+    /**
+     * Find blog post summaries by category.
+     * 
+     * @param categorySlug the category slug (must not be null or blank)
+     * @param pageable pagination information (must not be null)
+     * @return page of blog post summaries in the category
+     */
+    @Query("SELECT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c " +
+           "WHERE c.slug = :categorySlug AND bp.status = 'PUBLISHED' AND bp.deleted = false " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> findPostSummariesByCategory(@Param("categorySlug") @NotBlank String categorySlug, 
+                                                     @NonNull Pageable pageable);
+
+    /**
+     * Find blog post summaries by tag.
+     * 
+     * @param tagSlug the tag slug (must not be null or blank)
+     * @param pageable pagination information (must not be null)
+     * @return page of blog post summaries with the tag
+     */
+    @Query("SELECT DISTINCT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c JOIN bp.tags t " +
+           "WHERE t.slug = :tagSlug AND bp.status = 'PUBLISHED' AND bp.deleted = false " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> findPostSummariesByTag(@Param("tagSlug") @NotBlank String tagSlug, 
+                                                @NonNull Pageable pageable);
+
+    /**
+     * Find blog post summaries by author.
+     * 
+     * @param authorUsername the author username (must not be null or blank)
+     * @param pageable pagination information (must not be null)
+     * @return page of blog post summaries by the author
+     */
+    @Query("SELECT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c " +
+           "WHERE a.username = :authorUsername AND bp.status = 'PUBLISHED' AND bp.deleted = false " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> findPostSummariesByAuthor(@Param("authorUsername") @NotBlank String authorUsername, 
+                                                   @NonNull Pageable pageable);
+
+    /**
+     * Search blog post summaries by title or content.
+     * 
+     * @param searchTerm the search term (must not be null or blank)
+     * @param pageable pagination information (must not be null)
+     * @return page of matching blog post summaries
+     */
+    @Query("SELECT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c " +
+           "WHERE bp.deleted = false AND bp.status = 'PUBLISHED' AND " +
+           "(LOWER(bp.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "bp.content LIKE CONCAT('%', :searchTerm, '%') OR " +
+           "LOWER(bp.excerpt) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> searchPostSummaries(@Param("searchTerm") @NotBlank String searchTerm, 
+                                             @NonNull Pageable pageable);
+
+    /**
+     * Find recent blog post summaries.
+     * 
+     * @param since the date since when to find posts (must not be null)
+     * @param pageable pagination information (must not be null)
+     * @return page of recent blog post summaries
+     */
+    @Query("SELECT bp.id as id, bp.title as title, bp.slug as slug, " +
+           "bp.status as status, bp.createdAt as createdAt, bp.publishedDate as publishedDate, " +
+           "bp.viewCount as viewCount, bp.readingTimeMinutes as readingTimeMinutes, " +
+           "bp.excerpt as excerpt, bp.featuredImageUrl as featuredImageUrl, " +
+           "a.username as authorUsername, a.username as authorDisplayName, " +
+           "c.name as categoryName, c.slug as categorySlug " +
+           "FROM BlogPost bp JOIN bp.author a JOIN bp.category c " +
+           "WHERE bp.status = 'PUBLISHED' AND bp.deleted = false " +
+           "AND bp.publishedDate >= :since " +
+           "ORDER BY bp.publishedDate DESC")
+    Page<BlogPostSummary> findRecentPostSummaries(@Param("since") @NotNull LocalDateTime since, 
+                                                 @NonNull Pageable pageable);
 }
